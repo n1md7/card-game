@@ -1,0 +1,157 @@
+body{
+	background-image: url('image/background.jpg');
+	background-size: cover;
+}
+
+.main{
+	position: relative;
+	margin: 70px auto;
+	height: 660px;
+	width: 1000px;
+	background-image: url('image/table.jpg');
+	background-size: cover;
+	border-radius: 25px;
+	-webkit-box-shadow: 4px 0px 30px 3px rgba(0,0,0,0.75);
+	-moz-box-shadow: 4px 0px 30px 3px rgba(0,0,0,0.75);
+	box-shadow: 4px 0px 30px 3px rgba(0,0,0,0.75);
+}
+
+.player-bar{
+    position: absolute;
+    width: 360px;
+    height: 190px;
+    bottom: -50px;
+    right: 300px;
+    border-radius: 15px;
+}
+
+.player-bar.pl-1{
+ 	bottom: -50px;
+    right: 310px;
+}
+
+.player-bar.pl-2{
+	transform: rotate(180deg);
+ 	top: -50px;
+    right: 310px;
+}
+
+.player-bar.pl-2 .player-info .player-name{
+	transform: rotate(180deg);
+}
+
+.player-bar.pl-3{
+	transform: rotate(90deg);
+    bottom: 208px;
+    right: 776px;
+}
+
+.player-bar.pl-4{
+ 	transform: rotate(-90deg);
+    bottom: 208px;
+    right: -135px;
+}
+
+.cards{
+	position: relative;
+	width: 100%;
+	height: 140px;
+	border-top-left-radius: 15px;
+	border-top-right-radius: 15px;
+	display: flex;
+	justify-content: center;
+}
+
+.player-info{
+	position: relative;
+	background-color: black;
+	width: 100%;
+	height: 50px;
+	border-bottom-left-radius: 15px;
+	border-bottom-right-radius: 15px;
+	border-top: 1px white solid;
+}
+
+.player-name{
+	position: relative;
+    margin: 4px auto;
+    display: flex;
+    justify-content: center;
+    color: white;
+	line-height: 38px;
+}
+
+.player-name::before {
+    position: relative;
+    content: "";
+    width: 38px;
+    height: 38px;
+    background-image: url('image/icon-player.png');
+    background-size: 330%;
+    left: -11px;
+}
+
+.pl-icon-1::before{
+	background-position: 0px 0px;
+}
+
+.pl-icon-2::before{
+	background-position: -44px 0px;
+}
+
+.pl-icon-3::before{
+	background-position: 0px -43px;
+}
+
+.pl-icon-4::before{
+	background-position: -43px -43px;
+}
+
+.card-pl{
+	margin-left: 4px;
+    margin-top: 4px;
+    position: relative;
+    border-radius: 5px;
+    width: 82px;
+    height: 135px;
+    background-color: white;
+    right: 2px;
+    cursor: pointer;
+}
+
+.card-pl:hover{
+	opacity: 0.9;
+}
+
+.board-cards{
+	position: absolute;
+    width: 670px;
+    height: 360px;
+    top: 150px;
+    left: 165px;
+    background-color: white;
+}
+
+.card-pl.table-1{
+	position: absolute;
+	background-color: black;
+	transform: rotate(33deg);
+	top: 99px;
+    left: 331px;
+}
+
+.card-pl.table-2{
+	position: absolute;
+	background-color: black;
+    transform: rotate(22deg);
+    top: 50px;
+    left: 244px;
+}
+
+.card-pl.table-3{
+	position: absolute;
+	background-color: black;
+	transform: rotate(15deg);
+    top: 99px;
+    left: 403px;
+}
