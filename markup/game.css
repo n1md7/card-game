@@ -129,10 +129,24 @@ body{
     height: 360px;
     top: 150px;
     left: 165px;
-    background-color: white;
 }
 
-.card-pl.table-1{
+.desc-cards{
+    position: absolute;
+    width: 82px;
+    height: 135px;
+    top: 40px;
+    left: 109px;
+    transform: rotate(-51deg);
+    background-color: red;
+    line-height: 113px;
+    font-size: 43px;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+}
+
+/*.card-pl.table-1{
 	position: absolute;
 	background-color: black;
 	transform: rotate(33deg);
@@ -154,4 +168,16 @@ body{
 	transform: rotate(15deg);
     top: 99px;
     left: 403px;
+}*/
+
+.tb-card{
+	background-color: black;
+	position: absolute;
+}
+
+/*for test*/
+
+.card-pl, .desc-cards, .tb-card{
+	background-image: url('image/cardbg.jpg');
+	background-size: cover;
 }
