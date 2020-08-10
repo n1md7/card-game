@@ -113,10 +113,13 @@ body{
     position: relative;
     border-radius: 5px;
     width: 82px;
-    height: 135px;
-    background-color: white;
+    height: 121px;
+    /*background-color: white;*/
     right: 2px;
     cursor: pointer;
+    background-image: url(image/cards.png);
+    background-size: 1358%;
+    background-position: -7px -5px;
 }
 
 .card-pl:hover{
@@ -134,16 +137,16 @@ body{
 .desc-cards{
     position: absolute;
     width: 82px;
-    height: 135px;
+    height: 121px;
     top: 40px;
     left: 109px;
     transform: rotate(-51deg);
-    background-color: red;
     line-height: 113px;
     font-size: 43px;
-    color: white;
+    /*color: black;*/
     text-align: center;
     border-radius: 5px;
+    background-position: -347px -502px;
 }
 
 /*.card-pl.table-1{
@@ -171,13 +174,225 @@ body{
 }*/
 
 .tb-card{
-	background-color: black;
+	/*background-color: black;*/
 	position: absolute;
 }
 
 /*for test*/
 
-.card-pl, .desc-cards, .tb-card{
+/*.card-pl, .desc-cards, .tb-card{
 	background-image: url('image/cardbg.jpg');
 	background-size: cover;
+}*/
+
+.ClubsAce{
+	background-position: -7px -5px;
+}
+
+.DiamondsAce{
+	background-position: -7px -129px;
+}
+
+.HeartsAce{
+	background-position: -7px -253px;
+}
+
+.SpadesAce{
+	background-position: -7px -377px;
+}
+
+.Clubs_2{
+	background-position: -90px -5px;
+}
+
+.Diamonds_2{
+	background-position: -90px -129px;
+}
+
+.Hearts_2{
+	background-position: -90px -253px;
+}
+
+.Spades_2{
+	background-position: -90px -377px;
+}
+
+.Clubs_3{
+	background-position: -175px -5px;
+}
+
+.Diamonds_3{
+	background-position: -175px -129px;
+}
+
+.Hearts_3{
+	background-position: -175px -253px;
+}
+
+.Spades_3{
+	background-position: -175px -377px;
+}
+
+.Clubs_4{
+	background-position: -260px -5px;
+}
+
+.Diamonds_4{
+	background-position: -260px -129px;
+}
+
+.Hearts_4{
+	background-position: -260px -253px;
+}
+
+.Spades_4{
+	background-position: -260px -377px;
+}
+
+.Clubs_5{
+	background-position: -345px -5px;
+}
+
+.Diamonds_5{
+	background-position: -345px -129px;
+}
+
+.Hearts_5{
+	background-position: -345px -253px;
+}
+
+.Spades_5{
+	background-position: -345px -377px;
+}
+
+.Clubs_6{
+	background-position: -430px -5px;
+}
+
+.Diamonds_6{
+	background-position: -430px -129px;
+}
+
+.Hearts_6{
+	background-position: -430px -253px;
+}
+
+.Spades_6{
+	background-position: -430px -377px;
+}
+
+.Clubs_7{
+	background-position: -515px -5px;
+}
+
+.Diamonds_7{
+	background-position: -515px -129px;
+}
+
+.Hearts_7{
+	background-position: -515px -253px;
+}
+
+.Spades_7{
+	background-position: -515px -377px;
+}
+
+.Clubs_8{
+	background-position: -600px -5px;
+}
+
+.Diamonds_8{
+	background-position: -600px -129px;
+}
+
+.Hearts_8{
+	background-position: -600px -253px;
+}
+
+.Spades_8{
+	background-position: -600px -377px;
+}
+
+.Clubs_9{
+	background-position: -685px -5px;
+}
+
+.Diamonds_9{
+	background-position: -685px -129px;
+}
+
+.Hearts_9{
+	background-position: -685px -253px;
+}
+
+.Spades_9{
+	background-position: -685px -377px;
+}
+
+.Clubs_10{
+	background-position: -770px -5px;
+}
+
+.Diamonds_10{
+	background-position: -770px -129px;
+}
+
+.Hearts_10{
+	background-position: -770px -253px;
+}
+
+.Spades_10{
+	background-position: -770px -377px;
+}
+
+.ClubsJack{
+	background-position: -855px -5px;
+}
+
+.DiamondsJack{
+	background-position: -855px -129px;
+}
+
+.HeartsJack{
+	background-position: -855px -253px;
+}
+
+.SpadesJack{
+	background-position: -855px -377px;
+}
+
+.ClubsQueen{
+	background-position: -940px -5px;
+}
+
+.DiamondsQueen{
+	background-position: -940px -129px;
+}
+
+.HeartsQueen{
+	background-position: -940px -253px;
+}
+
+.SpadesQueen{
+	background-position: -940px -377px;
+}
+
+.ClubsKing{
+	background-position: -1025px -5px;
+}
+
+.DiamondsKing{
+	background-position: -1025px -129px;
+}
+
+.HeartsKing{
+	background-position: -1025px -253px;
+}
+
+.SpadesKing{
+	background-position: -1025px -377px;
+}
+
+.CardBack{
+	background-position: -347px -502px;
 }
