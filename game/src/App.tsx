@@ -1,25 +1,25 @@
 import React from 'react';
-import logo from './img/logo.svg';
-import './css/App.css';
+import Grid from './components/Grid'
+import './css/app.css';
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+
+const testData = {
+  grid: [
+    {id: 111, players: 2},
+    {id: 211, players: 2},
+    {id: 3222, players: 2}
+  ]
+}
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <>
+        <Header/>
+        <Grid data={testData.grid}/>
+        <Footer/>
+      </>
   );
 }
 

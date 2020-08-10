@@ -1,0 +1,15 @@
+.gird {
+    width: 500px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.grid-cell {
+    width: 80%;
+    display: flex;
+    flex: 1 1 150px;
+}
+
+.grid-cell-column {
+    flex: 1 1 150px;
+}
