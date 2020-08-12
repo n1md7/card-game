@@ -5,7 +5,7 @@ import socketIO from "socket.io";
 import dotenv from "dotenv";
 import serve from "koa-static";
 import path from "path";
-import {SocketCallback} from "./types";
+import {SetupGame} from "./socket/setup/setup";
 // initialize configuration
 dotenv.config();
 
@@ -18,7 +18,13 @@ const router = new Router();
 
 const httpServer = http.createServer(app.callback());
 // Pass a http.Server instance to the listen method
-const io = socketIO.listen(httpServer);
+const io = socketIO(httpServer, {
+    cookie: true
+});
+
+// Create game setup instance
+const setup = new SetupGame();
+
 
 app.use(router.routes())
     .use(router.allowedMethods())
@@ -34,21 +40,26 @@ app.use(router.routes())
 app.use(serve(path.join(__dirname, '../public')));
 
 // To check server status
-router.get('/status-check', ctx => ctx.body = {
-    status: "up"
+router.get('/status-check', ctx => {
+    ctx.body = {
+        status: "up"
+    }
 });
 
 io.on('connection', function (socket: any) {
-    console.log("Connected successfully to the socket ...");
-    socket.on('create', function (message: any) {
-        console.log(message);
-    });
-    socket.on('join', function (message: any) {
-        console.log(message);
-    });
+    console.log("A user is connected successfully to the socket ...");
+    console.log('Current socket ID: ', socket.id)
+    // pass the socket reference
+    setup.socket = socket;
+    socket.on('do:create-room', () => setup.createRoom());
+    socket.on('do:join-room', (roomId: string) => setup.joinRoom(roomId));
+    // socket.join('mothersucker');
+    socket.on('do:get-rooms-list', () => setup.showRooms());
+    socket.on('disconnect', () => setup.disconnect())
 });
 
 // start the server
 httpServer.listen(httpPort, () => {
     console.log(`server started at http://localhost:${httpPort}`);
 });
+

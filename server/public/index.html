@@ -8,10 +8,17 @@
 <body>
 <div>hello</div>
 <script>
-    const socket = io("http://localhost:8080");
-    socket.emit('create', 'dude create table')
+    const socket = io("http://localhost:81");
+    socket.emit('do:create-room');
+    socket.emit('do:get-rooms-list');
+    // socket.emit('create', 'dude create table');
+    // socket.emit('get rooms', 'dude gimme fuckin rooms')
+
     // listen for new messages
-    socket.on("message", function(data) {
+    // socket.on("message", function(data) {
+    //     console.log(data);
+    // });
+    socket.on("client:get-rooms-list", function(data) {
         console.log(data);
     });
     // our sendMsg function...
