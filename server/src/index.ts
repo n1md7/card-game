@@ -25,7 +25,6 @@ const io = socketIO(httpServer, {
 // Create game setup instance
 const setup = new SetupGame();
 
-
 app.use(router.routes())
     .use(router.allowedMethods())
     .use(async (ctx, next) => {
@@ -51,8 +50,9 @@ io.on('connection', function (socket: any) {
     console.log('Current socket ID: ', socket.id)
     // pass the socket reference
     setup.socket = socket;
-    socket.on('do:create-room', () => setup.createRoom());
-    socket.on('do:join-room', (roomId: string) => setup.joinRoom(roomId));
+    setup.io = io;
+    socket.on('do:create-room', (name:string) => setup.createRoom(name));
+    socket.on('do:join-room', (roomId: string, name: string) => setup.joinRoom(roomId, name));
     // socket.join('mothersucker');
     socket.on('do:get-rooms-list', () => setup.showRooms());
     socket.on('disconnect', () => setup.disconnect())

@@ -11,14 +11,16 @@ type IsPublicProps = true | false;
 
 type RoomsProps = {
     [roomId: string]: {
+        name: string;
         users: UsersProps;
         size: RoomSizeProps;
-        public: IsPublicProps;
+        isPublic: IsPublicProps;
     }
 };
 
 export class SetupGame {
     public socket: any;
+    public io: any;
     private rooms: RoomsProps;
     private users: {
         [id: string]: {
@@ -30,7 +32,7 @@ export class SetupGame {
         this.rooms = {};
     }
 
-    createRoom() {
+    createRoom(name: string) {
         console.log('create room', this.socket?.id)
         const roomId = `roomId{${uuidv4()}}`;
         // Register new room and join
@@ -40,13 +42,14 @@ export class SetupGame {
             ...this.rooms,
             ...{
                 [roomId]: {
+                    name,
                     users: {
                         [this.socket.id]: {
-                            name: this.socket.id
+                            name
                         }
                     },
                     size: 3,
-                    public: true
+                    isPublic: true
                 }
             }
         };
@@ -59,10 +62,57 @@ export class SetupGame {
                 }
             }
         };
+
+        // emit rooms to the users except the creator
+        // this.socket.broadcast.emit('client:get-rooms-list', {
+        //     socketRooms: this.socket.rooms,
+        //     gameRooms: this.rooms
+        // });
+
+        // Emit to all including creator
+        // FIXME For testing only
+        this.io.emit('client:get-rooms-list', {
+            socketRooms: this.socket.rooms,
+            gameRooms: this.rooms
+        });
     }
 
-    joinRoom(roomId: string) {
+    joinRoom(roomId: string, name:string) {
         this.socket.join(roomId);
+        // Append to rooms object new user
+        if(this.rooms[roomId]){
+            this.rooms[roomId].users = {
+                ...this.rooms[roomId].users,
+                ...{
+                    [this.socket.id]: {
+                        name
+                    }
+                }
+            }
+        }
+
+        // Record new User
+        this.users = {
+            ...this.users,
+            ...{
+                [this.socket.id]: {
+                    room: roomId
+                }
+            }
+        };
+
+        // emit rooms for the rest users except the creator
+        // this.socket.broadcast.emit('client:get-rooms-list', {
+        //     socketRooms: this.socket.rooms,
+        //     gameRooms: this.rooms
+        // });
+
+        // Emit to all including creator
+        // FIXME For testing only
+        this.io.emit('client:get-rooms-list', {
+            socketRooms: this.socket.rooms,
+            gameRooms: this.rooms
+        });
     }
 
     showRooms() {
@@ -78,9 +128,20 @@ export class SetupGame {
         // find room from where user has been disconnected
         const {room} = this.users[userId];
         // remove the user from rooms list
-        delete this.rooms[room].users[userId];
+        if (this.rooms[room]?.users[userId]) {
+            delete this.rooms[room].users[userId];
+        }
         // remove from the users
-        delete this.users[userId];
+        if (this.users[userId]) {
+            delete this.users[userId];
+        }
+
+        // emit rooms for the rest users except the creator
+        this.socket.broadcast.emit('client:get-rooms-list', {
+            socketRooms: this.socket.rooms,
+            gameRooms: this.rooms
+        });
+
         console.log('users');
         console.dir(this.users);
         console.log('rooms');
