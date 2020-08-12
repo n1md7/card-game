@@ -5,6 +5,7 @@ import socketIO from "socket.io";
 import dotenv from "dotenv";
 import serve from "koa-static";
 import path from "path";
+import Cors from '@koa/cors'
 import {SocketCallback} from "./types";
 // initialize configuration
 dotenv.config();
@@ -15,6 +16,7 @@ const httpPort = process.env.SERVER_PORT_HTTP;
 
 const app = new Koa();
 const router = new Router();
+app.use(Cors());
 
 const httpServer = http.createServer(app.callback());
 // Pass a http.Server instance to the listen method

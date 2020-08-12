@@ -19,7 +19,7 @@ function App() {
   return (
       <>
         <Header/>
-        <CreateGame createGameUrl={'https://google.com'}/>
+        <CreateGame createGameUrl={'http://localhost:8080/status-check'}/>
         <Grid data={testData.grid} filters={Object.fromEntries(Object.keys(testData.grid[0]).map(a => [a, '']))}/>
         <Footer/>
       </>

@@ -19,6 +19,7 @@ const socket_io_1 = __importDefault(require("socket.io"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const koa_static_1 = __importDefault(require("koa-static"));
 const path_1 = __importDefault(require("path"));
+const cors_1 = __importDefault(require("@koa/cors"));
 // initialize configuration
 dotenv_1.default.config();
 // port is now available to the Node.js runtime
@@ -26,6 +27,7 @@ dotenv_1.default.config();
 const httpPort = process.env.SERVER_PORT_HTTP;
 const app = new koa_1.default();
 const router = new koa_router_1.default();
+app.use(cors_1.default());
 const httpServer = http_1.default.createServer(app.callback());
 // Pass a http.Server instance to the listen method
 const io = socket_io_1.default.listen(httpServer);
