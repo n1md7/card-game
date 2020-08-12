@@ -1,15 +1,23 @@
-.gird {
-    width: 500px;
-    display: flex;
-    flex-wrap: wrap;
-}
 
-.grid-cell {
+
+.grid {
     width: 80%;
     display: flex;
-    flex: 1 1 150px;
+    flex-direction: column;
 }
 
-.grid-cell-column {
-    flex: 1 1 150px;
+.grid-cell, .grid-filter {
+    flex: 0 1 auto;
+    display: flex;
+    justify-content: flex-start;
 }
+
+.grid-cell-column, .filter-column {
+    width: 50%;
+    flex: 0 0 auto;
+}
+
+.filter-column > input {
+    width: 90%;
+}
+

@@ -3,6 +3,7 @@ import Grid from './components/Grid'
 import './css/app.css';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import CreateGame from "./components/CreateGame";
 
 const testData = {
   grid: [
@@ -18,6 +19,7 @@ function App() {
   return (
       <>
         <Header/>
+        <CreateGame createGameUrl={'https://google.com'}/>
         <Grid data={testData.grid} filters={Object.fromEntries(Object.keys(testData.grid[0]).map(a => [a, '']))}/>
         <Footer/>
       </>
