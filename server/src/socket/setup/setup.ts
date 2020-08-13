@@ -24,20 +24,62 @@ type CreateRoomProps = {
     isPublic: boolean;
 };
 
-export class SetupGame {
+abstract class BaseSetup {
     public socket: any;
     public io: any;
-    private rooms: RoomsProps;
-    private users: Map<string, { room: string }> = new Map();
+    protected rooms: RoomsProps;
+    protected users: Map<string, {
+        room?: string;
+        name?: string;
+    }> = new Map();
+
+    protected constructor() {
+        this.rooms = {};
+    }
+
+    protected findUserByRoomId(id: string): string | null {
+        for (const [key, {room}] of this.users) {
+            if (room === id) {
+                return key;
+            }
+        }
+
+        return null;
+    }
+}
+
+export class SetupGame extends BaseSetup {
 
     constructor() {
-        this.rooms = {};
+        super();
+    }
+
+    public authOrRegisterUser({id, name}: {
+        id: string | null;
+        name: string
+    }) {
+        // Register just user id with an empty body for now
+        // We will update it later
+        if (id) {
+            if (!this.users.has(id)) {
+                this.users.set(id, {
+                    name
+                });
+            }
+        } else {
+            id = `U-${uuidv4().substring(0, 5)}`;
+            this.users.set(id, {
+                name
+            });
+        }
+
+        // send echo to the client
+        this.socket.emit('client:sign-in', id);
     }
 
     public createRoom({name, size, isPublic}: CreateRoomProps) {
         this.disconnectUserFromPreviousRoom();
-        console.log('create room', this.socket?.id)
-        const roomId = `roomId{${uuidv4()}}`;
+        const roomId = `G-${uuidv4().substring(0, 5)}`;
         // Register new room and join
         this.socket.join(roomId);
         // Append to rooms object new room
@@ -118,18 +160,27 @@ export class SetupGame {
 
     private disconnectUserFromPreviousRoom() {
         const {id: userId} = this.socket;
-        console.log(`A user ${userId} disconnected`);
+        console.log(`v---------------------------------------------v`);
+        console.log(`A user ${userId} is about to be disconnected!`);
         // find room from where user has been disconnected
         if (this.users.has(userId)) {
 
             const {room: roomId} = this.users.get(userId);
             // remove the user from rooms list
-            if (this.rooms[roomId]?.users[userId]) {
-                delete this.rooms[roomId].users[userId];
+            if (this.rooms.hasOwnProperty(roomId)) {
+                if (this.rooms[roomId].users.hasOwnProperty(userId)) {
+                    console.log(userId, ' is about to remove!')
+                    console.dir(this.rooms[roomId].users)
+                    delete this.rooms[roomId].users[userId];
+                }
             }
+            console.log(userId, ' is about to remove!')
+            console.dir(this.users)
             // remove from the users
             this.users.delete(userId);
         }
+        console.log(`^----------------------------------------------^`);
+
     }
 
     public disconnect() {

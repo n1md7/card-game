@@ -7,6 +7,7 @@ import serve from "koa-static";
 import path from "path";
 import {SetupGame} from "./socket/setup/setup";
 import {RoomSizeProps} from "./types";
+import {v4 as uuidv4} from "uuid";
 // initialize configuration
 dotenv.config();
 
@@ -20,7 +21,7 @@ const router = new Router();
 const httpServer = http.createServer(app.callback());
 // Pass a http.Server instance to the listen method
 const io = socketIO(httpServer, {
-    cookie: true
+    cookie: 'mycooke'
 });
 
 // Create game setup instance
@@ -52,6 +53,10 @@ io.on('connection', function (socket: any) {
     // pass the socket reference
     setup.socket = socket;
     setup.io = io;
+    socket.on('do:sign-in', (data: {
+        id: string | null;
+        name: string;
+    }) => setup.authOrRegisterUser(data));
     socket.on('do:create-room', (data: {
         name: string;
         size: RoomSizeProps;

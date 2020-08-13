@@ -99,39 +99,49 @@
         $('#start').hide();
         const socket = io("http://localhost:81");
         const name = $('#name').val();
+        socket.emit('do:sign-in', {
+            id: localStorage.getItem('playerId'),
+            name
+        });
 
-        // get rooms list
-        socket.emit('do:get-rooms-list');
-        // show create new room section
-        $('#create-section').show();
+        // Wait player id and then continue
+        socket.on('client:sign-in', playerId => {
+            // Save player Id to storage
+            // when it exists just overwrite it
+            localStorage.setItem('playerId', playerId);
+            // get rooms list
+            socket.emit('do:get-rooms-list');
+            // show create new room section
+            $('#create-section').show();
 
-        $('#create').click(function () {
-            const size = $('#room-size').val();
-            const visibility = $('#room-visibility').val();
-            socket.emit('do:create-room', {
-                name,
-                size: +size,
-                isPublic: !!visibility
+            $('#create').click(function () {
+                const size = $('#room-size').val();
+                const visibility = $('#room-visibility').val();
+                socket.emit('do:create-room', {
+                    name,
+                    size: +size,
+                    isPublic: !!visibility
+                });
             });
-        });
 
-        $('body').on('click', '.join-room-btn', function () {
-            const {id} = this.dataset;
-            socket.emit('do:join-room', id, 'lambada');
-        });
+            $('body').on('click', '.join-room-btn', function () {
+                const {id} = this.dataset;
+                socket.emit('do:join-room', id, name);
+            });
 
-        socket.on("client:get-rooms-list", ({gameRooms}) => {
-            $('#join-section').show();
-            $('#rooms').html(
-                Object
-                    .entries(gameRooms)
-                    .reduce((html, [id, {
-                        isPublic,
-                        size,
-                        users,
-                        creator
-                    }]) => {
-                        return html + `
+            socket.on("client:get-rooms-list", ({gameRooms}) => {
+                console.log('GameRooms', gameRooms);
+                $('#join-section').show();
+                $('#rooms').html(
+                    Object
+                        .entries(gameRooms)
+                        .reduce((html, [id, {
+                            isPublic,
+                            size,
+                            users,
+                            creator
+                        }]) => {
+                            return html + `
                         <tr>
                             <td>${id}</td>
                             <td>${creator}</td>
@@ -145,8 +155,9 @@
                             </td>
                         <td>
                     `;
-                    }, '')
-            );
+                        }, '')
+                );
+            });
         });
     });
     // socket.emit('create', 'dude create table');
