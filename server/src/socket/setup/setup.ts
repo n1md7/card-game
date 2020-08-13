@@ -1,4 +1,5 @@
 import {v4 as uuidv4} from "uuid";
+import {RoomSizeProps} from "../../types";
 
 type UsersProps = {
     [user: string]: {
@@ -6,33 +7,34 @@ type UsersProps = {
     }
 }
 
-type RoomSizeProps = 1 | 2 | 3 | 4;
 type IsPublicProps = true | false;
 
 type RoomsProps = {
     [roomId: string]: {
-        name: string;
+        creator: string;
         users: UsersProps;
         size: RoomSizeProps;
         isPublic: IsPublicProps;
     }
 };
 
+type CreateRoomProps = {
+    name: string;
+    size: RoomSizeProps;
+    isPublic: boolean;
+};
+
 export class SetupGame {
     public socket: any;
     public io: any;
     private rooms: RoomsProps;
-    private users: {
-        [id: string]: {
-            room: string
-        };
-    };
+    private users: Map<string, {room: string}> = new Map();
 
     constructor() {
         this.rooms = {};
     }
 
-    createRoom(name: string) {
+    createRoom({name, size, isPublic}: CreateRoomProps) {
         console.log('create room', this.socket?.id)
         const roomId = `roomId{${uuidv4()}}`;
         // Register new room and join
@@ -42,26 +44,21 @@ export class SetupGame {
             ...this.rooms,
             ...{
                 [roomId]: {
-                    name,
+                    creator: name,
                     users: {
                         [this.socket.id]: {
                             name
                         }
                     },
-                    size: 3,
-                    isPublic: true
+                    size,
+                    isPublic
                 }
             }
         };
         // Record new User and it's table
-        this.users = {
-            ...this.users,
-            ...{
-                [this.socket.id]: {
-                    room: roomId
-                }
-            }
-        };
+        this.users.set(this.socket.id, {
+            room: roomId
+        });
 
         // emit rooms to the users except the creator
         // this.socket.broadcast.emit('client:get-rooms-list', {
@@ -77,10 +74,10 @@ export class SetupGame {
         });
     }
 
-    joinRoom(roomId: string, name:string) {
+    joinRoom(roomId: string, name: string) {
         this.socket.join(roomId);
         // Append to rooms object new user
-        if(this.rooms[roomId]){
+        if (this.rooms[roomId]) {
             this.rooms[roomId].users = {
                 ...this.rooms[roomId].users,
                 ...{
@@ -126,14 +123,14 @@ export class SetupGame {
         const {id: userId} = this.socket;
         console.log(`A user ${userId} disconnected`);
         // find room from where user has been disconnected
-        const {room} = this.users[userId];
+        const {room: roomId} = this.users.get(userId);
         // remove the user from rooms list
-        if (this.rooms[room]?.users[userId]) {
-            delete this.rooms[room].users[userId];
+        if (this.rooms[roomId]?.users[userId]) {
+            delete this.rooms[roomId].users[userId];
         }
         // remove from the users
-        if (this.users[userId]) {
-            delete this.users[userId];
+        if (this.users.has(userId)) {
+            this.users.delete(userId);
         }
 
         // emit rooms for the rest users except the creator
