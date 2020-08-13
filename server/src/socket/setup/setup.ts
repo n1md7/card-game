@@ -28,13 +28,14 @@ export class SetupGame {
     public socket: any;
     public io: any;
     private rooms: RoomsProps;
-    private users: Map<string, {room: string}> = new Map();
+    private users: Map<string, { room: string }> = new Map();
 
     constructor() {
         this.rooms = {};
     }
 
-    createRoom({name, size, isPublic}: CreateRoomProps) {
+    public createRoom({name, size, isPublic}: CreateRoomProps) {
+        this.disconnectUserFromPreviousRoom();
         console.log('create room', this.socket?.id)
         const roomId = `roomId{${uuidv4()}}`;
         // Register new room and join
@@ -74,7 +75,8 @@ export class SetupGame {
         });
     }
 
-    joinRoom(roomId: string, name: string) {
+    public joinRoom(roomId: string, name: string) {
+        this.disconnectUserFromPreviousRoom();
         this.socket.join(roomId);
         // Append to rooms object new user
         if (this.rooms[roomId]) {
@@ -89,14 +91,9 @@ export class SetupGame {
         }
 
         // Record new User
-        this.users = {
-            ...this.users,
-            ...{
-                [this.socket.id]: {
-                    room: roomId
-                }
-            }
-        };
+        this.users.set(this.socket.id, {
+            room: roomId
+        });
 
         // emit rooms for the rest users except the creator
         // this.socket.broadcast.emit('client:get-rooms-list', {
@@ -112,27 +109,31 @@ export class SetupGame {
         });
     }
 
-    showRooms() {
+    public showRooms() {
         this.socket.emit('client:get-rooms-list', {
             socketRooms: this.socket.rooms,
             gameRooms: this.rooms
         });
     }
 
-    disconnect() {
+    private disconnectUserFromPreviousRoom() {
         const {id: userId} = this.socket;
         console.log(`A user ${userId} disconnected`);
         // find room from where user has been disconnected
-        const {room: roomId} = this.users.get(userId);
-        // remove the user from rooms list
-        if (this.rooms[roomId]?.users[userId]) {
-            delete this.rooms[roomId].users[userId];
-        }
-        // remove from the users
         if (this.users.has(userId)) {
+
+            const {room: roomId} = this.users.get(userId);
+            // remove the user from rooms list
+            if (this.rooms[roomId]?.users[userId]) {
+                delete this.rooms[roomId].users[userId];
+            }
+            // remove from the users
             this.users.delete(userId);
         }
+    }
 
+    public disconnect() {
+        this.disconnectUserFromPreviousRoom();
         // emit rooms for the rest users except the creator
         this.socket.broadcast.emit('client:get-rooms-list', {
             socketRooms: this.socket.rooms,

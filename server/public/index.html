@@ -96,6 +96,7 @@
 
 <script>
     $('#connect').click(function () {
+        $('#start').hide();
         const socket = io("http://localhost:81");
         const name = $('#name').val();
 

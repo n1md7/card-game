@@ -58,7 +58,6 @@ io.on('connection', function (socket: any) {
         isPublic: boolean;
     }) => setup.createRoom(data));
     socket.on('do:join-room', (roomId: string, name: string) => setup.joinRoom(roomId, name));
-    // socket.join('mothersucker');
     socket.on('do:get-rooms-list', () => setup.showRooms());
     socket.on('disconnect', () => setup.disconnect())
 });
