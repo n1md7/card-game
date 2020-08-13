@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import serve from "koa-static";
 import path from "path";
 import {SetupGame} from "./socket/setup/setup";
+import {RoomSizeProps} from "./types";
 // initialize configuration
 dotenv.config();
 
@@ -51,7 +52,11 @@ io.on('connection', function (socket: any) {
     // pass the socket reference
     setup.socket = socket;
     setup.io = io;
-    socket.on('do:create-room', (name:string) => setup.createRoom(name));
+    socket.on('do:create-room', (data: {
+        name: string;
+        size: RoomSizeProps;
+        isPublic: boolean;
+    }) => setup.createRoom(data));
     socket.on('do:join-room', (roomId: string, name: string) => setup.joinRoom(roomId, name));
     // socket.join('mothersucker');
     socket.on('do:get-rooms-list', () => setup.showRooms());
