@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+            integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+            integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+            crossorigin="anonymous"></script>
+
+    <style>
+        /*body{*/
+        /*    background: black;*/
+        /*    color: white;*/
+        /*}*/
+    </style>
+</head>
+<body>
+<div class="container my-5" id="start">
+    <h2 class="text-center my-4">Card Game</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-3 mb-md-0 mb-2">
+            <input
+                    autofocus="autofocus"
+                    autocomplete="off"
+                    placeholder="Your name..."
+                    type="text"
+                    class="form-control"
+                    id="name"
+            >
+        </div>
+        <div class="col-md-2">
+            <button id="connect" class="btn btn-primary w-100">Connect</button>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5" id="create-section" style="display: none;">
+    <h3 class="text-center my-4">Create Room</h3>
+    <div class="row justify-content-center">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="room-size">Room size</label>
+                <select id="room-size" class="form-control">
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="room-visibility">Room visibility</label>
+                <select id="room-visibility" class="form-control">
+                    <option value="1">Public</option>
+                    <option value="0">Private</option>
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <button id="create" class="btn btn-secondary">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-3" id="join-section" style="display: none;">
+    <h3 class="text-center my-4">Rooms</h3>
+    <div class="row justify-content-center">
+        <div class="col-12 text-center">
+            <table class="table table-sm table-hover">
+                <thead>
+                <tr>
+                    <td>ID</td>
+                    <td>Creator</td>
+                    <td>Players</td>
+                    <td>Action</td>
+                </tr>
+                </thead>
+                <tbody id="rooms">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#connect').click(function () {
+        $('#start').hide();
+        const socket = io("http://localhost:81");
+        const name = $('#name').val();
+        socket.emit('do:sign-in', {
+            id: localStorage.getItem('playerId'),
+            name
+        });
+
+        // Wait player id and then continue
+        socket.on('client:sign-in', playerId => {
+            // Save player Id to storage
+            // when it exists just overwrite it
+            localStorage.setItem('playerId', playerId);
+            // get rooms list
+            socket.emit('do:get-rooms-list');
+            // show create new room section
+            $('#create-section').show();
+
+            $('#create').click(function () {
+                const size = $('#room-size').val();
+                const visibility = $('#room-visibility').val();
+                socket.emit('do:create-room', {
+                    name,
+                    size: +size,
+                    isPublic: !!visibility
+                });
+            });
+
+            $('body').on('click', '.join-room-btn', function () {
+                const {id} = this.dataset;
+                socket.emit('do:join-room', id, name);
+            });
+
+            socket.on("client:get-rooms-list", ({gameRooms}) => {
+                console.log('GameRooms', gameRooms);
+                $('#join-section').show();
+                $('#rooms').html(
+                    Object
+                        .entries(gameRooms)
+                        .reduce((html, [id, {
+                            isPublic,
+                            size,
+                            users,
+                            creator
+                        }]) => {
+                            return html + `
+                        <tr>
+                            <td>${id}</td>
+                            <td>${creator}</td>
+                            <td>${Object.keys(users).length}/${size}</td>
+                            <td>
+                                <button
+                                    data-id="${id}"
+                                    class="join-room-btn btn btn-sm btn-outline-secondary">
+                                    Join
+                                </button>
+                            </td>
+                        <td>
+                    `;
+                        }, '')
+                );
+            });
+        });
+    });
+    // socket.emit('create', 'dude create table');
+    // socket.emit('get rooms', 'dude gimme fuckin rooms')
+
+    // listen for new messages
+    // socket.on("message", function(data) {
+    //     console.log(data);
+    // });
+
+    // our sendMsg function...
+</script>
+</body>
+</html>

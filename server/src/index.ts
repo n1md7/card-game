@@ -1,74 +1,101 @@
-import http from "http";
-import Koa from "koa";
-import Router from "koa-router";
-import socketIO from "socket.io";
-import dotenv from "dotenv";
-import serve from "koa-static";
-import path from "path";
-import {SetupGame} from "./socket/setup/setup";
-import {RoomSizeProps} from "./types";
+import {router} from "./httpServer";
 import {v4 as uuidv4} from "uuid";
-// initialize configuration
-dotenv.config();
 
-// port is now available to the Node.js runtime
-// as if it were an environment variable
-const httpPort = process.env.SERVER_PORT_HTTP;
+type PlayerProps = {
+    id?: string;
+    signUpTime?: number;
+    updateTime?: number;
+    name?: string;
+    roomId?: string;
+}
 
-const app = new Koa();
-const router = new Router();
+abstract class BaseSetup {
+    protected players: Map<string, PlayerProps> = new Map();
 
-const httpServer = http.createServer(app.callback());
-// Pass a http.Server instance to the listen method
-const io = socketIO(httpServer, {
-    cookie: 'mycooke'
-});
+    protected signIn(playerId: string): null | PlayerProps {
+        const player = this.players.get(playerId);
+        if (player) {
+            player.updateTime = new Date().valueOf();
+            this.players.set(playerId, player);
+            return player;
+        }
+        return null;
+    }
 
-// Create game setup instance
-const setup = new SetupGame();
+    protected signUp(name: string): PlayerProps {
+        const id = `P-${uuidv4().substring(0, 5)}`;
+        const player = {
+            id,
+            name,
+            updateTime: new Date().valueOf(),
+            signUpTime: new Date().valueOf()
+        };
+        // save player
+        this.players.set(id, player);
 
-app.use(router.routes())
-    .use(router.allowedMethods())
-    .use(async (ctx, next) => {
-        // custom middleware
-        ctx.cookies.set('test-cookie', 'test-value');
-        await next();
-    });
+        return player;
+    }
+}
 
-// make public all content inside ../public folder
-// mainly for testing(socket.io),
-// public files will be served from apache/nginx
-app.use(serve(path.join(__dirname, '../public')));
+class GameSetup extends BaseSetup {
+
+    public status(ctx: any) {
+        ctx.body = {
+            status: "up"
+        }
+    }
+
+    public authenticate(ctx: any) {
+        const id = ctx.params.id;
+        if (id) {
+            const player = this.signIn(id);
+            if (player) {
+                ctx.body = {
+                    player,
+                    ok: true
+                };
+            }
+
+            return;
+        }
+
+        ctx.body = {
+            ok: false,
+            msg: 'No such user'
+        };
+    }
+
+    public register(ctx: any) {
+        const name = ctx.params.name;
+        if (name) {
+            ctx.body = {
+                player: this.signUp(name),
+                ok: true
+            }
+
+            return;
+        }
+
+        ctx.body = {
+            ok: false,
+            msg: 'Name is empty'
+        };
+    }
+}
+
+const gameSetup = new GameSetup();
 
 // To check server status
-router.get('/status-check', ctx => {
+router.get('/status-check', () => gameSetup.status);
+router.get('/authenticate/:id', ctx => gameSetup.authenticate(ctx));
+router.get('/register/:name', ctx => gameSetup.register(ctx));
+
+
+router.get('/lol/:id?', ctx => {
+    console.dir(ctx.response.body);
+    console.dir(ctx.params);
+
     ctx.body = {
-        status: "up"
-    }
+        yo: 'got it'
+    };
 });
-
-io.on('connection', function (socket: any) {
-    console.log("A user is connected successfully to the socket ...");
-    console.log('Current socket ID: ', socket.id)
-    // pass the socket reference
-    setup.socket = socket;
-    setup.io = io;
-    socket.on('do:sign-in', (data: {
-        id: string | null;
-        name: string;
-    }) => setup.authOrRegisterUser(data));
-    socket.on('do:create-room', (data: {
-        name: string;
-        size: RoomSizeProps;
-        isPublic: boolean;
-    }) => setup.createRoom(data));
-    socket.on('do:join-room', (roomId: string, name: string) => setup.joinRoom(roomId, name));
-    socket.on('do:get-rooms-list', () => setup.showRooms());
-    socket.on('disconnect', () => setup.disconnect())
-});
-
-// start the server
-httpServer.listen(httpPort, () => {
-    console.log(`server started at http://localhost:${httpPort}`);
-});
-
