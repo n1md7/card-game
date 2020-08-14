@@ -21,39 +21,159 @@
 
 </head>
 <body>
+<div class="container my-5" id="start">
+    <h2 class="text-center my-4">Card Game</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-3 mb-md-0 mb-2">
+            <input
+                    autofocus="autofocus"
+                    autocomplete="off"
+                    placeholder="Your name..."
+                    type="text"
+                    class="form-control"
+                    id="name"
+            >
+        </div>
+        <div class="col-md-2">
+            <button id="connect" class="btn btn-primary w-100">Start</button>
+        </div>
+    </div>
+</div>
 
+<div class="container my-5" id="create-section" style="display: none;">
+    <h3 class="text-center my-4">Create Room</h3>
+    <div class="row justify-content-center">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="room-size">Room size</label>
+                <select id="room-size" class="form-control">
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="room-visibility">Room visibility</label>
+                <select id="room-visibility" class="form-control">
+                    <option value="1">Public</option>
+                    <option value="0">Private</option>
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <button id="create" class="btn btn-secondary">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-hasdad
+<div class="container my-3" id="join-section" style="display: none;">
+    <h3 class="text-center my-4">Rooms</h3>
+    <div class="row justify-content-center">
+        <div class="col-12 text-center">
+            <table class="table table-sm table-hover">
+                <thead>
+                <tr>
+                    <td>ID</td>
+                    <td>Creator</td>
+                    <td>Players</td>
+                    <td>Action</td>
+                </tr>
+                </thead>
+                <tbody id="rooms">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 <script>
-    let name = 'nimda';
-    let playerId = localStorage.getItem('player-id');
-    if (playerId) {
-        fetch(`http://localhost:81/authenticate/${playerId}`)
+    $('#connect').click(function () {
+        const name = $('#name').val();
+        fetch(`http://localhost:81/authenticate/${name}`)
             .then(response => {
                 if (response.ok) {
                     return response.json();
                 }
                 throw new Error(Response.statusText);
             })
-            .then(response => {
-                if (response.ok && response.player) {
-                    localStorage.setItem('player-id', response.player.id);
-                    playerId = response.player.id;
+            .then(({ok, player, msg}) => {
+                if (ok && player) {
+                    console.log(player);
+                    $('#create-section').show();
+                    $('#start').hide();
+
+                    updateRoomsList();
+
+                } else {
+                    console.log(msg);
                 }
             })
             .catch(console.error);
-    } else {
-        fetch(`http://localhost:81/register/${name}`)
+
+
+        $('#create').click(function () {
+            const size = $('#room-size').val();
+            const visibility = $('#room-visibility').val();
+            fetch(`http://localhost:81/create-room/${size}/${visibility}`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error(Response.statusText);
+                })
+                .then(({ok, roomId}) => {
+                    if (ok && roomId) {
+                        $('#create-section').show();
+                        $('#start').hide();
+                        console.log('Here is your roomId:', roomId);
+                    } else {
+                        console.log(' Something went wrong!')
+                    }
+                })
+                .catch(console.error);
+        });
+    });
+
+    function updateRoomsList() {
+        fetch(`http://localhost:81/rooms`)
             .then(response => {
                 if (response.ok) {
                     return response.json();
                 }
                 throw new Error(Response.statusText);
             })
-            .then(response => {
-                if (response.ok && response.player) {
-                    localStorage.setItem('player-id', response.player.id);
-                    playerId = response.player.id;
+            .then(({ok, rooms}) => {
+                if(rooms && ok){
+                    $('#join-section').show();
+                    $('#rooms').html(
+                        Object
+                            .entries(rooms)
+                            .reduce((html, [id, {
+                                isPublic,
+                                size,
+                                players,
+                                inRoomSize,
+                                creator:{name:creator}
+                            }]) => {
+                                return html + `
+                        <tr>
+                            <td>${id}</td>
+                            <td>${creator}</td>
+                            <td>${inRoomSize}/${size}</td>
+                            <td>
+                                <button
+                                    data-id="${id}"
+                                    class="join-room-btn btn btn-sm btn-outline-secondary">
+                                    Join
+                                </button>
+                            </td>
+                        <td>
+                    `;
+                            }, '')
+                    );
+
+                    // update every 3 seconds
+                    setTimeout(updateRoomsList, 3000);
                 }
             })
             .catch(console.error);

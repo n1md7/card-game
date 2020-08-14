@@ -24,7 +24,7 @@ app.use(router.routes())
     .use(bodyParser())
     .use(async (ctx, next) => {
         // custom middleware
-        ctx.cookies.set('test-cookie', 'test-value');
+        // ctx.cookies.set('test-cookie', 'test-value');
         await next();
     });
 
