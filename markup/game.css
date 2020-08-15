@@ -38,6 +38,8 @@ body{
 
 .player-bar.pl-2 .player-info .player-name{
 	transform: rotate(180deg);
+	position: relative;
+	left: -35px;
 }
 
 .player-bar.pl-3{
@@ -50,6 +52,23 @@ body{
  	transform: rotate(-90deg);
     bottom: 208px;
     right: -135px;
+}
+
+.pl-2 .loader{
+	transform: rotate(180deg);
+	width: 65px;
+}
+
+.pl-3 .loader{
+	transform: rotate(270deg);
+    width: 60px;
+    top: 4px;
+}
+
+.pl-4 .loader{
+    transform: rotate(90deg);
+    width: 60px;
+    top: -4px;
 }
 
 .cards{
@@ -73,12 +92,13 @@ body{
 }
 
 .player-name{
-	position: relative;
+	/*position: relative;*/
     margin: 4px auto;
     display: flex;
     justify-content: center;
     color: white;
 	line-height: 38px;
+	width: 130px;
 }
 
 .player-name::before {
@@ -89,6 +109,17 @@ body{
     background-image: url('image/icon-player.png');
     background-size: 330%;
     left: -11px;
+}
+
+.pl-info{
+	position: relative;
+	float: left;
+}
+
+.loader{
+	width: 115px;
+	height: 100%;
+	/*background-color: red;*/
 }
 
 .pl-icon-1::before{

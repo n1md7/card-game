@@ -4,17 +4,248 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+            integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+            integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+            crossorigin="anonymous"></script>
+
 </head>
 <body>
-<div>hello</div>
+<div class="container my-5" id="start">
+    <h2 class="text-center my-4">Card Game</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-3 mb-md-0 mb-2">
+            <input
+                    autofocus="autofocus"
+                    autocomplete="off"
+                    placeholder="Your name..."
+                    type="text"
+                    class="form-control"
+                    id="name"
+            >
+        </div>
+        <div class="col-md-2">
+            <button id="connect" class="btn btn-primary w-100">Start</button>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5" id="create-section" style="display: none;">
+    <h3 class="text-center my-4">Create Room</h3>
+    <div class="row justify-content-center">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="room-size">Room size</label>
+                <select id="room-size" class="form-control">
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="room-visibility">Room visibility</label>
+                <select id="room-visibility" class="form-control">
+                    <option value="1">Public</option>
+                    <option value="0">Private</option>
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <button id="create" class="btn btn-secondary">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-3" id="join-section" style="display: none;">
+    <h3 class="text-center my-4">Rooms</h3>
+    <div class="row justify-content-center">
+        <div class="col-12 text-center">
+            <table class="table table-sm table-hover">
+                <thead>
+                <tr>
+                    <td>ID</td>
+                    <td>Creator</td>
+                    <td>Players</td>
+                    <td>Action</td>
+                </tr>
+                </thead>
+                <tbody id="rooms">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="container my-3" id="play-area" style="display: none;">
+    <h3 class="text-center my-4">Playing room</h3>
+    <div class="row justify-content-center">
+        <div class="col-12 text-center">
+            <button class="btn btn-lg btn-danger">
+                Leave Room
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
-    const socket = io("http://localhost:8080");
-    socket.emit('create', 'dude create table')
-    // listen for new messages
-    socket.on("message", function(data) {
-        console.log(data);
+    $('#connect').click(function () {
+        const name = $('#name').val();
+        fetch(`http://localhost:81/authenticate/${name}`)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error(Response.statusText);
+            })
+            .then(({ok, user, msg}) => {
+                if (ok && user) {
+                    console.log(user);
+                    $('#create-section').show();
+                    $('#start').hide();
+
+                    updateRoomsList();
+
+                } else {
+                    console.log(msg);
+                }
+            })
+            .catch(console.error);
+
+
+        $('#create').click(function () {
+            const size = $('#room-size').val();
+            const visibility = $('#room-visibility').val();
+            fetch(`http://localhost:81/create-room/${size}/${visibility}`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error(Response.statusText);
+                })
+                .then(({ok, roomId, msg}) => {
+                    if (ok && roomId) {
+                        $('#create-section').show();
+                        $('#start').hide();
+                        console.log('Here is your roomId:', roomId);
+                        $('#play-area').show();
+                        $('#play-area')
+                            .find('button')
+                            .click(function () {
+                                fetch(`http://localhost:81/leave-room`)
+                                    .then(response => {
+                                        if (response.ok) {
+                                            return response.json();
+                                        }
+                                        throw new Error(Response.statusText);
+                                    })
+                                    .then(({ok, room, msg}) => {
+                                        $('#play-area').hide();
+                                    })
+                                    .catch(console.error);
+
+                            });
+                    } else {
+                        console.log(msg || 'Something went wrong!')
+                    }
+                })
+                .catch(console.error);
+        });
     });
-    // our sendMsg function...
+
+    function updateRoomsList() {
+        fetch(`http://localhost:81/show-rooms`)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error(Response.statusText);
+            })
+            .then(({ok, rooms}) => {
+                if (rooms && ok) {
+                    $('#join-section').show();
+                    $('#rooms').html(
+                        Object
+                            .entries(rooms)
+                            .reduce((html, [id, {
+                                isPublic,
+                                size,
+                                users,
+                                inRoomSize,
+                                creator: {name: creator}
+                            }]) => {
+                                return html + `
+                                    <tr>
+                                        <td>${id}</td>
+                                        <td>${creator}</td>
+                                        <td>${inRoomSize}/${size}</td>
+                                        <td>
+                                            <button
+                                                data-id="${id}"
+                                                class="join-room-btn btn btn-sm btn-outline-secondary">
+                                                Join
+                                            </button>
+                                        </td>
+                                    <td>
+                                `;
+                            }, '')
+                    );
+
+                    // update every 3 seconds
+                    setTimeout(updateRoomsList, 3000);
+                }
+            })
+            .catch(console.error);
+    }
+
+
+    $(document).on('click', '.join-room-btn', function () {
+        const {id} = this.dataset;
+        fetch(`http://localhost:81/join-room/${id}`)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error(Response.statusText);
+            })
+            .then(({ok, room, msg}) => {
+                if (room && ok) {
+                    console.log('yay u just joined', room);
+                    $('#play-area').show();
+                    $('#play-area')
+                        .find('button')
+                        .click(function () {
+                            fetch(`http://localhost:81/leave-room`)
+                                .then(response => {
+                                    if (response.ok) {
+                                        return response.json();
+                                    }
+                                    throw new Error(Response.statusText);
+                                })
+                                .then(({ok, room, msg}) => {
+                                    $('#play-area').hide();
+                                })
+                                .catch(console.error);
+
+                        })
+                } else {
+                    console.log(msg);
+                }
+            })
+            .catch(console.error);
+    });
+
+
 </script>
 </body>
 </html>
