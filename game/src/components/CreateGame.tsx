@@ -1,17 +1,20 @@
-import React from 'react';
-import Axios from 'axios'
+import React, {useState} from 'react';
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import Dropdown from "react-bootstrap/Dropdown";
-import InputGroup from "react-bootstrap/InputGroup";
-import FormControl from "react-bootstrap/FormControl";
 
 
 const CreateGame = (props: any) => {
 
-    const handleSelect = (event: any) => {
-        let {name, value} = event.target;
-        alert(name + " " + value);
+    const [options, setOptions] = useState({games: "1", players: "2"});
+
+    const handleGamesSelect = (event: any) => {
+        const val = event.target.value;
+        setOptions({...options, games: val});
+    }
+
+    const handlePlayersSelect = (event: any) => {
+        const val = event.target.value;
+        setOptions({...options, players: val});
     }
 
     return (
@@ -21,32 +24,25 @@ const CreateGame = (props: any) => {
             </Modal.Header>
 
             <Modal.Body>
-                <InputGroup className="mb-3">
-                    <InputGroup.Prepend>
-                        <InputGroup.Text id="inputGroup-sizing-default">Name</InputGroup.Text>
-                    </InputGroup.Prepend>
-                    <FormControl
-                        aria-label="Default"
-                        aria-describedby="inputGroup-sizing-default"
-                    />
-                </InputGroup>
 
-                <Dropdown>
-                    <Dropdown.Toggle variant="success" id="dropdown-basic">
-                        Number of players
-                    </Dropdown.Toggle>
+                <label>Games :</label>
+                <select className="form-control" name="games" onChange={handleGamesSelect}>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
 
-                    <Dropdown.Menu onSelect={handleSelect}>
-                        <Dropdown.Item>1</Dropdown.Item>
-                        <Dropdown.Item>2</Dropdown.Item>
-                        <Dropdown.Item>3</Dropdown.Item>
-                        <Dropdown.Item>4</Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
-                </Modal.Body>
+                <label>Players :</label>
+                <select className="form-control" name="players" onChange={handlePlayersSelect}>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </Modal.Body>
 
             <Modal.Footer>
-                <Button variant="primary" onClick={() => props.createGameHandler("giorgi", 1)}>Create</Button>
+                <Button variant="primary" onClick={() => props.createGameHandler(options)}>Create</Button>
             </Modal.Footer>
         </Modal.Dialog>
     )

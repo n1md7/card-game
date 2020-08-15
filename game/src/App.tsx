@@ -4,6 +4,8 @@ import './css/app.css';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import CreateGame from "./components/CreateGame";
+import Axios from 'axios'
+
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -18,11 +20,20 @@ const testData = {
 }
 
 const joinGameUrl = 'http://localhost:8080/join-game';
+const createGameUrl = 'http://localhost:8080/join-game';
 
 function App() {
 
-    const createGame = (name: string, players: number) => {
-        alert(name + " " + players);
+    const createGame = (options: any) => {
+        Axios
+            .post(createGameUrl, options)
+            .then((res) => {
+                console.log(res);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        console.log(options);
     }
 
     const joinGame = (gameId: string) => {
@@ -32,7 +43,7 @@ function App() {
     return (
       <>
         <Header/>
-        <CreateGame createGameHandler={(name: string, players: number) => {createGame(name, players)}}/>
+        <CreateGame createGameHandler={(options: any) => {createGame(options)}}/>
         <Grid data={testData.grid} joinGameHandler={(gameId: string) => {joinGame(gameId)}}/>
         <Footer/>
       </>
