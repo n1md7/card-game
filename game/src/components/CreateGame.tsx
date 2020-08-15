@@ -25,7 +25,7 @@ const CreateGame = (props: any) => {
 
             <Modal.Body>
 
-                <label>Games :</label>
+                <label>Games</label>
                 <select className="form-control" name="games" onChange={handleGamesSelect}>
                     <option value="1">1</option>
                     <option value="2">2</option>
@@ -33,7 +33,7 @@ const CreateGame = (props: any) => {
                     <option value="4">4</option>
                 </select>
 
-                <label>Players :</label>
+                <label>Players</label>
                 <select className="form-control" name="players" onChange={handlePlayersSelect}>
                     <option value="2">2</option>
                     <option value="3">3</option>
