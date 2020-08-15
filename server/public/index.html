@@ -121,13 +121,13 @@
                     }
                     throw new Error(Response.statusText);
                 })
-                .then(({ok, roomId}) => {
+                .then(({ok, roomId, msg}) => {
                     if (ok && roomId) {
                         $('#create-section').show();
                         $('#start').hide();
                         console.log('Here is your roomId:', roomId);
                     } else {
-                        console.log(' Something went wrong!')
+                        console.log(msg || 'Something went wrong!')
                     }
                 })
                 .catch(console.error);

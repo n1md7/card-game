@@ -56,12 +56,30 @@ class GameSetup {
         const userId = ctx.cookies.get(cookie.name);
         const {isPublic, size} = ctx.params;
 
-        this.action.createRoom({
-            userId,
-            roomId,
-            isPublic: !!isPublic,
-            size: +size
-        });
+        if(!isPublic || !size || !userId){
+            ctx.body = {
+                msg: 'required params are missing',
+                ok: false
+            }
+
+            return;
+        }
+
+        try {
+            this.action.createRoom({
+                userId,
+                roomId,
+                isPublic: !!isPublic,
+                size: +size
+            });
+        }catch ({message}) {
+            ctx.body = {
+                msg: message,
+                ok: false
+            }
+
+            return;
+        }
 
         ctx.body = {
             roomId,
@@ -79,6 +97,15 @@ class GameSetup {
     public joinRoom(ctx: any) {
         const {id} = ctx.params;
         const userId = ctx.cookies.get(cookie.name);
+        if(!id || !userId){
+            ctx.body = {
+                msg: 'required params are missing',
+                ok: false
+            }
+
+            return;
+        }
+
         const room = this.action.joinRoom({id, userId});
         if (!room) {
             ctx.body = {

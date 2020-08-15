@@ -25,8 +25,11 @@ class SetupAction {
         roomId: string;
         size: number;
         isPublic: boolean;
-    }): RoomProps {
+    }): RoomProps | Error {
         const creator = store.getUserById(userId);
+        if(!creator){
+            throw new Error(`no such user with the id:${userId}`);
+        }
         return store.setRoomById(roomId, {
             creator: {
                 id: creator.id,
