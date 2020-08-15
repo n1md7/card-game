@@ -11,17 +11,21 @@ import FormControl from "react-bootstrap/FormControl";
 
 
 
-function Login(props) {
+function Login({setAuth}) {
 
-    const [username, setUsername] = useState("");
-    const inputOnChange = (event) => {
-        const val = event.target.value;
-        setUsername(val);
+    const [name, setName] = useState("");
+    const inputOnChange = ({target: {value}}) => {
+        setName(value);
     }
 
     const onSubmit = () => {
-        Cookies.set("name", username);
-        props.onAuthorise(true);
+        if(!name.length){
+            alert('Enter fucking name');
+
+            return false;
+        }
+        Cookies.set("name", name);
+        setAuth(true);
     }
 
     return (
@@ -39,7 +43,7 @@ function Login(props) {
                         aria-label="Default"
                         aria-describedby="inputGroup-sizing-default"
                         onChange={inputOnChange}
-                        value={username}
+                        value={name}
                     />
                 </InputGroup>
             </Modal.Body>
