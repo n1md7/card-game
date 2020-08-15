@@ -19,9 +19,10 @@ const httpServer = http.createServer(app.callback());
 // if (process.env.NODE_ENV === 'development') app.use(cors());
 
 
-app.use(router.routes())
-    .use(router.allowedMethods())
+app
     .use(bodyParser())
+    .use(router.routes())
+    .use(router.allowedMethods())
     .use(async (ctx, next) => {
         // custom middleware
         // ctx.cookies.set('test-cookie', 'test-value');
