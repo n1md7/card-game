@@ -1,5 +1,5 @@
 import {v4 as uuidv4} from "uuid";
-import setupAction from "./action/setupAction";
+import setup from "../model/setup";
 import {store} from "../store";
 
 enum cookie {
@@ -7,8 +7,6 @@ enum cookie {
 }
 
 class GameSetup {
-    private action = setupAction;
-
     public status(ctx: any) {
         ctx.body = {
             status: "up"
@@ -29,7 +27,7 @@ class GameSetup {
         }
 
         if (id) {
-            const user = this.action.signIn(id, name);
+            const user = setup.signIn(id, name);
             if (user) {
                 // sign-in successful
                 ctx.body = {
@@ -45,7 +43,7 @@ class GameSetup {
         const newId = `U-${uuidv4().substring(0, 5)}`;
         ctx.cookies.set(cookie.name, newId);
         ctx.body = {
-            user: this.action.signUp(newId, name),
+            user: setup.signUp(newId, name),
             ok: true
         }
 
@@ -56,7 +54,7 @@ class GameSetup {
         const userId = ctx.cookies.get(cookie.name);
         const {isPublic, size} = ctx.params;
 
-        if(!isPublic || !size || !userId){
+        if (!isPublic || !size || !userId) {
             ctx.body = {
                 msg: 'required params are missing',
                 ok: false
@@ -66,13 +64,13 @@ class GameSetup {
         }
 
         try {
-            this.action.createRoom({
+            setup.createRoom({
                 userId,
                 roomId,
                 isPublic: !!isPublic,
                 size: +size
             });
-        }catch ({message}) {
+        } catch ({message}) {
             ctx.body = {
                 msg: message,
                 ok: false
@@ -97,20 +95,22 @@ class GameSetup {
     public joinRoom(ctx: any) {
         const {id} = ctx.params;
         const userId = ctx.cookies.get(cookie.name);
-        if(!id || !userId){
+        if (!id || !userId) {
             ctx.body = {
-                msg: 'required params are missing',
+                msg: 'required params [id or userId] are missing',
                 ok: false
             }
 
             return;
         }
 
-        const room = this.action.joinRoom({id, userId});
-        if (!room) {
+        let room = {};
+        try {
+            room = setup.joinRoom({id, userId});
+        } catch ({message}) {
             ctx.body = {
                 ok: false,
-                msg: 'could not join the room'
+                msg: message
             };
 
             return;
@@ -119,6 +119,34 @@ class GameSetup {
         ctx.body = {
             ok: true,
             room
+        };
+
+    }
+
+    public leaveRoom(ctx: any) {
+        const userId = ctx.cookies.get(cookie.name);
+        if (!userId) {
+            ctx.body = {
+                msg: 'required param [userId] is missing',
+                ok: false
+            }
+
+            return;
+        }
+
+        try {
+            setup.leaveRoom(userId);
+        }catch ({message}) {
+            ctx.body = {
+                ok: false,
+                msg: message
+            };
+
+            return;
+        }
+
+        ctx.body = {
+            ok: true
         };
 
     }

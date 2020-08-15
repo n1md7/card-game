@@ -86,6 +86,18 @@
         </div>
     </div>
 </div>
+
+<div class="container my-3" id="play-area" style="display: none;">
+    <h3 class="text-center my-4">Playing room</h3>
+    <div class="row justify-content-center">
+        <div class="col-12 text-center">
+            <button class="btn btn-lg btn-danger">
+                Leave Room
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
     $('#connect').click(function () {
         const name = $('#name').val();
@@ -126,6 +138,23 @@
                         $('#create-section').show();
                         $('#start').hide();
                         console.log('Here is your roomId:', roomId);
+                        $('#play-area').show();
+                        $('#play-area')
+                            .find('button')
+                            .click(function () {
+                                fetch(`http://localhost:81/leave-room`)
+                                    .then(response => {
+                                        if (response.ok) {
+                                            return response.json();
+                                        }
+                                        throw new Error(Response.statusText);
+                                    })
+                                    .then(({ok, room, msg}) => {
+                                        $('#play-area').hide();
+                                    })
+                                    .catch(console.error);
+
+                            });
                     } else {
                         console.log(msg || 'Something went wrong!')
                     }
@@ -192,7 +221,24 @@
             .then(({ok, room, msg}) => {
                 if (room && ok) {
                     console.log('yay u just joined', room);
-                } else{
+                    $('#play-area').show();
+                    $('#play-area')
+                        .find('button')
+                        .click(function () {
+                            fetch(`http://localhost:81/leave-room`)
+                                .then(response => {
+                                    if (response.ok) {
+                                        return response.json();
+                                    }
+                                    throw new Error(Response.statusText);
+                                })
+                                .then(({ok, room, msg}) => {
+                                    $('#play-area').hide();
+                                })
+                                .catch(console.error);
+
+                        })
+                } else {
                     console.log(msg);
                 }
             })

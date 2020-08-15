@@ -1,7 +1,7 @@
 type UserProps = {
     id?: string;
     name?: string;
-    roomId?: string;
+    roomId?: string | null;
     signUpTime?: number;
     updateTime?: number;
 }
