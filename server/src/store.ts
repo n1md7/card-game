@@ -7,15 +7,15 @@ type UserProps = {
 }
 
 type RoomProps = {
-    creator: {
+    creator?: {
         readonly id: string;
         readonly name: string;
     };
-    readonly name: string;
-    users: string[];
-    readonly size: number;
+    readonly name?: string;
+    users?: string[];
+    readonly size?: number;
     inRoomSize?: number;
-    readonly isPublic: boolean;
+    readonly isPublic?: boolean;
     readonly id?: string;
     readonly signUpTime?: number;
     updateTime?: number;
@@ -59,6 +59,7 @@ class Store {
         // it will create new record for that
         // except id and signUpTime and updateTime all can be updated
         return this.rooms[id] = {
+            ...this.rooms[id],
             ...room,
             id,
             updateTime: new Date().valueOf(),
@@ -71,6 +72,7 @@ class Store {
         // it will create new record for that
         // except id and signUpTime and updateTime all can be updated
         return this.users[id] = {
+            ...this.users[id],
             ...user,
             id,
             updateTime: new Date().valueOf(),

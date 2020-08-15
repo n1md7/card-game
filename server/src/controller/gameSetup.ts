@@ -1,17 +1,18 @@
 import {v4 as uuidv4} from "uuid";
-import BaseSetup from "./abstract/baseSetup";
+import setupAction from "./action/setupAction";
 import {store} from "../store";
 
 enum cookie {
     name = 'user-id'
 }
 
-class GameSetup extends BaseSetup {
+class GameSetup {
+    private action = setupAction;
 
     public status(ctx: any) {
         ctx.body = {
             status: "up"
-        }
+        };
     }
 
     public authenticate(ctx: any) {
@@ -28,7 +29,7 @@ class GameSetup extends BaseSetup {
         }
 
         if (id) {
-            const user = this.signIn(id, name);
+            const user = this.action.signIn(id, name);
             if (user) {
                 // sign-in successful
                 ctx.body = {
@@ -44,7 +45,7 @@ class GameSetup extends BaseSetup {
         const newId = `U-${uuidv4().substring(0, 5)}`;
         ctx.cookies.set(cookie.name, newId);
         ctx.body = {
-            user: this.signUp(newId, name),
+            user: this.action.signUp(newId, name),
             ok: true
         }
 
@@ -55,7 +56,7 @@ class GameSetup extends BaseSetup {
         const userId = ctx.cookies.get(cookie.name);
         const {isPublic, size} = ctx.params;
 
-        this.createRoom({
+        this.action.createRoom({
             userId,
             roomId,
             isPublic: !!isPublic,
@@ -73,6 +74,26 @@ class GameSetup extends BaseSetup {
             ok: true,
             rooms: store.getRoomsList()
         };
+    }
+
+    public joinRoom(ctx: any) {
+        const {id} = ctx.params;
+        const userId = ctx.cookies.get(cookie.name);
+        const room = this.action.joinRoom({id, userId});
+        if (!room) {
+            ctx.body = {
+                ok: false,
+                msg: 'could not join the room'
+            };
+
+            return;
+        }
+
+        ctx.body = {
+            ok: true,
+            room
+        };
+
     }
 }
 

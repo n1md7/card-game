@@ -135,7 +135,7 @@
     });
 
     function updateRoomsList() {
-        fetch(`http://localhost:81/rooms`)
+        fetch(`http://localhost:81/show-rooms`)
             .then(response => {
                 if (response.ok) {
                     return response.json();
@@ -178,6 +178,26 @@
             })
             .catch(console.error);
     }
+
+
+    $(document).on('click', '.join-room-btn', function () {
+        const {id} = this.dataset;
+        fetch(`http://localhost:81/join-room/${id}`)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error(Response.statusText);
+            })
+            .then(({ok, room, msg}) => {
+                if (room && ok) {
+                    console.log('yay u just joined', room);
+                } else{
+                    console.log(msg);
+                }
+            })
+            .catch(console.error);
+    });
 
 
 </script>

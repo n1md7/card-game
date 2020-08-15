@@ -1,8 +1,8 @@
 import {store, RoomProps, UserProps} from "../../store";
 
-abstract class BaseSetup {
+class SetupAction {
 
-    protected signIn(id: string, name: string | undefined): null | UserProps {
+    public signIn(id: string, name: string | undefined): null | UserProps {
         const user = store.getUserById(id);
         if (user) {
             return store.updateUserById(id, {
@@ -14,13 +14,13 @@ abstract class BaseSetup {
         return null;
     }
 
-    protected signUp(id: string, name: string): UserProps {
+    public signUp(id: string, name: string): UserProps {
         return store.setUserById(id, {
             name
         });
     }
 
-    protected createRoom({userId, roomId, size, isPublic}: {
+    public createRoom({userId, roomId, size, isPublic}: {
         userId: string;
         roomId: string;
         size: number;
@@ -39,12 +39,23 @@ abstract class BaseSetup {
         });
     }
 
-    protected joinRoom({id, userId}: {
+    public joinRoom({id, userId}: {
         id: string;
         userId: string;
-    }) {
+    }): RoomProps | boolean {
+        const room = store.getRoomById(id);
+        if (!room || 1 + room.inRoomSize > room.size) {
+            // cannot join the room
+            // because it is already full
+            // or does not exist such room
+            return false;
+        }
 
+        return store.updateRoomById(id, {
+            users: [...room.users, userId],
+            inRoomSize: 1 + room.inRoomSize
+        });
     }
 }
 
-export default BaseSetup;
+export default new SetupAction();
