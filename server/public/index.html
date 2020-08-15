@@ -96,9 +96,9 @@
                 }
                 throw new Error(Response.statusText);
             })
-            .then(({ok, player, msg}) => {
-                if (ok && player) {
-                    console.log(player);
+            .then(({ok, user, msg}) => {
+                if (ok && user) {
+                    console.log(user);
                     $('#create-section').show();
                     $('#start').hide();
 
@@ -143,7 +143,7 @@
                 throw new Error(Response.statusText);
             })
             .then(({ok, rooms}) => {
-                if(rooms && ok){
+                if (rooms && ok) {
                     $('#join-section').show();
                     $('#rooms').html(
                         Object
@@ -151,24 +151,24 @@
                             .reduce((html, [id, {
                                 isPublic,
                                 size,
-                                players,
+                                users,
                                 inRoomSize,
-                                creator:{name:creator}
+                                creator: {name: creator}
                             }]) => {
                                 return html + `
-                        <tr>
-                            <td>${id}</td>
-                            <td>${creator}</td>
-                            <td>${inRoomSize}/${size}</td>
-                            <td>
-                                <button
-                                    data-id="${id}"
-                                    class="join-room-btn btn btn-sm btn-outline-secondary">
-                                    Join
-                                </button>
-                            </td>
-                        <td>
-                    `;
+                                    <tr>
+                                        <td>${id}</td>
+                                        <td>${creator}</td>
+                                        <td>${inRoomSize}/${size}</td>
+                                        <td>
+                                            <button
+                                                data-id="${id}"
+                                                class="join-room-btn btn btn-sm btn-outline-secondary">
+                                                Join
+                                            </button>
+                                        </td>
+                                    <td>
+                                `;
                             }, '')
                     );
 

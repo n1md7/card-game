@@ -12,9 +12,17 @@
       "*": [
         "node_modules/*"
       ]
-    }
+    },
+    "lib": ["es2018", "dom", "esnext"],
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "src/**/*"
+  ],
+  "exclude": [
+    "typings/browser.d.ts",
+    "typings/browser",
+    "node_modules"
   ]
 }
