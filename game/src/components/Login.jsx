@@ -10,7 +10,6 @@ import Button from "react-bootstrap/Button";
 import FormControl from "react-bootstrap/FormControl";
 
 
-
 function Login({setAuth}) {
 
     const [name, setName] = useState("");
@@ -19,19 +18,23 @@ function Login({setAuth}) {
     }
 
     const onSubmit = () => {
-        if(!name.length){
-            alert('Enter fucking name');
-
-            return false;
-        }
-        Cookies.set("name", name);
-        setAuth(true);
+        Axios
+            .get(props.urls.base + props.urls.auth + name)
+            .then((res) => {
+                Cookies.set("user", res.data.user);
+                setAuth(true);
+                console.log(res.data.user);
+            })
+            .catch((err) => {
+                console.log(err);
+                setAuth(false);
+            });
     }
 
     return (
         <Modal.Dialog>
             <Modal.Header>
-                <Modal.Title>Create Game</Modal.Title>
+                <Modal.Title>Log in</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
