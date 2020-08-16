@@ -11,7 +11,7 @@ const Header = ({user, logOut}) => {
                         className='btn btn-outline-dark' >
                     <i>Logout </i>
                     <b>
-                        [{user}]
+                        {user}
                     </b>
                 </button>
             </div>

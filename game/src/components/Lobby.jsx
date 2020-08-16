@@ -7,6 +7,10 @@ import CreateGame from "./CreateGame";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './../css/app.css';
 
+
+import {urls} from "../constants/urls.js"
+
+
 const testData = {
     grid: [
         {id: 111, name: "ass", players: 2},
@@ -17,13 +21,11 @@ const testData = {
     ]
 }
 
-const joinGameUrl = 'http://localhost:8080/join-game';
-const createGameUrl = 'http://localhost:8080/join-game';
 
 function Lobby() {
     const createGame = (options) => {
         Axios
-            .post(createGameUrl, options)
+            .post(urls.create_room, options)
             .then((res) => {
                 console.log(res);
             })

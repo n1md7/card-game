@@ -15,7 +15,7 @@ class GameSetup {
 
     public authenticate(ctx: any) {
         const id = ctx.cookies.get(cookie.name);
-        const {name} = ctx.params;
+        const {name} = ctx.request.body;
         if (!name) {
 
             ctx.body = {
@@ -52,7 +52,7 @@ class GameSetup {
     public create(ctx: any) {
         const roomId = `R-${uuidv4().substring(0, 5)}`;
         const userId = ctx.cookies.get(cookie.name);
-        const {isPublic, size} = ctx.params;
+        const {isPublic, size} = ctx.request.body;
 
         if (!isPublic || !size || !userId) {
             ctx.body = {
@@ -93,7 +93,7 @@ class GameSetup {
     }
 
     public joinRoom(ctx: any) {
-        const {id} = ctx.params;
+        const {id} = ctx.request.body;
         const userId = ctx.cookies.get(cookie.name);
         if (!id || !userId) {
             ctx.body = {
@@ -150,6 +150,49 @@ class GameSetup {
         };
 
     }
+
+    public getUserInfo(ctx: any) {
+        const userId = ctx.cookies.get(cookie.name);
+        if (!userId) {
+            ctx.body = {
+                msg: 'required param [userId] is missing',
+                ok: false
+            }
+
+            return;
+        }
+        let user = {};
+        try {
+            user = setup.getUserInfo(userId);
+        }catch ({message}) {
+            ctx.body = {
+                ok: false,
+                msg: message
+            };
+
+            return;
+        }
+
+        ctx.body = {
+            user
+        };
+
+    }
+    public logOut(ctx: any) {
+        const userId = ctx.cookies.get(cookie.name);
+        if (!userId) {
+            ctx.body = {
+                msg: 'required param [userId] is missing',
+                ok: false
+            }
+            return;
+        }
+        ctx.cookies.set(cookie.name);
+        ctx.body = {
+            ok: true
+        };
+    }
+
 }
 
 export default new GameSetup();
