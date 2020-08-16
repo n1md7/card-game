@@ -12,8 +12,8 @@
     "dev:start": "npm-run-all build start",
     "dev": "nodemon --watch src -e ts,ejs --exec npm run dev:start",
     "start": "node .",
-    "test:os-linux": "NODE_ENV=test jest",
-    "test:os-windows": "set NODE_ENV=test && jest"
+    "test:os-linux": "NODE_ENV=test jest --coverage",
+    "test:os-windows": "set NODE_ENV=test && jest --coverage"
   },
   "keywords": [],
   "author": "",
