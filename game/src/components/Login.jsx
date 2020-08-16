@@ -10,7 +10,6 @@ import Button from "react-bootstrap/Button";
 import FormControl from "react-bootstrap/FormControl";
 
 
-
 function Login(props) {
 
     const [username, setUsername] = useState("");
@@ -20,14 +19,23 @@ function Login(props) {
     }
 
     const onSubmit = () => {
-        Cookies.set("name", username);
-        props.onAuthorise(true);
+        Axios
+            .get(props.urls.base + props.urls.auth + username)
+            .then((res) => {
+                Cookies.set("user", res.data.user);
+                props.onAuthorise(true);
+                console.log(res.data.user);
+            })
+            .catch((err) => {
+                console.log(err);
+                props.onAuthorise(false);
+            });
     }
 
     return (
         <Modal.Dialog>
             <Modal.Header>
-                <Modal.Title>Create Game</Modal.Title>
+                <Modal.Title>Log in</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>

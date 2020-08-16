@@ -7,7 +7,7 @@ import './../css/grid.css';
 const Grid = (props) => {
     return (
         <div className={'table-container'}>
-            <Table striped hover bordered={true} size="sm">
+            <Table striped hover bordered={false} size="sm">
                 <thead>
                 <tr>
                     <th>#</th>

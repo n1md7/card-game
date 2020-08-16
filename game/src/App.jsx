@@ -14,6 +14,17 @@ import Login from "./components/Login";
 import Lobby from "./components/Lobby";
 
 
+const base_url = "http://localhost:81/";
+
+const urls = {
+    auth: ```${base_url}authenticate/```,
+    status_check: ```${base_url}status-check/```,
+    create_room: ```${base_url}create-room/```,
+    show_rooms: ```${base_url}show-rooms/```,
+    join_room: ```${base_url}join-room/```,
+    leave_room: ```${base_url}leave-room/```
+}
+
 
 function App() {
 
@@ -27,7 +38,7 @@ function App() {
     return (
       <div>
         <Header onAuthorise={setAuth}/>
-        {!auth ? <Login onAuthorise={setAuth}/> : <Lobby/>}
+        {!auth ? <Login onAuthorise={setAuth} urls={urls}/> : <Lobby/>}
         <Footer/>
       </div>
 );

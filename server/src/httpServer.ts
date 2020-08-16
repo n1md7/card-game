@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import serve from "koa-static";
 import path from "path";
 import bodyParser from "koa-bodyparser";
+import cors from "@koa/cors";
 dotenv.config();
 
 // port is now available to the Node.js runtime
@@ -20,6 +21,7 @@ const httpServer = http.createServer(app.callback());
 
 
 app
+    .use(cors())
     .use(bodyParser())
     .use(router.routes())
     .use(router.allowedMethods())
@@ -39,6 +41,8 @@ app.use(serve(path.join(__dirname, '../public')));
 httpServer.listen(httpPort, () => {
     console.log(`server started at http://localhost:${httpPort}`);
 });
+
+
 
 export {
     httpServer,
