@@ -2,28 +2,16 @@ import React, {useEffect, useState} from 'react';
 import Cookies from "js-cookie";
 import { v4 as uuidv4 } from 'uuid';
 
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/app.css';
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Login from "./components/Login";
 import Lobby from "./components/Lobby";
 
-
-const base_url = "http://localhost:81/";
-
-const urls = {
-    auth: ```${base_url}authenticate/```,
-    status_check: ```${base_url}status-check/```,
-    create_room: ```${base_url}create-room/```,
-    show_rooms: ```${base_url}show-rooms/```,
-    join_room: ```${base_url}join-room/```,
-    leave_room: ```${base_url}leave-room/```
-}
 
 
 function App() {
@@ -33,7 +21,7 @@ function App() {
 
     const logOut = () => {
         // remove cookie value
-        Cookies.set('name', '');
+        Cookies.remove('user');
         // reset user and trigger update
         setUser('');
         setAuth(false);
@@ -41,10 +29,15 @@ function App() {
 
     useEffect(() => {
         // get cookie value
-        const name = Cookies.get('name');
-        // update User state with boolean values
-        setUser(name);
-        setAuth(!!name);
+        try {
+            const user = JSON.parse(Cookies.get('user'));
+            // update User state with boolean values
+            console.log(user);
+            setUser(user.name);
+            setAuth(!!user.name);
+        } catch (ex) {
+
+        }
         // and do this every auth state change
     }, [auth]);
 

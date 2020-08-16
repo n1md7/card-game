@@ -3,11 +3,12 @@ import Cookies from "js-cookie";
 
 import Axios from 'axios'
 
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Modal from "react-bootstrap/Modal";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
 import FormControl from "react-bootstrap/FormControl";
+
+import {urls} from "../constants/urls.js"
 
 
 function Login({setAuth}) {
@@ -19,11 +20,10 @@ function Login({setAuth}) {
 
     const onSubmit = () => {
         Axios
-            .get(props.urls.base + props.urls.auth + name)
+            .get(urls.auth + name)
             .then((res) => {
                 Cookies.set("user", res.data.user);
                 setAuth(true);
-                console.log(res.data.user);
             })
             .catch((err) => {
                 console.log(err);
