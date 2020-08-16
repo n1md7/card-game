@@ -10,25 +10,24 @@ import Button from "react-bootstrap/Button";
 import FormControl from "react-bootstrap/FormControl";
 
 
-function Login(props) {
+function Login({setAuth}) {
 
-    const [username, setUsername] = useState("");
-    const inputOnChange = (event) => {
-        const val = event.target.value;
-        setUsername(val);
+    const [name, setName] = useState("");
+    const inputOnChange = ({target: {value}}) => {
+        setName(value);
     }
 
     const onSubmit = () => {
         Axios
-            .get(props.urls.base + props.urls.auth + username)
+            .get(props.urls.base + props.urls.auth + name)
             .then((res) => {
                 Cookies.set("user", res.data.user);
-                props.onAuthorise(true);
+                setAuth(true);
                 console.log(res.data.user);
             })
             .catch((err) => {
                 console.log(err);
-                props.onAuthorise(false);
+                setAuth(false);
             });
     }
 
@@ -47,7 +46,7 @@ function Login(props) {
                         aria-label="Default"
                         aria-describedby="inputGroup-sizing-default"
                         onChange={inputOnChange}
-                        value={username}
+                        value={name}
                     />
                 </InputGroup>
             </Modal.Body>

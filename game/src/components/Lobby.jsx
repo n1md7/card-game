@@ -4,12 +4,8 @@ import Axios from 'axios'
 import Grid from './Grid'
 import CreateGame from "./CreateGame";
 
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './../css/app.css';
-
-
-
 
 const testData = {
     grid: [
@@ -24,7 +20,7 @@ const testData = {
 const joinGameUrl = 'http://localhost:8080/join-game';
 const createGameUrl = 'http://localhost:8080/join-game';
 
-function App() {
+function Lobby() {
     const createGame = (options) => {
         Axios
             .post(createGameUrl, options)
@@ -43,10 +39,10 @@ function App() {
 
     return (
         <>
-            <CreateGame createGameHandler={(options) => {createGame(options)}}/>
-            <Grid data={testData.grid} joinGameHandler={(gameId) => {joinGame(gameId)}}/>
+            <CreateGame createGameHandler={createGame}/>
+            <Grid data={testData.grid} joinGameHandler={joinGame}/>
         </>
     );
 }
 
-export default App;
+export default Lobby;
