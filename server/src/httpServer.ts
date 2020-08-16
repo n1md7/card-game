@@ -18,7 +18,7 @@ const router = new Router();
 
 const httpServer = http.createServer(app.callback());
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV.trim() === 'development') {
     app.use(cors());
 }
 
@@ -40,15 +40,14 @@ if (process.env.NODE_ENV === 'development') {
     app.use(serve(path.join(__dirname, '../../game/build')));
 }
 
-if (process.env.NODE_ENV !== 'test') {
-// start the server
+if (process.env.NODE_ENV.trim() !== 'test') {
+    // start the server
     httpServer.listen(httpPort, () => {
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV.trim() === 'development') {
             console.log(`server started at http://localhost:${httpPort}`);
         }
     });
 }
-
 
 // This is for tests
 export {

@@ -70,7 +70,7 @@ class Setup {
 
         const user = store.getUserById(userId);
         if (!user) {
-            throw new Error(`could not find a user with the id:${id}`);
+            throw new Error(`could not find a user with the id:${userId}`);
         }
         if (user.roomId) {
             throw new Error(`you need to leave the table first with the id:${user.roomId}`);
@@ -95,7 +95,7 @@ class Setup {
         const {roomId} = user;
         const room = store.getRoomById(roomId);
         if (!room) {
-            throw new Error(`could not find a room to join with the id:${roomId}`);
+            throw new Error(`could not find a room to remove`);
         }
 
         // kick out a user from the room

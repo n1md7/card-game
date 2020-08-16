@@ -83,6 +83,18 @@ class Store {
     public getRoomsList(){
         return this.rooms;
     }
+
+    public getUsersList(){
+        return this.users;
+    }
+
+    public clearRooms(){
+        this.rooms = {};
+    }
+
+    public clearUsers(){
+        this.users = {};
+    }
 }
 
 const store = new Store();
