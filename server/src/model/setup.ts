@@ -109,6 +109,15 @@ class Setup {
             roomId: null
         });
     }
+
+    public getUserInfo(userId: string) {
+        const user = store.getUserById(userId);
+        if (!user) {
+            throw new Error(`could not find a user with the id:${userId}`);
+        }
+        return user;
+    }
+
 }
 
 export default new Setup();

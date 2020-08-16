@@ -20,13 +20,12 @@ function Login({setAuth}) {
 
     const onSubmit = () => {
         Axios
-            .get(urls.auth + name)
+            .post(urls.auth, {"name" : name})
             .then((res) => {
                 Cookies.set("user", res.data.user);
                 setAuth(true);
             })
             .catch((err) => {
-                console.log(err);
                 setAuth(false);
             });
     }
