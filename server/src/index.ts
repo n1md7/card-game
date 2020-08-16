@@ -1,4 +1,4 @@
-import {router} from "./httpServer";
+import {router, httpServer} from "./httpServer";
 import gameSetup from "./controller/gameSetup";
 
 // To check server status
@@ -17,3 +17,8 @@ router.get('/lol/:id?', ctx => {
         yo: 'got it'
     };
 });
+
+export {
+    router,
+    httpServer
+}
