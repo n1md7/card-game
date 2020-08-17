@@ -3,8 +3,12 @@ import "../helpers/index";
 
 class Setup {
 
-    public signIn(id: string, name: string | undefined): null | UserProps {
+    public signIn(id: string, name?: string | null): null | UserProps {
         const user = store.getUserById(id);
+        if (user && !name) {
+            return user;
+        }
+
         if (user) {
             return store.updateUserById(id, {
                 updateTime: new Date().valueOf(),
@@ -15,8 +19,15 @@ class Setup {
         return null;
     }
 
-    public signUp(id: string, name: string): UserProps {
+    public signUp(id: string, name: string | null): UserProps {
         return store.setUserById(id, {
+            name
+        });
+    }
+
+    public updateUserById(id: string, name: string): UserProps {
+        return store.updateUserById(id, {
+            updateTime: new Date().valueOf(),
             name
         });
     }

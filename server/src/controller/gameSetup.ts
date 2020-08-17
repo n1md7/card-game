@@ -1,67 +1,52 @@
-import {v4 as uuidv4} from "uuid";
 import setup from "../model/setup";
 import {store} from "../store";
 
-enum cookie {
-    name = 'user-id'
-}
+import {room as Room} from "../config";
+import {id as Id} from "../helpers/ids";
+import {Context} from "../types";
 
 class GameSetup {
-    public status(ctx: any) {
+    public status(ctx: Context) {
         ctx.body = {
             status: "up"
         };
     }
 
-    public authenticate(ctx: any) {
-        const id = ctx.cookies.get(cookie.name);
-        const {name} = ctx.request.body;
-        if (!name) {
+    public create(ctx: Context) {
+        const roomId = Id.room();
+        const userId = ctx.state.user.id;
+        const {isPublic, size, name} = ctx.request.body;
+        const roomSizes = [Room.two, Room.three, Room.four];
 
+        if (!roomSizes.includes(size)) {
             ctx.body = {
-                ok: false,
-                msg: 'name is empty'
-            };
-
-            return;
-        }
-
-        if (id) {
-            const user = setup.signIn(id, name);
-            if (user) {
-                // sign-in successful
-                ctx.body = {
-                    user,
-                    ok: true
-                };
-
-                return;
-            }
-        }
-
-        // or sign-up new user
-        const newId = `U-${uuidv4().substring(0, 5)}`;
-        ctx.cookies.set(cookie.name, newId);
-        ctx.body = {
-            user: setup.signUp(newId, name),
-            ok: true
-        }
-
-    }
-
-    public create(ctx: any) {
-        const roomId = `R-${uuidv4().substring(0, 5)}`;
-        const userId = ctx.cookies.get(cookie.name);
-        const {isPublic, size} = ctx.request.body;
-
-        if (!isPublic || !size || !userId) {
-            ctx.body = {
-                msg: 'required params are missing',
+                msg: `allowed sizes are for the room are ${roomSizes}`,
                 ok: false
             }
 
             return;
         }
+
+        if (!isPublic) {
+            ctx.body = {
+                msg: 'isPublic param is required',
+                ok: false
+            }
+
+            return;
+        }
+
+        if (!name) {
+            ctx.body = {
+                msg: 'name param is required',
+                ok: false
+            }
+
+            return;
+        }
+
+        // update user name field
+        setup.updateUserById(userId, name);
 
         try {
             setup.createRoom({
@@ -85,24 +70,37 @@ class GameSetup {
         }
     }
 
-    public showRooms(ctx: any) {
+    public showRooms(ctx: Context) {
         ctx.body = {
             ok: true,
             rooms: store.getRoomsList()
         };
     }
 
-    public joinRoom(ctx: any) {
-        const {id} = ctx.request.body;
-        const userId = ctx.cookies.get(cookie.name);
-        if (!id || !userId) {
+    public joinRoom(ctx: Context) {
+        const {id, name} = ctx.request.body;
+        // user id is always set from the auth middleware
+        const userId = ctx.state.user.id;
+        if (!id) {
             ctx.body = {
-                msg: 'required params [id or userId] are missing',
+                msg: 'required param [id] is missing',
                 ok: false
             }
 
             return;
         }
+
+        if (!name) {
+            ctx.body = {
+                msg: 'name param is required',
+                ok: false
+            }
+
+            return;
+        }
+
+        // update user name field
+        setup.updateUserById(userId, name);
 
         let room = {};
         try {
@@ -123,20 +121,13 @@ class GameSetup {
 
     }
 
-    public leaveRoom(ctx: any) {
-        const userId = ctx.cookies.get(cookie.name);
-        if (!userId) {
-            ctx.body = {
-                msg: 'required param [userId] is missing',
-                ok: false
-            }
-
-            return;
-        }
+    public leaveRoom(ctx: Context) {
+        const {id} = ctx.state.user;
 
         try {
-            setup.leaveRoom(userId);
-        }catch ({message}) {
+            // user leaves the room
+            setup.leaveRoom(id);
+        } catch ({message}) {
             ctx.body = {
                 ok: false,
                 msg: message
@@ -151,20 +142,12 @@ class GameSetup {
 
     }
 
-    public getUserInfo(ctx: any) {
-        const userId = ctx.cookies.get(cookie.name);
-        if (!userId) {
-            ctx.body = {
-                msg: 'required param [userId] is missing',
-                ok: false
-            }
-
-            return;
-        }
+    public getUserInfo(ctx: Context) {
+        const {id} = ctx.state.user;
         let user = {};
         try {
-            user = setup.getUserInfo(userId);
-        }catch ({message}) {
+            user = setup.getUserInfo(id);
+        } catch ({message}) {
             ctx.body = {
                 ok: false,
                 msg: message
@@ -177,20 +160,6 @@ class GameSetup {
             user
         };
 
-    }
-    public logOut(ctx: any) {
-        const userId = ctx.cookies.get(cookie.name);
-        if (!userId) {
-            ctx.body = {
-                msg: 'required param [userId] is missing',
-                ok: false
-            }
-            return;
-        }
-        ctx.cookies.set(cookie.name);
-        ctx.body = {
-            ok: true
-        };
     }
 
 }

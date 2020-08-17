@@ -99,40 +99,40 @@
 </div>
 
 <script>
+    async function postData(url = '', data = {}) {
+        // Default options are marked with *
+        const response = await fetch(url, {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: JSON.stringify(data) // body data type must match "Content-Type" header
+        });
+        return response.json(); // parses JSON response into native JavaScript objects
+    }
+
+    let name = null;
     $('#connect').click(function () {
-        const name = $('#name').val();
-        fetch(`http://localhost:81/authenticate/${name}`)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error(Response.statusText);
-            })
-            .then(({ok, user, msg}) => {
-                if (ok && user) {
-                    console.log(user);
-                    $('#create-section').show();
-                    $('#start').hide();
-
-                    updateRoomsList();
-
-                } else {
-                    console.log(msg);
-                }
-            })
-            .catch(console.error);
-
+        name = $('#name').val();
+        console.log('My name is: ', name);
+        $('#create-section').show();
+        $('#start').hide();
+        updateRoomsList();
 
         $('#create').click(function () {
             const size = $('#room-size').val();
             const visibility = $('#room-visibility').val();
-            fetch(`http://localhost:81/create-room/${size}/${visibility}`)
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
-                    throw new Error(Response.statusText);
-                })
+            postData('/api/create-room', {
+                size: +size,
+                isPublic: visibility,
+                name
+            })
                 .then(({ok, roomId, msg}) => {
                     if (ok && roomId) {
                         $('#create-section').show();
@@ -142,7 +142,7 @@
                         $('#play-area')
                             .find('button')
                             .click(function () {
-                                fetch(`http://localhost:81/leave-room`)
+                                fetch(`/api/leave-room`)
                                     .then(response => {
                                         if (response.ok) {
                                             return response.json();
@@ -164,7 +164,7 @@
     });
 
     function updateRoomsList() {
-        fetch(`http://localhost:81/show-rooms`)
+        fetch(`/api/show-rooms`)
             .then(response => {
                 if (response.ok) {
                     return response.json();
@@ -211,7 +211,10 @@
 
     $(document).on('click', '.join-room-btn', function () {
         const {id} = this.dataset;
-        fetch(`http://localhost:81/join-room/${id}`)
+        postData('/api/join-room', {
+            id,
+            name
+        })
             .then(response => {
                 if (response.ok) {
                     return response.json();
@@ -225,7 +228,7 @@
                     $('#play-area')
                         .find('button')
                         .click(function () {
-                            fetch(`http://localhost:81/leave-room`)
+                            fetch(`/api/leave-room`)
                                 .then(response => {
                                     if (response.ok) {
                                         return response.json();
