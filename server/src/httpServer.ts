@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import serve from "koa-static";
 import path from "path";
 import bodyParser from "koa-bodyparser";
+import auth from "./middleware/auth";
 
 dotenv.config();
 
@@ -13,31 +14,29 @@ dotenv.config();
 // as if it were an environment variable
 const httpPort = process.env.SERVER_PORT_HTTP;
 
-const app = new Koa();
-const router = new Router();
+const koaApp = new Koa();
+const router = new Router({
+    // prefix: '/api'
+});
 
-const httpServer = http.createServer(app.callback());
+const httpServer = http.createServer(koaApp.callback());
 
 if (process.env.NODE_ENV.trim() === 'development') {
-    app.use(cors());
+    koaApp.use(cors());
 }
 
-app
+koaApp
+    .use(auth)
     .use(bodyParser())
     .use(router.routes())
-    .use(router.allowedMethods())
-    .use(async (ctx, next) => {
-        // custom middleware
-        // ctx.cookies.set('test-cookie', 'test-value');
-        await next();
-    });
+    .use(router.allowedMethods());
 
 // make public all content inside ../public folder
 // mainly for testing(socket.io),
 // public files will be served from apache/nginx
 if (process.env.NODE_ENV === 'development') {
-    // app.use(serve(path.join(__dirname, '../public')));
-    app.use(serve(path.join(__dirname, '../../game/build')));
+    koaApp.use(serve(path.join(__dirname, '../public')));
+    // koaApp.use(serve(path.join(__dirname, '../../game/build')));
 }
 
 if (process.env.NODE_ENV.trim() !== 'test') {
@@ -53,5 +52,5 @@ if (process.env.NODE_ENV.trim() !== 'test') {
 export {
     httpServer,
     router
-};
+}
 
