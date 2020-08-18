@@ -27,7 +27,8 @@ class GameSetup {
             return;
         }
 
-        if (!isPublic) {
+        if ([null, undefined].includes(isPublic)) {
+            // isPublic can be 0 so checking explicitly
             ctx.body = {
                 msg: 'isPublic param is required',
                 ok: false
