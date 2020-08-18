@@ -25,5 +25,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: cd server
-    - run: npm i
+    - run: npm i --prefix ./server
+    - run: npm --prefix ./server run test:os-linux
 #     - run: npm run test:os-linux
