@@ -16,7 +16,7 @@ const httpPort = process.env.SERVER_PORT_HTTP;
 
 const koaApp = new Koa();
 const router = new Router({
-    // prefix: '/api'
+    prefix: '/api'
 });
 
 const httpServer = http.createServer(koaApp.callback());
