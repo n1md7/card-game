@@ -1,6 +1,7 @@
 const user = (state = {
-    id: '',
-    name: ''
+    id: null,
+    name: null,
+    roomId: null
 }, {type, ...rest}) => {
     switch (type) {
         case 'UPDATE':

@@ -1,6 +1,6 @@
 import React, {useState, Fragment} from "react";
 import {useDispatch} from "react-redux";
-import {updateUser} from "../actions";
+import {updateUser} from "../redux/actions";
 
 export default () => {
     const [name, setName] = useState('');
