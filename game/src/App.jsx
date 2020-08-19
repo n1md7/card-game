@@ -1,11 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React from "react";
 import Authenticate from "./components/authenticate";
 import Lobby from "./components/Lobby";
-import './css/app.scss';
-
-import {urls} from "./constants/urls";
 import {useSelector} from "react-redux";
-
+import './css/app.scss';
 
 function App() {
     const user = useSelector(({user}) => user);

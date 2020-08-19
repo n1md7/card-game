@@ -35,8 +35,8 @@ koaApp
 // mainly for testing(socket.io),
 // public files will be served from apache/nginx
 if (process.env.NODE_ENV === 'development') {
-    koaApp.use(serve(path.join(__dirname, '../public')));
-    // koaApp.use(serve(path.join(__dirname, '../../game/build')));
+    // koaApp.use(serve(path.join(__dirname, '../public')));
+    koaApp.use(serve(path.join(__dirname, '../../game/build')));
 }
 
 if (process.env.NODE_ENV.trim() !== 'test') {

@@ -15,7 +15,7 @@ export default () => {
     return (
         <Fragment>
             <div className="row justify-content-center my-5 text-center">
-                <div className="col-md-4">
+                <div className="col-sm-9 col-md-4 ">
                     <form onSubmit={submitHandler}>
                         <div className="form-group">
                             <input
@@ -30,11 +30,15 @@ export default () => {
                                 This name will be used during the game
                             </small>
                         </div>
-                        <button
-                            type="submit"
-                            className="btn btn-outline-primary">
-                            START
-                        </button>
+                        <div className="row">
+                            <div className="col-12">
+                                <button
+                                    type="submit"
+                                    className="w-100 btn btn-outline-primary">
+                                    START
+                                </button>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>

@@ -42,10 +42,10 @@ export default () => {
 
     return (
         <Fragment>
-            <h3 className="text-center mt-5 mb-4 text-muted">Create Rooms</h3>
+            <h3 className="text-center mt-5 mb-4 text-muted">Create Room</h3>
             <form onSubmit={formSubmitHandler}>
                 <div className="form-row justify-content-center">
-                    <div className="form-group col-md-6">
+                    <div className="form-group col-md-3">
                         <label htmlFor="room-size">Room size</label>
                         <select id="room-size" onChange={sizeChangeHandler} className="form-control">
                             <option value="2">2</option>
@@ -53,15 +53,16 @@ export default () => {
                             <option value="4">4</option>
                         </select>
                     </div>
-                    <div className="form-group col-md-6">
+                    <div className="form-group col-md-3">
                         <label htmlFor="room-visibility">Room visibility</label>
                         <select id="room-visibility" onChange={isPublicChangeHandler} className="form-control">
                             <option value="1">Public</option>
                             <option value="0">Private</option>
                         </select>
                     </div>
-                    <div className="form-group col-md-6">
-                        <button type="submit" id="create" className="btn btn-secondary">Create</button>
+                    <div className="col-12"></div>
+                    <div className="form-group col-md-6 text-center">
+                        <button type="submit" id="create" className="btn btn-secondary w-100">Create</button>
                     </div>
                 </div>
             </form>
