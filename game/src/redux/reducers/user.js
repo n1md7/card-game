@@ -10,7 +10,7 @@ const user = (state = {
                 ...rest
             };
         default:
-            return state
+            return state;
     }
 }
 

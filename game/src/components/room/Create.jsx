@@ -1,10 +1,10 @@
 import React, {Fragment, useState} from "react";
 import ajax from "axios";
-import {urls} from "../constants/urls";
+import {urls} from "../../constants/urls";
 import {useDispatch, useSelector} from "react-redux";
-import {updateUser} from "../redux/actions";
+import {updateUser} from "../../redux/actions";
 
-export default () => {
+export default function Create() {
     const dispatch = useDispatch();
     const [size, setSize] = useState(2);
     const [isPublic, setIsPublic] = useState(true);
@@ -13,19 +13,24 @@ export default () => {
     // define event change handlers
     const sizeChangeHandler = ({target: {value}}) => setSize(+value);
     const isPublicChangeHandler = ({target: {value}}) => setIsPublic(!!value);
-    const formSubmitHandler = event => {
+    const formSubmitHandler = function (event) {
         event.preventDefault();
+        const {
+            size,
+            isPublic,
+            name
+        } = this;
         ajax.post(urls.create_room, {
             size,
             isPublic,
             name
         })
             .then(({data}) => data)
-            .then(({ok, roomId}) => {
+            .then(({ok, roomId, msg}) => {
                 if (!ok || !roomId) {
                     // todo log error
                     // hmm that's bad
-                    return null;
+                    throw new Error(msg);
                 }
 
                 return roomId;
@@ -38,7 +43,11 @@ export default () => {
                 // hmm again too bad
                 console.debug(error);
             });
-    }
+    }.bind({
+        size,
+        isPublic,
+        name
+    })
 
     return (
         <Fragment>
@@ -60,7 +69,7 @@ export default () => {
                             <option value="0">Private</option>
                         </select>
                     </div>
-                    <div className="col-12"></div>
+                    <div className="col-12">{''}</div>
                     <div className="form-group col-md-6 text-center">
                         <button type="submit" id="create" className="btn btn-secondary w-100">Create</button>
                     </div>

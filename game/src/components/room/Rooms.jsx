@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react";
 import ajax from "axios";
-import {urls} from "../constants/urls";
+import {urls} from "../../constants/urls";
 import {useDispatch, useSelector} from "react-redux";
-import {updateUser} from "../redux/actions";
+import {updateUser} from "../../redux/actions";
 
-const RoomsList = () => {
+const Rooms = () => {
     const [list, setList] = useState([]);
     useEffect(() => {
         const updateRoomsList = () => {
@@ -86,7 +86,10 @@ const RoomRow = ({id, creator, inRoomSize, size}) => {
             // which will be caught from the component Lobby
             .then(roomId => dispatch(updateUser({roomId})))
             .catch(error => {
-                setJoinText('Join')
+                // just 1s delay
+                setTimeout(() => {
+                    setJoinText('Join')
+                }, 1000);
                 // todo log this
                 // hmm again too bad
                 console.warn(error);
@@ -113,4 +116,4 @@ const RoomRow = ({id, creator, inRoomSize, size}) => {
     );
 };
 
-export default RoomsList;
+export default Rooms;
