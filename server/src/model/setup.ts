@@ -76,7 +76,8 @@ class Setup {
 
         const {users} = room;
         if (users && users.includes(userId)) {
-            throw new Error('you cannot double join the room');
+            // return current user since the one is already joined
+            return store.getUserById(userId);
         }
 
         const user = store.getUserById(userId);
