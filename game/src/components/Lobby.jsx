@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 import JoinRoom from "./room/Join";
 import CreateRoom from "./room/Create";
 import { useSelector } from "react-redux";
-import { Route, Switch, Link, Redirect } from "react-router-dom";
+import { Link, Redirect, Route, Switch } from "react-router-dom";
 import EnterRoom from "./room/Room";
 
 export default function Lobby() {
