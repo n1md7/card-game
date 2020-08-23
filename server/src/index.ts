@@ -1,6 +1,7 @@
 import {router, httpServer} from "./httpServer";
 import gameSetup from "./controller/gameSetup";
 
+router.get('/init', ctx => gameSetup.init(ctx));
 router.get('/status-check', ctx => gameSetup.status(ctx));
 router.get('/show-rooms', ctx => gameSetup.showRooms(ctx));
 router.get('/leave-room', ctx => gameSetup.leaveRoom(ctx));

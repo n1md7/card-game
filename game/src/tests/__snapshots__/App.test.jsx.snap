@@ -2,59 +2,7 @@
 
 exports[`Render app and show auth 1`] = `
 <div>
-  <div
-    class="container my-5"
-  >
-    <div
-      class="jumbotron"
-    >
-      <h1
-        class="text-muted text-center"
-      >
-        Card game
-      </h1>
-      <div
-        class="row justify-content-center my-5 text-center"
-      >
-        <div
-          class="col-sm-9 col-md-4 "
-        >
-          <form>
-            <div
-              class="form-group"
-            >
-              <input
-                autocomplete="off"
-                class="form-control"
-                maxlength="16"
-                placeholder="Nickname"
-                value=""
-              />
-              <small
-                class="form-text text-muted"
-              >
-                This name will be used during the game
-              </small>
-            </div>
-            <div
-              class="row"
-            >
-              <div
-                class="col-12"
-              >
-                <button
-                  class="w-100 btn btn-outline-primary"
-                  type="submit"
-                >
-                  START
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+  loading...
 </div>
 `;
 

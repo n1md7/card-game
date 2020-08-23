@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from "react";
-import ajax from "axios";
+import { ajax } from "../../services/ajax";
 import { urls } from "../../constants/urls";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../../redux/actions";
@@ -9,18 +9,19 @@ export default function Create() {
   const [ size, setSize ] = useState( 2 );
   const [ isPublic, setIsPublic ] = useState( true );
   // get name value from the redux store
-  const name = useSelector( ( { user } ) => user.name );
+  const { name } = useSelector( ( { user } ) => user );
   // define event change handlers
   const sizeChangeHandler = ( { target: { value } } ) => setSize( + value );
   const isPublicChangeHandler = ( { target: { value } } ) => setIsPublic( !!value );
   const formSubmitHandler = function ( event ) {
     event.preventDefault();
+    // console.log(config)
     const {
       size,
       isPublic,
       name
     } = this;
-    ajax.post( urls.create_room, {
+    ajax.post( urls.createRoom, {
         size,
         isPublic,
         name

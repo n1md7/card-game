@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, Fragment, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { updateUser } from "../redux/actions";
 
@@ -9,8 +9,17 @@ export default () => {
 
   const submitHandler = event => {
     event.preventDefault();
+    // save name into storage
+    localStorage.setItem( "name", name );
     dispatch( updateUser( { name } ) );
   };
+
+  useEffect( () => {
+    // get name from the storage when available
+    // and set it as a default value
+    const storageName = localStorage.getItem( "name" );
+    setName( storageName || '' );
+  }, [] );
 
   return (
     <Fragment>
@@ -19,9 +28,10 @@ export default () => {
           <form onSubmit={ submitHandler }>
             <div className="form-group">
               <input
-                autoFocus={ "on" }
+                autoFocus={ true }
                 autoComplete={ "off" }
                 value={ name }
+                spellCheck={false}
                 onChange={ nameChangeHandler }
                 placeholder="Nickname"
                 maxLength={ 16 }
