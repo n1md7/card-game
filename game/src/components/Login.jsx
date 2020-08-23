@@ -19,6 +19,8 @@ function Login({setAuth}) {
     }
 
     const onSubmit = () => {
+        console.log(urls.auth);
+
         Axios
             .post(urls.auth, {"name" : name})
             .then((res) => {

@@ -1,4 +1,4 @@
-const base_url = "http://localhost:81/";
+const base_url = `http://localhost:80/`;
 export const urls = {
     auth: `${base_url}authenticate/`,
     status_check: `${base_url}status-check/`,

@@ -1,0 +1,26 @@
+version: '3'
+services:
+  client:
+    image: phurti_game:0.1
+    container_name: phurti_game
+    build:
+      context: ./game
+      dockerfile: Dockerfile
+    volumes:
+      - ./game:/home/node/src
+    ports:
+      - 3000:3000
+    command: npm run start
+    stdin_open: true
+    tty: true
+  server:
+    image: phurti_server:0.1
+    container_name: phurti_server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    command: npm run dev
+    volumes:
+      - ./server:/home/http_server_user/src
+    ports:
+      - 80:8000

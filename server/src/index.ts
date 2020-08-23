@@ -1,6 +1,5 @@
 import {router, httpServer} from "./httpServer";
 import gameSetup from "./controller/gameSetup";
-import proxy from "koa-proxy";
 
 // To check server status
 // router.get('/status-check', ctx => gameSetup.status(ctx));
