@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ajax from "axios";
+import { ajax } from "../../services/ajax";
 import { urls } from "../../constants/urls";
 import Row from "./table/Row";
 
@@ -8,7 +8,7 @@ export default function Rooms() {
   useEffect( () => {
     const updateRoomsList = () => {
       ajax
-        .get( urls.show_rooms )
+        .get( urls.showRooms )
         .then( ( { data } ) => data )
         .then( ( { ok, rooms, msg } ) => {
           if ( !ok ) {

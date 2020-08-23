@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../../redux/actions";
-import ajax from "axios";
+import { ajax } from "../../services/ajax";
 import { urls } from "../../constants/urls";
 
 // id is prop passed from Lobby
@@ -10,6 +10,7 @@ import { urls } from "../../constants/urls";
 export default function Room( { id } ) {
   // roomId is URL route param
   const user = useSelector( ( { user } ) => user );
+  const [ joining, setJoining ] = useState( true );
   const { roomId } = useParams();
   const dispatch = useDispatch();
 
@@ -18,7 +19,7 @@ export default function Room( { id } ) {
     // we dont know that roomId definitely exists
     // or the user is able to join the table
     if ( !id ) {
-      ajax.post( urls.join_room, {
+      ajax.post( urls.joinRoom, {
           id: roomId, name: user.name
         } )
         .then( ( { data } ) => data )
@@ -33,19 +34,25 @@ export default function Room( { id } ) {
         } )
         // trigger redux user store object update
         // which will be caught from the component Lobby
-        .then( roomId => dispatch( updateUser( { roomId } ) ) )
+        .then( roomId => {
+          dispatch( updateUser( { roomId } ) );
+          setJoining( false );
+        } )
         .catch( error => {
           // error on non valid roomId
           // so reset it
           dispatch( updateUser( { roomId: null } ) )
+          setJoining( false );
           console.warn( error );
         } );
     }
   }, [] );
 
   return user.roomId ? (
-    <div>This is your game room #{ user.roomId }</div>
-  ) : (
+    <div className="text-center">
+      This is your game room #{ user.roomId }
+    </div>
+  ) : joining ? "loading..." : (
     <h3 className="text-center">
       Requested room ID: { user.roomId } does not exist or
       you are not allowed to join here!

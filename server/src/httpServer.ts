@@ -36,15 +36,15 @@ koaApp
 // make public all content inside ../public folder
 if ( process.env.NODE_ENV === 'development' ) {
   // koaApp.use(serve(path.join(__dirname, '../public')));
-  koaApp.use( serve( path.join( __dirname, '../../game/build' ) ) );
+  // koaApp.use( serve( path.join( __dirname, '../../game/build' ) ) );
 }
 
 koaApp
   .use( async ctx => {
     // everything else point to index.html
     // this is for react router
-    ctx.set( 'content-type', 'text/html' );
-    ctx.body = fs.readFileSync( path.join( __dirname, '../../game/build/index.html' ) );
+    // ctx.set( 'content-type', 'text/html' );
+    // ctx.body = fs.readFileSync( path.join( __dirname, '../../game/build/index.html' ) );
   } );
 
 if ( process.env.NODE_ENV.trim() !== 'test' ) {
