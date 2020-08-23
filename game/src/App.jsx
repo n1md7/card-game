@@ -1,83 +1,25 @@
-import React, {useEffect, useState} from 'react';
-import Cookies from "js-cookie";
-import {v4 as uuidv4} from 'uuid';
-
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './css/app.css';
-
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-
-
-import Login from "./components/Login";
+import React from "react";
+import Authenticate from "./components/Authenticate";
 import Lobby from "./components/Lobby";
-import Axios from "axios";
-import {urls} from "./constants/urls";
+import { useSelector } from "react-redux";
+import { BrowserRouter as Router } from "react-router-dom";
+import "./css/app.scss";
 
+// when user.name is not defined
+// it always shows auth component
+export default function App() {
+  const user = useSelector( ( { user } ) => user );
 
-function App() {
-
-    const [auth, setAuth] = useState(false);
-    const [user, setUser] = useState('');
-
-    const logOut = () => {
-        Axios
-            .get(urls.log_out)
-            .then((res) => {
-                Cookies.remove('user');
-                setUser('');
-                setAuth(false);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-
-    }
-
-    useEffect(() => {
-        // get cookie value
-        const userCookie = Cookies.get('user');
-        if (userCookie !== undefined) {
-            const user = JSON.parse(userCookie);
-            // update User state with boolean values
-            setUser(user.name);
-            setAuth(!!user.name);
-        } else {
-            Axios
-                .get(urls.user_info)
-                .then((res) => {
-                    const user = res.data.user;
-                    if(user !== undefined) {
-                        Cookies.set("user", user);
-                        setUser(user);
-                        setAuth(!!user);
-                    }
-                })
-                .catch((err) => {
-
-                });
-        }
-
-        // and do this every auth state change
-    }, [auth]);
-
-    return (
-        <div>
-            {
-                auth ? (
-                        <>
-                            <Header
-                                user={user}
-                                logOut={logOut}
-                            />
-                            <Lobby/>
-                        </>
-                    ) :
-                    <Login setAuth={setAuth}/>
-            }
-            <Footer/>
+  return (
+    <Router>
+      <div className="container my-5">
+        <div className="jumbotron">
+          <h1 className="text-muted text-center">Card game</h1>
+          {
+            !user.name ? <Authenticate/> : <Lobby/>
+          }
         </div>
-    );
+      </div>
+    </Router>
+  );
 }
-
-export default App;

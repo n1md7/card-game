@@ -10,7 +10,7 @@ export default async (ctx: Context, next: Next) => {
     if (!userId || !user) {
         // set new cookie since no such user in store or cookie
         userId = id.user();
-        ctx.cookies.set(cookie.userId, userId);
+        ctx.cookies.set(cookie.userId, userId, {});
         // register new user
         user = setup.signUp(userId, null);
     }
