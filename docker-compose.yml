@@ -10,6 +10,10 @@ services:
       - ./game:/home/node/src
     ports:
       - 3000:3000
+    environment:
+      - PORT=3000
+    expose:
+      - 3000
     command: npm run start
     stdin_open: true
     tty: true
@@ -24,3 +28,7 @@ services:
       - ./server:/home/http_server_user/src
     ports:
       - 80:8000
+    environment:
+      - PORT=8000
+    expose:
+      - 8000

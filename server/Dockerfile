@@ -11,6 +11,3 @@ USER http_server_user
 WORKDIR /home/http_server_user/src
 
 RUN npm install
-
-ENV PORT=8000
-EXPOSE 8000

@@ -9,9 +9,5 @@ USER node
 
 WORKDIR /home/node/src
 
-
 CMD ["/bin/bash"]
 
-
-ENV PORT=3000
-EXPOSE 3000
