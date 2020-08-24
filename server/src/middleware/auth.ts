@@ -2,7 +2,7 @@ import { token } from "../config";
 import { Context, Next } from "koa";
 import setup from "../model/setup";
 import jwt from "jsonwebtoken";
-import { store, UserProps } from "../store";
+import { UserProps } from "../store";
 
 interface TokenProps {
   "userId": string,
@@ -11,10 +11,6 @@ interface TokenProps {
 }
 
 export default async ( ctx: Context, next: Next ) => {
-  if ( /^\/api\/init/.test( ctx.path ) ) {
-    // skip when it is api init request
-    return next();
-  }
   // try to get token from the client response header
   const jwToken = ctx?.header ?. [ token.self ];
   let verified: TokenProps | any;
