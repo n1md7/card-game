@@ -157,7 +157,6 @@ class GameSetup {
     ctx.body = {
       ok: true
     };
-
   }
 
   public getUserInfo( ctx: Context ) {
@@ -175,6 +174,7 @@ class GameSetup {
     }
 
     ctx.body = {
+      ok: true,
       user
     };
 
