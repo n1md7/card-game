@@ -1,24 +1,53 @@
-import {cookie} from "../config";
-import {Context, Next} from "koa";
-import {id} from "../helpers/ids";
+import { token } from "../config";
+import { Context, Next } from "koa";
 import setup from "../model/setup";
+import jwt from "jsonwebtoken";
+import { UserProps } from "../store";
 
-export default async (ctx: Context, next: Next) => {
-    // get cookie value
-    let userId = ctx.cookies.get(cookie.userId);
-    let user = setup.signIn(userId);
-    if (!userId || !user) {
-        // set new cookie since no such user in store or cookie
-        userId = id.user();
-        ctx.cookies.set(cookie.userId, userId, {});
-        // register new user
-        user = setup.signUp(userId, null);
-    }
+interface TokenProps {
+  "userId": string,
+  "iat": number,
+  "exp": number
+}
 
-    ctx.state.user = {
-        id: userId,
-        name: user.name
+export default async ( ctx: Context, next: Next ) => {
+  // try to get token from the client response header
+  const jwToken = ctx?.header ?. [ token.self ];
+  let verified: TokenProps | any;
+
+  try {
+    // verify token and parse it
+    verified = jwt.verify( jwToken, token.secret );
+  } catch ( error ) {
+    // not valid or expired
+    ctx.body = {
+      ok: false,
+      msg: error.message
     };
 
-    await next();
+    return;
+  }
+
+  // get user data
+  let user: UserProps;
+  try {
+    user = setup.getUserInfo( ( verified as TokenProps )[ token.userId ] );
+  } catch ( error ) {
+    // this could happen when valid token exists but db is empty
+    // when server is restarted and the db is not stateful
+    // better to check
+    ctx.body = {
+      ok: false,
+      msg: error.message,
+    };
+
+    return;
+  }
+  // update context with state key
+  ctx.state.user = {
+    id: user.id,
+    name: user.name
+  };
+
+  await next();
 };

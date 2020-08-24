@@ -1,15 +1,32 @@
 import setup from "../model/setup";
 import { store } from "../store";
 
-import { room as Room } from "../config";
+import { room as Room, token } from "../config";
 import { id as Id } from "../helpers/ids";
 import { Context } from "../types";
+import jwt from "jsonwebtoken";
 
 class GameSetup {
   public status( ctx: Context ) {
     ctx.body = {
-      status: "up"
+      ok: true,
+      msg: "up",
     };
+  }
+
+  public init( ctx: Context ) {
+    const userId = Id.user();
+    // generate token
+    const jwToken = Id.jwt( { [ token.userId ]: userId } );
+    // register new user
+    setup.signUp( userId, null );
+
+    ctx.body = {
+      ok: true,
+      [ token.self ]: jwToken,
+      userId,
+      jwToken: jwt.verify( jwToken, token.secret )
+    }
   }
 
   public create( ctx: Context ) {
@@ -140,7 +157,6 @@ class GameSetup {
     ctx.body = {
       ok: true
     };
-
   }
 
   public getUserInfo( ctx: Context ) {
@@ -158,6 +174,7 @@ class GameSetup {
     }
 
     ctx.body = {
+      ok: true,
       user
     };
 

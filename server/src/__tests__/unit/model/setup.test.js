@@ -99,7 +99,7 @@ describe('Test setup CRUD operations', () => {
                 size,
                 isPublic
             })
-        ).toThrowError(`you need to leave the current room first with the id:${roomId}`);
+        ).toThrowError(`you cannot re-create existing room: ${roomId}`);
     });
 
     it('should fail with the exception message', () => {
