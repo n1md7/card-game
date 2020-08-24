@@ -6,7 +6,7 @@ describe('Create room with extended requests', () => {
        httpServer.close();
     });
 
-    it('should auth, get list of rooms and join one of them', async done => {
+    it.skip('should auth, get list of rooms and join one of them', async done => {
         const session1 = superTest.agent(httpServer);
         const session2 = superTest.agent(httpServer);
         const creatorName = 'Jora Kekluci';

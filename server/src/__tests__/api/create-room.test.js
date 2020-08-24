@@ -3,7 +3,7 @@ const superTest = require( "supertest" );
 
 describe( "Test Api endpoints for create-room", () => {
 
-  it( "should auth and create a room and set cookies", async done => {
+  it.skip( "should auth and create a room and set cookies", async done => {
     // Sends GET Request to /create-room/:size/:isPublic endpoint
     const session = superTest.agent( httpServer );
     const myName = "harry";
@@ -29,7 +29,7 @@ describe( "Test Api endpoints for create-room", () => {
 
 
 describe( "Test Api endpoints for create-room", () => {
-  it( "should auth, create room and try to join another one and fail", async done => {
+  it.skip( "should auth, create room and try to join another one and fail", async done => {
     const session1 = superTest.agent( httpServer );
     const myName = "ninja";
     const size = 2;
