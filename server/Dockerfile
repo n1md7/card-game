@@ -10,4 +10,4 @@ RUN usermod -aG sudo http_server_user
 USER http_server_user
 WORKDIR /home/http_server_user/src
 
-RUN npm install
+

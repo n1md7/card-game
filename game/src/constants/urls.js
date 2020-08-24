@@ -1,4 +1,4 @@
-export const baseURL = "http://localhost/api/";
+export const baseURL = `http://localhost:${process.env.REACT_APP_SERVER_PORT}/api/`;
 export const urls = {
   init: "init",
   statusCheck: "status-check",
