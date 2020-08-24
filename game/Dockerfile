@@ -9,5 +9,3 @@ USER node
 
 WORKDIR /home/node/src
 
-CMD ["/bin/bash"]
-
