@@ -7,6 +7,7 @@ import { ajax } from "./services/ajax";
 import { urls, baseURL, token as tokenKey } from "./constants/urls";
 import { tokenStore } from "./services/token";
 import "./css/app.scss";
+import GameRoom from "./components/game/Room";
 
 // when user.name is not defined
 // it always shows auth component
@@ -56,6 +57,9 @@ export default function App() {
         } );
     } )
   }, [] );
+
+
+  return <GameRoom/>
 
   return (
     <Router>
