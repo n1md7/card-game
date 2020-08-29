@@ -32,12 +32,25 @@ body {
 
       .x-card {
         box-sizing: border-box;
-        border: solid 1px blue;
         width: $card-w;
         height: $card-h;
         border-radius: 4px;
+        //animation: hide-show 1s 3s ease infinite;
+
+      }
+
+      .x-animate path {
+        animation: heart-beat 750ms alternate ease-in-out infinite;
       }
     }
   }
 }
 
+@keyframes heart-beat {
+  0% {
+    transform: scale(1, 1)
+  }
+  100% {
+    transform: scale(1.015, 1.2)
+  }
+}
