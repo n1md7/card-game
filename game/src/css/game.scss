@@ -1,0 +1,43 @@
+$card-w: 78px;
+$card-h: 110px;
+
+body {
+  background-image: url('../img/background.jpg');
+  background-size: cover;
+}
+
+.x-room-table {
+  position: relative;
+  margin: 70px auto;
+  height: 80vh;
+  width: 80vw;
+  background-image: url('../img/table.jpg');
+  background-size: cover;
+  border-radius: 25px;
+  -webkit-box-shadow: 4px 0 30px 3px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 4px 0 30px 3px rgba(0, 0, 0, 0.75);
+  box-shadow: 4px 0 30px 3px rgba(0, 0, 0, 0.75);
+
+  .x-player-bar {
+    width: calc(4 * (#{$card-w} + 12px));
+    padding: 2px;
+    margin: auto;
+
+    .x-cards {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      height: $card-h;
+
+      .x-card {
+        box-sizing: border-box;
+        border: solid 1px blue;
+        width: $card-w;
+        height: $card-h;
+        border-radius: 4px;
+      }
+    }
+  }
+}
+
