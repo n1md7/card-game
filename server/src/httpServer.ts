@@ -4,8 +4,11 @@ import cors from "@koa/cors";
 import Router from "koa-router";
 import dotenv from "dotenv";
 import bodyParser from "koa-bodyparser";
+import Deck from "./lib/deck";
 
 dotenv.config();
+
+const deck = new Deck();
 
 // port is now available to the Node.js runtime
 // as if it were an environment variable
