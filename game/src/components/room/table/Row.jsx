@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { ajax } from "../../../services/ajax";
 import { urls } from "../../../constants/urls";
 import { updateUser } from "../../../redux/actions";
+import {Alert, AlertType } from "../../../helpers/toaster";
 
 export default function Row( { id, creator, inRoomSize, size } ) {
   const dispatch = useDispatch();
@@ -34,9 +35,7 @@ export default function Row( { id, creator, inRoomSize, size } ) {
         setTimeout( () => {
           setJoinText( "Join" )
         }, 1000 );
-        // todo log this
-        // hmm again too bad
-        console.warn( error );
+        Alert( AlertType.ERROR, error.message, 10 );
       } );
 
   }.bind( {

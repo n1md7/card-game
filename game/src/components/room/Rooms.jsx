@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ajax } from "../../services/ajax";
 import { urls } from "../../constants/urls";
 import Row from "./table/Row";
+import { Alert, AlertType } from "../../helpers/toaster";
 
 export default function Rooms() {
   const [ list, setList ] = useState( [] );
@@ -20,8 +21,7 @@ export default function Rooms() {
         } )
         .then( setList )
         .catch( error => {
-          // todo add error handling to show to user nicely
-          console.log(error);
+          Alert(AlertType.ERROR, error.message, 10);
           setList( [] );
         } );
     };
