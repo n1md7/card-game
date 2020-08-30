@@ -31,7 +31,7 @@ export default function Card( { rank, suit, svg, ...props } ) {
   };
 
   if ( !svg ) {
-    return <img { ...props } src={ src } alt="Cover"/>;
+    return <img className='x-card' { ...props } src={ src } alt="Cover"/>;
   }
 
   return <ReactSVG

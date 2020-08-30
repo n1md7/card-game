@@ -7,50 +7,24 @@ body {
 }
 
 .x-room-table {
-  position: relative;
-  margin: 70px auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
   height: 80vh;
   width: 80vw;
+  opacity: 0.95;
+  filter: grayscale(100%) drop-shadow(0 25px 0 #404040);
+  transform: rotate3d(1, 0, 0, 60deg);
   background-image: url('../img/table.jpg');
   background-size: cover;
-  border-radius: 25px;
+  border-radius: 50%;
+  border: solid 4px #473939;
   -webkit-box-shadow: 4px 0 30px 3px rgba(0, 0, 0, 0.75);
   -moz-box-shadow: 4px 0 30px 3px rgba(0, 0, 0, 0.75);
   box-shadow: 4px 0 30px 3px rgba(0, 0, 0, 0.75);
-
-  .x-player-bar {
-    width: calc(4 * (#{$card-w} + 12px));
-    padding: 2px;
-    margin: auto;
-
-    .x-cards {
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-around;
-      height: $card-h;
-
-      .x-card {
-        box-sizing: border-box;
-        width: $card-w;
-        height: $card-h;
-        border-radius: 4px;
-        //animation: hide-show 1s 3s ease infinite;
-
-      }
-
-      .x-animate path {
-        animation: heart-beat 750ms alternate ease-in-out infinite;
-      }
-    }
-  }
 }
 
-@keyframes heart-beat {
-  0% {
-    transform: scale(1, 1)
-  }
-  100% {
-    transform: scale(1.015, 1.2)
-  }
-}
+
