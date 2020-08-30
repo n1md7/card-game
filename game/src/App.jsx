@@ -6,8 +6,13 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { ajax } from "./services/ajax";
 import { urls, baseURL, token as tokenKey } from "./constants/urls";
 import { tokenStore } from "./services/token";
+import { Alert, AlertType, showError } from "./helpers/toaster";
 import "./css/app.scss";
 import GameRoom from "./components/game/Room";
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 // when user.name is not defined
 // it always shows auth component
@@ -51,9 +56,7 @@ export default function App() {
           localStorage.setItem( tokenKey, token );
         } )
         .catch( error => {
-          // todo add error handling to show to user nicely
-          console.log( error );
-          alert( error.message );
+          Alert(AlertType.ERROR, error.message, 10);
         } );
     } )
   }, [] );
@@ -75,6 +78,7 @@ export default function App() {
           </div>
         )
       }
+      <ToastContainer />
     </Router>
   );
 }

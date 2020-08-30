@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../../redux/actions";
 import { ajax } from "../../services/ajax";
 import { urls } from "../../constants/urls";
+import { Alert, AlertType } from "../../helpers/toaster";
 
 // id is prop passed from Lobby
 // when redirect happens prop id is null
@@ -43,7 +44,7 @@ export default function Room( { id } ) {
           // so reset it
           dispatch( updateUser( { roomId: null } ) )
           setJoining( false );
-          console.warn( error );
+          Alert(AlertType.ERROR, error.message, 10);
         } );
     }
   }, [] );

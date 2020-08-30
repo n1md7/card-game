@@ -8,6 +8,8 @@ import { ajax } from "../services/ajax";
 import { urls } from "../constants/urls";
 import ResumeRoom from "./room/Resume";
 
+import {Alert, AlertType} from "../helpers/toaster"
+
 export default function Lobby() {
   // watches dynamic updates from different components
   // when changes redirects to Room
@@ -38,8 +40,7 @@ export default function Lobby() {
         setId( roomId );
       } )
       .catch( error => {
-        // todo log this
-        // hmm again too bad
+        Alert(AlertType.ERROR, error.message, 10);
         console.warn( error );
       } );
   }, [] );

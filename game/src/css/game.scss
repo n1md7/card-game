@@ -2,19 +2,16 @@ $card-w: 78px;
 $card-h: 110px;
 
 body {
-  background-image: url('../img/background.jpg');
-  background-size: cover;
+  background: rgba(14, 14, 14, 0.9);
 }
 
-.x-room-table {
+.x-3d-room-table {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   margin: auto;
-  height: 80vh;
-  width: 80vw;
   opacity: 0.95;
   filter: grayscale(100%) drop-shadow(0 25px 0 #404040);
   transform: rotate3d(1, 0, 0, 60deg);
@@ -25,6 +22,25 @@ body {
   -webkit-box-shadow: 4px 0 30px 3px rgba(0, 0, 0, 0.75);
   -moz-box-shadow: 4px 0 30px 3px rgba(0, 0, 0, 0.75);
   box-shadow: 4px 0 30px 3px rgba(0, 0, 0, 0.75);
+
+  .x-background-texture-skin-scratch {
+    width: 100%;
+    height: 100%;
+    background-image: url('../img/bg-skin-scratch.jpg');
+    background-size: cover;
+    opacity: 0.3;
+    border-radius: 50%;
+    filter: hue-rotate(90deg);
+
+    .x-background-texture-skin-cards {
+      background-image: url('../img/background.jpg');
+      opacity: 0.1;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      border-radius: 50%;
+    }
+  }
 }
 
 

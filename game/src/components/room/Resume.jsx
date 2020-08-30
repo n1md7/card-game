@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ajax } from "../../services/ajax";
 import { urls } from "../../constants/urls";
 import { updateUser } from "../../redux/actions";
+import { Alert, AlertType } from "../../helpers/toaster";
 
 export default ( { id } ) => {
   const dispatch = useDispatch();
@@ -25,9 +26,7 @@ export default ( { id } ) => {
       // which will be caught from the component Lobby
       .then( roomId => dispatch( updateUser( { roomId } ) ) )
       .catch( error => {
-        // todo log this
-        // hmm again too bad
-        console.warn( error );
+        Alert(AlertType.ERROR, error.message, 10);
       } );
   }, [] );
 

@@ -30,8 +30,12 @@ export default () => {
   }, [] );
 
   return (
-    <div style={ { width: defaults.w, height: defaults.h } } className="x-room-table">
+    <div className="x-3d-room-table" style={ { width: defaults.w, height: defaults.h } }>
+      <div className="x-background-texture-skin-scratch">
+        <div className="x-background-texture-skin-cards">
 
+        </div>
+      </div>
     </div>
   );
 };
