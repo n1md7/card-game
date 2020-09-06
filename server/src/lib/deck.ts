@@ -35,6 +35,21 @@ class Deck {
       throw new Error( "Not enough cards in deck!" )
     return this.cards.splice( 0, count );
   }
+
+  containsCards(cards: Card[]) {
+    for(const card of cards) {
+      if(this.cards.find(c => c.equals(card)) === undefined)
+        return false;
+    }
+    return true;
+  }
+
+  removeCards(cards: Card[]) {
+    for(const card of cards) {
+      if(this.cards.find(c => c.equals(card)) !== undefined)
+        this.cards.remove(card);
+    }
+  }
 }
 
 export default Deck;

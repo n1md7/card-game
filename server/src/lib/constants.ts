@@ -21,6 +21,12 @@ enum CardSuit {
   SPADES = "spades"
 }
 
+
+enum ActionType {
+  PLACE_CARD,
+  TAKE_CARDS
+}
+
 const cardTypesByName: Map<string, CardType> = new Map( [
   [ "ace", CardType.ACE ],
   [ "2", CardType.TWO ],
@@ -46,4 +52,4 @@ const cardSuitsByName = {
 
 export const CARD_SUM_VALUE = 11;
 
-export {CardType, cardTypesByName, cardSuitsByName }
+export {CardType, cardTypesByName, cardSuitsByName, ActionType }

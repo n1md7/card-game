@@ -11,6 +11,10 @@ class Card {
     this.value = value;
   }
 
+  equals(card: Card) {
+    return this.suit === card.suit && this.name === card.name;
+  }
+
   canTakeCards( cards: Card[] ) {
     if ( cards.length === 1 && cards[ 0 ].value >= 12 && cards[ 0 ].name === this.name )
       return true;
@@ -20,12 +24,15 @@ class Card {
       return true;
 
     if ( this.value === CardType.JACK ) {
-      const paintedCards = cards.filter( card => card.value > CardType.JACK);
-      return paintedCards.length === 4 || ( paintedCards.length === 2 && paintedCards[ 0 ].value === paintedCards[ 1 ].value );
+      const paintedCards = cards.filter( card => card.value > CardType.JACK );
+      const paintedCardsSum = paintedCards.reduce( ( accumulator, card ) =>
+        [ CardSuit.SPADES, CardSuit.CLUBS ].includes( card.suit ) ? accumulator - card.value : accumulator + card.value, 0 )
+      return paintedCardsSum === 0;
     }
 
     return false;
   }
+
 }
 
-export {Card};
+export { Card };
