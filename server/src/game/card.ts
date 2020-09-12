@@ -1,11 +1,11 @@
-import { CardType, CARD_SUM_VALUE } from "./constants";
+import { CardType, CARD_SUM_VALUE, CardSuit } from "./constants";
 
 class Card {
-  private readonly suit: string;
+  private readonly suit: CardSuit;
   private readonly name: string;
   private readonly value: number;
 
-  constructor( suit: string, name: string, value: number ) {
+  constructor( suit: CardSuit, name: string, value: number ) {
     this.suit = suit;
     this.name = name;
     this.value = value;

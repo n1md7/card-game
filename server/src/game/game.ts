@@ -2,19 +2,30 @@ import Deck from "./deck";
 import Player from "./player";
 import { ActionType } from "./constants";
 import { Card } from "./card";
+import { id } from "../helpers/ids";
 
 class Game {
   private deck: Deck;
   private players: Player[];
   private activePlayer: Player;
+  private gameId: string;
   constructor() {
     this.deck = new Deck();
+    this.gameId = id.game();
     this.players = [];
   }
 
   joinPlayer(player: Player) {
     player.setGameActionCallBack(this.playerAction)
     this.players.push(player);
+  }
+
+  getGameId() {
+    return this.gameId;
+  }
+
+  getPlayers() {
+    return this.players;
   }
 
   playerAction(player: Player, type: ActionType, playerCard: Card, tableCards: Card[]) {

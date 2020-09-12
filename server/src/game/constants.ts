@@ -43,13 +43,14 @@ const cardTypesByName: Map<string, CardType> = new Map( [
   [ "king", CardType.KING ]
 ] );
 
-const cardSuitsByName = {
-  "clubs": CardSuit.CLUBS,
-  "diamonds": CardSuit.DIAMONDS,
-  "hearts": CardSuit.HEARTS,
-  "spades": CardSuit.SPADES,
-};
+
+const cardSuitsByName: Map<string, CardSuit> = new Map( [
+  [ "clubs", CardSuit.CLUBS ],
+  [ "diamonds", CardSuit.DIAMONDS ],
+  [ "hearts", CardSuit.HEARTS ],
+  [ "spades", CardSuit.SPADES ],
+] );
 
 export const CARD_SUM_VALUE = 11;
 
-export {CardType, cardTypesByName, cardSuitsByName, ActionType }
+export {CardType, cardTypesByName, cardSuitsByName, ActionType, CardSuit }

@@ -64,7 +64,7 @@ class GameSetup {
     }
 
     // update user name field
-    setup.updateUserById( userId, name );
+    // setup.updateUserById( userId, name );
 
     try {
       setup.createRoom( {
@@ -91,7 +91,7 @@ class GameSetup {
   public showRooms( ctx: Context ) {
     ctx.body = {
       ok: true,
-      rooms: store.getRoomsList()
+      rooms: store.getGamesList()
     };
   }
 
@@ -118,7 +118,7 @@ class GameSetup {
     }
 
     // update user name field
-    setup.updateUserById( userId, name );
+    // setup.updateUserById( userId, name );
 
     let room = {};
     try {

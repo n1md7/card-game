@@ -4,7 +4,9 @@ import cors from "@koa/cors";
 import Router from "koa-router";
 import dotenv from "dotenv";
 import bodyParser from "koa-bodyparser";
-import Deck from "./lib/deck";
+import Deck from "./game/deck";
+import path from "path";
+import serve from "koa-static";
 
 dotenv.config();
 
@@ -23,6 +25,7 @@ const httpServer = http.createServer( koaApp.callback() );
 
 if ( process.env.NODE_ENV.trim() === 'development' ) {
   koaApp.use( cors() );
+  koaApp.use(serve(path.join(__dirname, '../public')));
 }
 
 koaApp

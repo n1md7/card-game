@@ -1,15 +1,35 @@
 import { Card } from "./card";
 import { ActionType } from "./constants";
+import { id } from "../helpers/ids";
+import Game from "./game";
 
 class Player {
   private readonly name: string;
   private cards: Card[];
   private takenCards: Card[];
+  private game: Game;
   private actionCallBack: (player: Player, type: ActionType, playerCard: Card, tableCards: Card[]) => void;
+  private playerId: string;
+
   constructor(name:string) {
     this.name = name;
+    this.playerId = id.player()
     this.cards = [];
     this.takenCards = [];
+  }
+
+
+
+  setGame(game: Game) {
+    this.game = game;
+  }
+
+  getPlayerId() {
+    return this.playerId;
+  }
+
+  getGameId() {
+    return this.game?.getGameId();
   }
 
   equals(player: Player) {

@@ -10,13 +10,13 @@ class Deck {
 
   constructor() {
     this.cards = [];
-    for ( const suitName in cardSuitsByName ) {
+    cardSuitsByName.forEach( ( suitType, suitName ) => {
       if ( suitName in cardSuitsByName ) {
-        cardTypesByName.forEach((cardType, name) => {
-            this.cards.push( new Card( suitName, name, cardType ) );
-        })
+        cardTypesByName.forEach( ( cardType, name ) => {
+          this.cards.push( new Card( suitType, name, cardType ) );
+        } )
       }
-    }
+    } )
     this.shuffle();
   }
 
@@ -36,18 +36,18 @@ class Deck {
     return this.cards.splice( 0, count );
   }
 
-  containsCards(cards: Card[]) {
-    for(const card of cards) {
-      if(this.cards.find(c => c.equals(card)) === undefined)
+  containsCards( cards: Card[] ) {
+    for ( const card of cards ) {
+      if ( this.cards.find( c => c.equals( card ) ) === undefined )
         return false;
     }
     return true;
   }
 
-  removeCards(cards: Card[]) {
-    for(const card of cards) {
-      if(this.cards.find(c => c.equals(card)) !== undefined)
-        this.cards.remove(card);
+  removeCards( cards: Card[] ) {
+    for ( const card of cards ) {
+      if ( this.cards.find( c => c.equals( card ) ) !== undefined )
+        this.cards.remove( card );
     }
   }
 }
