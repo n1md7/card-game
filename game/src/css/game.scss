@@ -10,6 +10,14 @@ $table-h: 360px;
 
 body, #root {
   //background: rgba(14, 14, 14, 0.9);
+  .no-select {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+  }
 }
 
 .x-2d-area {
@@ -44,7 +52,7 @@ body, #root {
 
 
     .x-table {
-      overflow: hidden;
+      //overflow: hidden;
 
       .x-card {
         transition: 150ms all;
