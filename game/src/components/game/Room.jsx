@@ -1,9 +1,7 @@
-import React, { forwardRef, Fragment, useEffect, useRef, useState } from "react";
-import { CSSTransition } from "react-transition-group";
+import React, { useEffect, useState } from "react";
 import "../../css/game.scss";
 import Card from "../cards/Card";
 import Ellipse, { ellipseRanges, random, Pythagoras } from "../../libs/Formulas";
-import CardDom from "../../libs/Card-dom";
 import { suits, ranks, Rank, Suit, fullDeck } from "../../libs/Deck";
 import Player from "./Player";
 
@@ -12,8 +10,8 @@ export default () => {
     windowWidth: 640,
     tableWidth: 740,
     tableHeight: 360,
-    cardWidth: 40,
-    cardHeight: 60,
+    cardWidth: 60,
+    cardHeight: 90,
     cardDiagonal: 10
   } );
   const [ deck, setDeck ] = useState( [] );
@@ -40,18 +38,29 @@ export default () => {
     // populate deck of cards
     setDeck( fullDeck
       .map( ( { id, suit, rank } ) => {
+        const xMax = (defaults.tableWidth) / 2;
+        const x = random( - xMax + defaults.cardDiagonal / 2, xMax - defaults.cardDiagonal );
+        const [ yMin, yMax ] = Ellipse.y( x );
+        const y = random( yMin, yMax - defaults.cardDiagonal );
+        const top = (defaults.tableHeight / 2) - 4 + y;
+        const left = (defaults.tableWidth / 2) - 4 + x;
+        const rotate = random( 0, 180 );
+
         return {
-          id, rank, suit
+          id, rank, suit, top, left, rotate
         }
       } ) );
   }, [] );
 
   useEffect( () => {
-    // Ellipse.setDimensions( 200, 100 );
-    console.log( {
-      deck
-    } )
-  } )
+    if ( !deck.length ) return;
+    const [ { id: one }, { id: two }, { id: three }, { id: four } ] = deck;
+    setTimeout( () => {
+      setDeck(
+        deck.filter( ( { id } ) => ![ one, two, three, four ].includes( id ) )
+      );
+    }, 3000 );
+  }, [ deck ] )
 
   return (
     <div className={ "x-2d-area no-select" } style={ {
@@ -70,19 +79,12 @@ export default () => {
           height: defaults.tableHeight,
         } }>
           {
-            deck.map( ( { id, suit, rank, card }, i ) => {
-              const xMax = (defaults.tableWidth) / 2;
-              const x = random( - xMax + defaults.cardDiagonal, xMax - defaults.cardDiagonal );
-              const [ yMin, yMax ] = Ellipse.y( x );
-              const y = random( yMin, yMax - defaults.cardDiagonal );
-              const top = (defaults.tableHeight / 2) - 4 + y;
-              const left = (defaults.tableWidth / 2) - 4 + x;
-
+            deck.map( ( { id, suit, rank, top, left, rotate }, i ) => {
               return <Card
                 y={ top }
                 x={ left }
                 key={ id }
-                rotate={ random( 0, 180 ) }
+                rotate={ rotate }
                 w={ defaults.cardWidth }
                 h={ defaults.cardHeight }
                 suit={ suit }
