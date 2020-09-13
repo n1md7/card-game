@@ -69,16 +69,10 @@ export default () => {
           width: defaults.tableWidth,
           height: defaults.tableHeight,
         } }>
-          {/*<Card w={ 64 } rank={ "4" } suit={ "clubs" } x={ 10 }/>*/ }
-          {/*<Card w={ 64 } rotate={ 18 } rank={ "6" } suit={ "clubs" } x={ 180 }/>*/ }
-          {/*<Card w={ 64 } rotate={ 45 } rank={ "6" } suit={ "clubs" } x={ 240 }/>*/ }
-          {/*<Card w={ 64 } rotate={ 65 } rank={ "6" } suit={ "diamonds" } x={ 300 }/>*/ }
-          {/*<Card w={ 64 } rotate={ 123 } rank={ "jack" } suit={ "diamonds" } x={ 380 }/>*/ }
-
           {
             deck.map( ( { id, suit, rank, card }, i ) => {
               const xMax = (defaults.tableWidth) / 2;
-              const x = random( - xMax + defaults.cardDiagonal/2, xMax - defaults.cardDiagonal );
+              const x = random( - xMax + defaults.cardDiagonal / 2, xMax - defaults.cardDiagonal );
               const [ yMin, yMax ] = Ellipse.y( x );
               const y = random( yMin - defaults.cardDiagonal, yMax );
               const top = (defaults.tableHeight / 2) - 4 + y;
@@ -94,12 +88,15 @@ export default () => {
                 suit={ suit }
                 rank={ rank }
                 onClick={ function ( { target } ) {
-                  const yMax = (defaults.tableHeight) / 2;
-                  const y = random( - yMax - defaults.cardHeight, yMax );
-                  const [ xMin, xMax ] = Ellipse.x( y );
-                  const x = random( xMin, xMax );
-                  target.style.top = (defaults.tableHeight / 2) - 4 + y + "px";
-                  target.style.left = (defaults.tableWidth / 2) - 4 + x + "px";
+                  const xMax = (defaults.tableWidth) / 2;
+                  const x = random( - xMax + defaults.cardDiagonal / 2, xMax - defaults.cardDiagonal );
+                  const [ yMin, yMax ] = Ellipse.y( x );
+                  const y = random( yMin - defaults.cardDiagonal, yMax );
+                  const top = (defaults.tableHeight / 2) - 4 + y;
+                  const left = (defaults.tableWidth / 2) - 4 + x;
+                  target.style.zIndex = i + 52;
+                  target.style.top = top + "px";
+                  target.style.left = left + "px";
                   target.style.transform = `rotate(${ random( 0, 180 ) }deg)`;
                   console.log( {
                     deck: this,
@@ -109,23 +106,7 @@ export default () => {
               />;
             } )
           }
-          {
-            ellipseRanges( (defaults.tableWidth - defaults.cardWidth) / 2, 15 ).map( i => {
-              let x = i;
-              // x += 200;
-              const y = Ellipse.y( x );
-              return y.map( ( val, key ) => (
-                <div key={ key } style={ {
-                  width: "1px",
-                  height: "1px",
-                  border: "1px solid white",
-                  position: "absolute",
-                  top: (defaults.tableHeight / 2) - 4 + val + "px",
-                  left: (defaults.tableWidth / 2) - 4 + x + "px",
-                } }>{/**/ }</div>
-              ) )
-            } )
-          }
+
         </div>
       </div>
       <div className="x-playing-actions">
