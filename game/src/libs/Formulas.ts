@@ -12,7 +12,7 @@ export default class Ellipse {
 
   static y( x: number ): [ number, number ] {
     const value = ( Ellipse.b * Math.sqrt( Ellipse.a ** 2 - x ** 2 ) ) / Ellipse.a;
-    return [ value, -1 * value ];
+    return [ -value, value ];
   }
 }
 

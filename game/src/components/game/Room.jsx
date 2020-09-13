@@ -72,36 +72,32 @@ export default () => {
           {
             deck.map( ( { id, suit, rank, card }, i ) => {
               const xMax = (defaults.tableWidth) / 2;
-              const x = random( - xMax + defaults.cardDiagonal / 2, xMax - defaults.cardDiagonal );
+              const x = random( - xMax + defaults.cardDiagonal, xMax - defaults.cardDiagonal );
               const [ yMin, yMax ] = Ellipse.y( x );
-              const y = random( yMin - defaults.cardDiagonal, yMax );
+              const y = random( yMin, yMax - defaults.cardDiagonal );
               const top = (defaults.tableHeight / 2) - 4 + y;
               const left = (defaults.tableWidth / 2) - 4 + x;
 
               return <Card
                 y={ top }
                 x={ left }
-                rotate={ random( 0, 180 ) }
                 key={ id }
+                rotate={ random( 0, 180 ) }
                 w={ defaults.cardWidth }
                 h={ defaults.cardHeight }
                 suit={ suit }
                 rank={ rank }
                 onClick={ function ( { target } ) {
                   const xMax = (defaults.tableWidth) / 2;
-                  const x = random( - xMax + defaults.cardDiagonal / 2, xMax - defaults.cardDiagonal );
+                  const x = random( - xMax + defaults.cardDiagonal, xMax - defaults.cardDiagonal );
                   const [ yMin, yMax ] = Ellipse.y( x );
-                  const y = random( yMin - defaults.cardDiagonal, yMax );
+                  const y = random( yMin, yMax - defaults.cardDiagonal );
                   const top = (defaults.tableHeight / 2) - 4 + y;
                   const left = (defaults.tableWidth / 2) - 4 + x;
                   target.style.zIndex = i + 52;
                   target.style.top = top + "px";
                   target.style.left = left + "px";
                   target.style.transform = `rotate(${ random( 0, 180 ) }deg)`;
-                  console.log( {
-                    deck: this,
-                    e: target
-                  } )
                 }.bind( id ) }
               />;
             } )
