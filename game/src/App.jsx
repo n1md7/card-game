@@ -6,12 +6,12 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { ajax } from "./services/ajax";
 import { urls, baseURL, token as tokenKey } from "./constants/urls";
 import { tokenStore } from "./services/token";
-import { Alert, AlertType, showError } from "./helpers/toaster";
-import "./css/app.scss";
+import { Alert, AlertType } from "./helpers/toaster";
 import GameRoom from "./components/game/Room";
+import { ToastContainer } from "react-toastify";
 
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import "./css/app.scss";
+import "react-toastify/dist/ReactToastify.css";
 
 
 // when user.name is not defined
@@ -56,7 +56,7 @@ export default function App() {
           localStorage.setItem( tokenKey, token );
         } )
         .catch( error => {
-          Alert(AlertType.ERROR, error.message, 10);
+          Alert( AlertType.ERROR, error.message, 10 );
         } );
     } )
   }, [] );
@@ -78,7 +78,7 @@ export default function App() {
           </div>
         )
       }
-      <ToastContainer />
+      <ToastContainer/>
     </Router>
   );
 }
