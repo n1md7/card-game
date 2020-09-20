@@ -28,7 +28,7 @@ export default () => {
     left: {
       name: 'jora',
       progress: 34,
-      cards: 2
+      cards: 4
     },
     up: {
       name: '',
@@ -83,7 +83,8 @@ export default () => {
     // fixme: remove me after testing
     // populate deck of cards
     setDeck( fullDeck.splice( 0, 0 )
-      .reduce( ( acc, { id, suit, rank } ) => {
+      .reduce( ( acc, { suit, rank } ) => {
+        const id = suit + rank;
         const xMax = (defaults.tableWidth) / 2;
         const x = random( - xMax + defaults.cardDiagonal / 2, xMax - defaults.cardDiagonal );
         const [ yMin, yMax ] = outerEllipse.y( x );
@@ -114,7 +115,8 @@ export default () => {
       } = defaults;
       setDeck(
         tableCards
-          .reduce( ( acc, { id, suit, rank } ) => {
+          .reduce( ( acc, { suit, rank } ) => {
+            const id = suit + rank;
             const xMax = (defaults.tableWidth) / 2;
             const x = random( - xMax + cardDiagonal / 2, xMax - cardDiagonal );
             const [ yMin, yMax ] = outerEllipse.y( x );
