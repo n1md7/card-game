@@ -18,7 +18,9 @@ class Player {
     this.takenCards = [];
   }
 
-
+  giveCards(cards: Card[]) {
+    this.cards = cards;
+  }
 
   setGame(game: Game) {
     this.game = game;
@@ -49,7 +51,6 @@ class Player {
   setGameActionCallBack(callBack: (player: Player, type: ActionType, playerCard: Card, tableCards: Card[]) => void) {
     this.actionCallBack = callBack;
   }
-
 
   placeCard(card: Card) {
     if(this.cards.find(c => c.equals(card)) === undefined)

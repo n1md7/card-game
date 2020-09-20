@@ -7,10 +7,11 @@ import bodyParser from "koa-bodyparser";
 import Deck from "./game/deck";
 import path from "path";
 import serve from "koa-static";
+import SocketIO from "socket.io"
+import { store } from "./store";
+import { id } from "./helpers/ids";
 
 dotenv.config();
-
-const deck = new Deck();
 
 // port is now available to the Node.js runtime
 // as if it were an environment variable
@@ -22,11 +23,27 @@ const router = new Router( {
 } );
 
 const httpServer = http.createServer( koaApp.callback() );
+const io = SocketIO( httpServer );
 
 if ( process.env.NODE_ENV.trim() === 'development' ) {
   koaApp.use( cors() );
-  koaApp.use(serve(path.join(__dirname, '../public')));
 }
+
+
+
+io.on( "connection", ( socket ) => {
+  console.log( "socket connection" );
+  socket.on( "connect_to_game", ( token ) => {
+    if(store.tokenExists(token)) {
+    }
+  } );
+} );
+
+
+setInterval( () => {
+  io.emit( "FromAPI", "" );
+}, 1000 );
+
 
 koaApp
   .use( bodyParser() )
@@ -41,6 +58,7 @@ if ( process.env.NODE_ENV.trim() !== 'test' ) {
     }
   } );
 }
+
 
 // This is for tests
 export {

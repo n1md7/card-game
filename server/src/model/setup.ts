@@ -1,7 +1,8 @@
-import { store} from "../store";
+import { store } from "../store";
 import "../helpers/index";
 import Player from "../game/player";
 import Game from "../game/game";
+import User from "../user";
 
 class Setup {
 
@@ -10,61 +11,38 @@ class Setup {
     if ( user && !name ) {
       return user;
     }
-
     return null;
   }
 
-  public signUp( id: string, name: string | null ): Player {
-    return new Player("");
+  public signUp( id: string, name: string | null ): User {
+    return store.setUserById( id, new User( id, name ) );
   }
 
-  public createRoom( { userId, roomId, size, isPublic }: {
-    userId: string;
-    roomId: string;
-    size: number;
-    isPublic: boolean;
-  } ): Game | Error {
-    const newPlayer = new Player("");
-    const game = new Game();
-    game.joinPlayer(newPlayer)
-    store.setPlayerById(newPlayer.getPlayerId(), newPlayer);
-    return store.setGameById(game.getGameId(), game);
+  public createRoom( userId: string, roomId: string, size: number, isPublic: boolean ): Player{
+    const newPlayer = new Player( "" );
+    const game = new Game( size );
+    game.joinPlayer( newPlayer )
+    store.setPlayerById( newPlayer.getPlayerId(), newPlayer );
+    store.setGameById( game.getGameId(), game )
+    return newPlayer;
   }
 
-  public joinRoom( { id, userId }: {
-    id: string;
-    userId: string;
-  } ): Game | Error {
+  public joinRoom( id: string, userId: string ): Game {
     const game = store.getGameById( id );
-    // when no such room instantly throw an error
     if ( !game ) {
       throw new Error( `could not find a room to join with the id:${ id }` );
     }
-    // get all joined user ids from that room
-    const players = game.getPlayers();
-    // get user info
-    const player = store.getPlayerById( userId );
-    // when user id is not valid throw an error
-    if ( !player ) {
+    const user = store.getUserById( userId );
+    if ( !user ) {
       throw new Error( `could not find a user with the id:${ userId }` );
     }
-    /*// return room since the one is already joined
-    if ( players?.length && players.includes( userId ) ) {
-      return room;
-    }
-    // increment room size
-    if ( 1 + room.inRoomSize > room.size ) {
-      throw new Error( 'the room is full' );
+    if ( game.isStarted ) {
+      throw new Error( `game started` );
     }
 
-    if ( user.roomId ) {
-      throw new Error( `you need to leave the table first with the id:${ user.roomId }` );
-    }*/
-
-    const newPlayer = new Player("");
-    game.joinPlayer(newPlayer);
-    store.setPlayerById(newPlayer.getPlayerId(), newPlayer)
-    // update room store
+    const newPlayer = new Player( user.name );
+    game.joinPlayer( newPlayer );
+    store.setPlayerById( newPlayer.getPlayerId(), newPlayer )
     return game;
   }
 
@@ -92,7 +70,7 @@ class Setup {
   }
 
   public getUserInfo( userId: string ) {
-    const user = store.getPlayerById( userId );
+    const user = store.getUserById( userId );
     if ( !user ) {
       throw new Error( `could not find a user with the id:${ userId }` );
     }
