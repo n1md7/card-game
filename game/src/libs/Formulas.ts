@@ -1,24 +1,21 @@
 export default class Ellipse {
-  private static a: number;
-  private static b: number;
+  private readonly a: number = 0;
+  private readonly b: number = 0;
 
-  static setDimensions( width: number, height: number ) {
-    if ( width === 0 || height === 0 ) {
-      throw new Error( 'width or height shouldn\'t be zero' );
-    }
-    Ellipse.a = width / 2;
-    Ellipse.b = height / 2;
+  constructor( width: number, height: number ) {
+    this.a = width / 2;
+    this.b = height / 2;
   }
 
-  static y( x: number ): [ number, number ] {
-    const value = ( Ellipse.b * Math.sqrt( Ellipse.a ** 2 - x ** 2 ) ) / Ellipse.a;
+  y( x: number ): [ number, number ] {
+    const value = ( this.b * Math.sqrt( this.a ** 2 - x ** 2 ) ) / this.a;
     return [ -value, value ];
   }
 }
 
-export const ellipseRanges = ( size: number, skips = 4 ) => {
+export const ellipseRanges = ( width: number, skips = 4 ) => {
   const list = [];
-  for ( let i = -1 * size; i < size; i += skips ) {
+  for ( let i = -1 * width; i < width; i += skips ) {
     list.push( i );
   }
 

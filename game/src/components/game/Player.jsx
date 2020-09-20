@@ -4,7 +4,7 @@ import { list } from "../../helpers/Protos";
 
 export default ( { cards, progress, ...props } ) => {
   const style = {};
-  if ( progress ) { style.width = progress + "%"}
+  if ( !isNaN( progress ) ) { style.width = progress + "%"}
   const [ seat, setSeat ] = useState( false );
 
   const joinHandler = e => {
@@ -28,7 +28,7 @@ export default ( { cards, progress, ...props } ) => {
               }
             </div>
             <div className="x-progress" style={ style }>{ "" }</div>
-            <div className="x-name">{ "nimda" }</div>
+            <div className="x-name">{ props?.name || "default" }</div>
           </Fragment>
       }
     </div>
