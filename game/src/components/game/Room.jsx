@@ -6,7 +6,7 @@ import { suits, ranks, Rank, Suit, fullDeck } from "../../libs/Deck";
 import Player from "./Player";
 import "../../css/game.scss";
 
-const SOCKET_ENDPOINT = "127.0.0.1";
+const SOCKET_ENDPOINT = "localhost:8000";
 
 export default () => {
   const [ defaults, setDefaults ] = useState( {

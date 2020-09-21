@@ -1,106 +1,80 @@
-type UserProps = {
-    id?: string;
-    name?: string;
-    roomId?: string | null;
-    signUpTime?: number;
-    updateTime?: number;
-}
-
-type RoomProps = {
-    creator?: {
-        readonly id: string;
-        readonly name: string;
-    };
-    readonly name?: string;
-    users?: string[];
-    readonly size?: number;
-    inRoomSize?: number;
-    readonly isPublic?: boolean;
-    readonly id?: string;
-    readonly signUpTime?: number;
-    updateTime?: number;
-};
+import Player from "./game/player";
+import Game from "./game/game";
+import User from "./user";
 
 class Store {
-    private users: { [id: string]: UserProps } = {/**/};
-    private rooms: { [id: string]: RoomProps } = {/**/};
+  private users: { [ id: string ]: User } = {/**/ };
+  private players: { [ id: string ]: Player } = {/**/ };
+  private games: { [ id: string ]: Game } = {/**/ };
 
-    public getUserById(id: string): UserProps {
-        return this.users[id];
-    }
 
-    public getRoomById(id: string): RoomProps {
-        return this.rooms[id];
+  public addPlayerToken( player: Player, userId: string ) {
+    try {
+      this.users[ userId ].player = player;
+    } catch ( ex ) {
     }
+  }
 
-    public setRoomById(id: string, room: RoomProps): RoomProps {
-        return this.rooms[id] = {
-            ...room,
-            id,
-            inRoomSize: 1,
-            signUpTime: new Date().valueOf(),
-            updateTime: new Date().valueOf()
-        };
-    }
+  public setUserById( id: string, user: User ): User {
+    return this.users[ id ] = user;
+  }
 
-    public setUserById(id: string, user: UserProps): UserProps {
-        // except id, signUpTime and updateTime
-        // all should be passed
-        return this.users[id] = {
-            ...user,
-            id,
-            signUpTime: new Date().valueOf(),
-            updateTime: new Date().valueOf()
-        }
-    }
+  public getUserById( id: string ): User {
+    return this.users[ id ];
+  }
 
-    public updateRoomById(id: string, room: RoomProps): RoomProps {
-        // when such id does not exist
-        // it will create new record for that
-        // except id and signUpTime and updateTime all can be updated
-        return this.rooms[id] = {
-            ...this.rooms[id],
-            ...room,
-            id,
-            updateTime: new Date().valueOf(),
-            signUpTime: this.rooms[id].signUpTime
-        };
-    }
+  public getPlayerById( id: string ): Player {
+    return this.players[ id ];
+  }
 
-    public updateUserById(id: string, user: UserProps): UserProps {
-        // when such id does not exist
-        // it will create new record for that
-        // except id and signUpTime and updateTime all can be updated
-        return this.users[id] = {
-            ...this.users[id],
-            ...user,
-            id,
-            updateTime: new Date().valueOf(),
-            signUpTime: this.users[id].signUpTime
-        };
-    }
+  public getGameById( id: string ): Game {
+    return this.games[ id ];
+  }
 
-    public getRoomsList(){
-        return this.rooms;
-    }
+  public setGameById( id: string, game: Game ): Game {
+    return this.games[ id ] = game;
+  }
 
-    public getUsersList(){
-        return this.users;
-    }
+  public setPlayerById( id: string, player: Player ): Player {
+    // except id, signUpTime and updateTime
+    // all should be passed
+    return this.players[ id ] = player;
+  }
 
-    public clearRooms(){
-        this.rooms = {};
-    }
+  public updateGameById( id: string, player: Player ): Player {
+    // when such id does not exist
+    // it will create new record for that
+    // except id and signUpTime and updateTime all can be updated
+    return this.players[ id ] = player;
+  }
 
-    public clearUsers(){
-        this.users = {};
-    }
+  /*   public updatePlayerById(id: string, gameId: string): Player {
+         // when such id does not exist
+         // it will create new record for that
+         // except id and signUpTime and updateTime all can be updated
+
+         return this.players[id] = new Player();
+     }*/
+
+  public getGamesList() {
+    return Object.values( this.games ).map( ( game: Game ) => game.getGameData() );
+  }
+
+  public getPlayersList() {
+    return this.players;
+  }
+
+  public clearGames() {
+    this.games = {};
+  }
+
+  public clearPlayers() {
+    this.players = {};
+  }
 }
 
 const store = new Store();
 
 export {
-    store,
-    RoomProps,
-    UserProps
+  store
 }
