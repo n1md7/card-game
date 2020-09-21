@@ -11,13 +11,15 @@ class Deck {
   constructor() {
     this.cards = [];
     cardSuitsByName.forEach( ( suitType, suitName ) => {
-      if ( suitName in cardSuitsByName ) {
         cardTypesByName.forEach( ( cardType, name ) => {
           this.cards.push( new Card( suitType, name, cardType ) );
         } )
-      }
     } )
     this.shuffle();
+  }
+
+  isEmpty() {
+    return this.cards.length === 0;
   }
 
   shuffle() {

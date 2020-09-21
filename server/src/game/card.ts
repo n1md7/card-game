@@ -1,9 +1,9 @@
 import { CardType, CARD_SUM_VALUE, CardSuit } from "./constants";
 
 class Card {
-  private readonly suit: CardSuit;
-  private readonly name: string;
-  private readonly value: number;
+  public readonly suit: CardSuit;
+  public readonly name: string;
+  public readonly value: number;
 
   constructor( suit: CardSuit, name: string, value: number ) {
     this.suit = suit;
@@ -12,7 +12,8 @@ class Card {
   }
 
   equals(card: Card) {
-    return this.suit === card.suit && this.name === card.name;
+    console.log(card);
+    return ![null, undefined].includes(card) && this.suit === card.suit && this.name === card.name;
   }
 
   canTakeCards( cards: Card[] ) {

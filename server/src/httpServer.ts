@@ -10,6 +10,8 @@ import serve from "koa-static";
 import SocketIO from "socket.io"
 import { store } from "./store";
 import { id } from "./helpers/ids";
+import Game from "./game/game";
+import Player from "./game/player";
 
 dotenv.config();
 
@@ -30,18 +32,25 @@ if ( process.env.NODE_ENV.trim() === 'development' ) {
 }
 
 
+const game = new Game( 4 );
+
+game.joinPlayer( new Player( "giorgi" ), 'left' );
+game.joinPlayer( new Player( "harry" ), 'up' );
+game.joinPlayer( new Player( "fifaia" ), 'down' );
+game.joinPlayer( new Player( "megan fox" ), 'right' );
 
 io.on( "connection", ( socket ) => {
   console.log( "socket connection" );
-  socket.on( "connect_to_game", ( token ) => {
-    if(store.tokenExists(token)) {
-    }
-  } );
+
+
 } );
 
 
 setInterval( () => {
-  io.emit( "FromAPI", "" );
+  io.emit( "player-cards", [ { rank: "queen", suit: "spades" } ] );
+
+  io.emit( "table-cards", game.getCardsList());
+  io.emit( "players", game.getPlayersData() );
 }, 1000 );
 
 

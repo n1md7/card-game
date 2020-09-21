@@ -10,10 +10,10 @@ class Game {
 
   private deck: Deck;
   private players: Player[];
-  private activePlayer: Player;
+  public activePlayer: Player;
   private gameId: string;
   private numberOfPlayers: number;
-  private timeToMove: number;
+  public timeToMove: number;
   private timer: Timeout;
   private currentPlayerIndex: number;
   private cards: Card[];
@@ -26,42 +26,62 @@ class Game {
     this.isStarted = false;
     this.timeToMove = 10;
     this.cards = [];
+    this.currentPlayerIndex = 0;
   }
 
   startGame() {
     this.isStarted = true;
+    this.dealCards( true );
     this.activePlayer = this.players[ this.currentPlayerIndex ];
     this.startTimer();
   }
 
-  dealCards() {
-    for(const player of this.players) {
-      player.giveCards(this.deck.getCards(6));
-    }
-    this.cards = this.deck.getCards(4);
+  getCardsList() {
+    return this.cards.reduce( ( a: any[], card: Card ) => ( a.push( { rank: card.name, suit: card.suit } ) , a ), [] );
   }
+
+  dealCards( firstDeal: boolean = false ) {
+    if(this.deck.isEmpty())
+      return;
+    for ( const player of this.players ) {
+      const numberOfCards = 4 - player.cards.length;
+      if ( numberOfCards > 0 )
+        player.giveCards( this.deck.getCards( numberOfCards ) );
+    }
+    if ( firstDeal )
+      this.cards = this.deck.getCards( 4 );
+  }
+
+  getPlayersData() {
+    return this.players.reduce( ( a: any, player: Player ) => ( a[ player.position ] = player.getPlayerData() , a ), {} );
+  }
+
 
   changePlayer() {
     this.currentPlayerIndex++;
     if ( this.currentPlayerIndex >= this.players.length ) {
       this.currentPlayerIndex = 0;
+      this.dealCards();
     }
     this.activePlayer = this.players[ this.currentPlayerIndex ];
   }
 
   startTimer() {
     this.timer = setInterval( () => {
+      this.timeToMove--;
       if ( this.timeToMove <= 0 ) {
-        this.changePlayer();
+        this.activePlayer.placeRandomCard();
         this.timeToMove = 10;
+        this.changePlayer();
       }
     }, 1000 );
   }
 
-  joinPlayer( player: Player ) {
+  joinPlayer( player: Player, position: string = "" ) {
+    player.position = position;
     if ( this.players.length >= this.numberOfPlayers )
       throw new Error( "Game is fool" );
-    player.setGameActionCallBack( this.playerAction )
+    player.setGame( this );
     this.players.push( player );
     if ( this.players.length === this.numberOfPlayers ) {
       this.startGame();
@@ -99,6 +119,7 @@ class Game {
     return true;
   }
 
+
   playerAction( player: Player, type: ActionType, playerCard: Card, tableCards: Card[] ) {
     this.validateAction( player, type, playerCard, tableCards );
     if ( type === ActionType.TAKE_CARDS ) {
@@ -109,7 +130,6 @@ class Game {
       this.cards.push( playerCard );
       player.removeCardFromHand( playerCard );
     }
-    this.changePlayer();
   }
 
   validateAction( player: Player, type: ActionType, playerCard: Card, tableCards: Card[] ) {
