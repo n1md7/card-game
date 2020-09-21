@@ -26,22 +26,22 @@ export default () => {
   const tableRef = useRef( null );
   const [ players, setPlayers ] = useState( {
     left: {
-      name: 'jora',
-      progress: 34,
-      cards: 4
+      name: "",
+      progress: 0,
+      cards: 0
     },
     up: {
-      name: '',
+      name: "",
       progress: 0,
       cards: 0
     },
     right: {
-      name: '',
+      name: "",
       progress: 0,
       cards: 0
     },
     down: {
-      name: '',
+      name: "",
       progress: 0,
       cards: 0
     },
@@ -80,29 +80,6 @@ export default () => {
   }, [] );
 
   useEffect( () => {
-    // fixme: remove me after testing
-    // populate deck of cards
-    setDeck( fullDeck.splice( 0, 0 )
-      .reduce( ( acc, { suit, rank } ) => {
-        const id = suit + rank;
-        const xMax = (defaults.tableWidth) / 2;
-        const x = random( - xMax + defaults.cardDiagonal / 2, xMax - defaults.cardDiagonal );
-        const [ yMin, yMax ] = outerEllipse.y( x );
-        const y = random( yMin, yMax - defaults.cardDiagonal );
-        const top = (defaults.tableHeight / 2) - borderWidth + y;
-        const left = (defaults.tableWidth / 2) - borderWidth + x;
-        const rotate = random( 0, 180 );
-
-        return {
-          ...acc,
-          [ id ]: {
-            id, rank, suit, top, left, rotate
-          }
-        }
-      }, {} ) );
-  }, [] );
-
-  useEffect( () => {
     const socket = socketIOClient( SOCKET_ENDPOINT );
     // player-cards expecting an array of objects with { suit, rank }
     socket.on( "players", setPlayers );
@@ -113,30 +90,32 @@ export default () => {
         tableHeight,
         tableWidth
       } = defaults;
-      setDeck(
+      setDeck( prevState => {
         tableCards
-          .reduce( ( acc, { suit, rank } ) => {
+          .forEach( ( { suit, rank } ) => {
             const id = suit + rank;
-            const xMax = (defaults.tableWidth) / 2;
-            const x = random( - xMax + cardDiagonal / 2, xMax - cardDiagonal );
-            const [ yMin, yMax ] = outerEllipse.y( x );
-            const y = random( yMin, yMax - cardDiagonal );
-            const top = (tableHeight / 2) - borderWidth + y;
-            const left = (tableWidth / 2) - borderWidth + x;
-            const rotate = random( 0, 180 );
+            if ( !prevState.hasOwnProperty( id ) ) {
+              const xMax = (defaults.tableWidth) / 2;
+              const x = random( - xMax + cardDiagonal / 2, xMax - cardDiagonal );
+              const [ yMin, yMax ] = outerEllipse.y( x );
+              const y = random( yMin, yMax - cardDiagonal );
+              const top = (tableHeight / 2) - borderWidth + y;
+              const left = (tableWidth / 2) - borderWidth + x;
+              const rotate = random( 0, 180 );
 
-            return {
-              ...acc,
-              [ id ]: {
+              prevState[ id ] = {
                 id,
                 rank,
                 suit,
                 top,
                 left,
                 rotate
-              }
+              };
             }
-          }, {} ) );
+          } );
+
+        return prevState;
+      } );
     } );
   }, [] );
 
