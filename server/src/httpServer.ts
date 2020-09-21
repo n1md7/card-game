@@ -41,13 +41,10 @@ game.joinPlayer( new Player( "megan fox" ), 'right' );
 
 io.on( "connection", ( socket ) => {
   console.log( "socket connection" );
-
-
 } );
 
-
 setInterval( () => {
-  io.emit( "player-cards", [ { rank: "queen", suit: "spades" } ] );
+  io.emit( "player-cards", game.activePlayer.getHandCards() );
 
   io.emit( "table-cards", game.getCardsList());
   io.emit( "players", game.getPlayersData() );
