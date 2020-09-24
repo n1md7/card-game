@@ -48,8 +48,7 @@ io.on( "connection", ( socket ) => {
 
 setInterval( () => {
   io.emit( "player-cards", [ { rank: "queen", suit: "spades" } ] );
-
-  io.emit( "table-cards", game.getCardsList());
+  io.emit( "table-cards:add", game.getCardsList());
   io.emit( "players", game.getPlayersData() );
 }, 1000 );
 

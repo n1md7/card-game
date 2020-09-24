@@ -26,21 +26,25 @@ export default () => {
   const tableRef = useRef( null );
   const [ players, setPlayers ] = useState( {
     left: {
+      taken: false,
       name: "",
       progress: 0,
       cards: 0
     },
     up: {
+      taken: false,
       name: "",
       progress: 0,
       cards: 0
     },
     right: {
+      taken: false,
       name: "",
       progress: 0,
       cards: 0
     },
     down: {
+      taken: false,
       name: "",
       progress: 0,
       cards: 0
@@ -84,14 +88,14 @@ export default () => {
     // player-cards expecting an array of objects with { suit, rank }
     socket.on( "players", setPlayers );
     socket.on( "player-cards", setPlayerCards );
-    socket.on( "table-cards", tableCards => {
+    socket.on( "table-cards:add", cards => {
       const {
         cardDiagonal,
         tableHeight,
         tableWidth
       } = defaults;
       setDeck( prevState => {
-        tableCards
+        cards
           .forEach( ( { suit, rank } ) => {
             const id = suit + rank;
             if ( !prevState.hasOwnProperty( id ) ) {
@@ -117,13 +121,26 @@ export default () => {
         return prevState;
       } );
     } );
+    socket.on( "table-cards:remove", cards => {
+      setDeck( prevState => {
+        cards
+          .forEach( ( { suit, rank } ) => {
+            const id = suit + rank;
+            if ( prevState.hasOwnProperty( id ) ) {
+              delete prevState[ id ];
+            }
+          } );
+
+        return prevState;
+      } );
+    } );
   }, [] );
 
   const calculatedValues = e => {
     // 4px is table border width
-    const calculatedX = e.clientX - tableRef.current.offsetLeft - borderWidth;
+    const calculatedX = e.clientX - tableRef.current?.offsetLeft - borderWidth;
     const calculatedY = (
-      e.clientY - tableRef.current.offsetTop
+      e.clientY - tableRef.current?.offsetTop
       - borderWidth - defaults.xActionsHeight
     );
 
@@ -188,21 +205,25 @@ export default () => {
       </div>
       <div className="x-2d-room">
         <Player
+          taken={ false }
           name={ players.left.name }
           cards={ players.left.cards }
           progress={ players.left.progress }
           className={ "x-seat x-one" }/>
         <Player
+          taken={ true }
           name={ players.up.name }
           cards={ players.up.cards }
           progress={ players.up.progress }
           className={ "x-seat x-two" }/>
         <Player
+          taken={ true }
           name={ players.right.name }
           cards={ players.right.cards }
           progress={ players.right.progress }
           className={ "x-seat x-three" }/>
         <Player
+          taken={ true }
           name={ players.down.name }
           cards={ players.down.cards }
           progress={ players.down.progress }
