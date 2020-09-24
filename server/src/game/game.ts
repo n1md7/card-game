@@ -37,11 +37,17 @@ class Game {
   }
 
   getCardsList() {
-    return this.cards.reduce( ( a: any[], card: Card ) => ( a.push( { rank: card.name, suit: card.suit } ) , a ), [] );
+    return this.cards
+      .reduce( ( a: any[], card: Card ) => ( [
+          ...a, {
+            rank: card.name,
+            suit: card.suit
+          } ]
+      ), [] );
   }
 
   dealCards( firstDeal: boolean = false ) {
-    if(this.deck.isEmpty())
+    if ( this.deck.isEmpty() )
       return;
     for ( const player of this.players ) {
       const numberOfCards = 4 - player.cards.length;

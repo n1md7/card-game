@@ -28,6 +28,7 @@ class Player {
 
   getPlayerData() {
     return {
+      taken: true,
       name: this.name,
       progress: this.game === null || [null, undefined].includes(this.game.activePlayer) || !this.game.activePlayer.equals(this) ? 0 : 100 * this.game.timeToMove / 10,
       cards: this.cards.length
