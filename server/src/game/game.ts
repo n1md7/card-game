@@ -98,7 +98,8 @@ class Game {
     return {
       id: this.getGameId(),
       inRoomSize: this.players.length,
-      size: this.numberOfPlayers
+      size: this.numberOfPlayers,
+      creator: {name: "giorgi"}
     }
   }
 

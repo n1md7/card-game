@@ -62,7 +62,7 @@ export default function App() {
   }, [] );
 
 
-  return <GameRoom/>
+  /*return <GameRoom/>*/
 
   return (
     <Router>

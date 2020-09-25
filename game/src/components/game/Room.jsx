@@ -5,6 +5,7 @@ import Ellipse, { ellipseRanges, random, Pythagoras } from "../../libs/Formulas"
 import { suits, ranks, Rank, Suit, fullDeck } from "../../libs/Deck";
 import Player from "./Player";
 import "../../css/game.scss";
+import jsonWebToken from "jsonwebtoken";
 
 const SOCKET_ENDPOINT = "localhost:8000";
 
@@ -84,7 +85,7 @@ export default () => {
   }, [] );
 
   useEffect( () => {
-    const socket = socketIOClient( SOCKET_ENDPOINT );
+    const socket = socketIOClient( SOCKET_ENDPOINT, { query: `userId=${localStorage.getItem("token")}`} );
     // player-cards expecting an array of objects with { suit, rank }
     socket.on( "players", setPlayers );
     socket.on( "player-cards", setPlayerCards );

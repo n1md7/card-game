@@ -51,7 +51,7 @@ class GameController {
     }
     let player : Player | Error = null;
     try {
-      player = setup.createRoom( userId, roomId, isPublic, size );
+      player = setup.createRoom( userId, roomId, size, isPublic );
     } catch ( { message } ) {
       this.createContextBody(ctx, false, message);
       return;
@@ -59,7 +59,7 @@ class GameController {
 
     store.addPlayerToken(player, userId);
 
-    this.createContextBody(ctx, true, "");
+    this.createContextBody(ctx, true, "", {roomId});
 
   }
 
@@ -88,7 +88,7 @@ class GameController {
       return;
     }
 
-    this.createContextBody(ctx, false, "", {room: room.getGameData()});
+    this.createContextBody(ctx, true, "", {room: room.getGameData()});
   }
 
   public leaveRoom( ctx: Context ) {
@@ -113,7 +113,7 @@ class GameController {
       this.createContextBody(ctx, false, message);
       return;
     }
-    this.createContextBody(ctx, false, "", {user});
+    this.createContextBody(ctx, true, "", {user});
   }
 
 }
