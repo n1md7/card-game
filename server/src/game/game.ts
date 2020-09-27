@@ -1,6 +1,6 @@
 import Deck from "./deck";
 import Player from "./player";
-import { ActionType } from "./constants";
+import { ActionType, CardSuit } from "./constants";
 import { Card } from "./card";
 import { id } from "../helpers/ids";
 import Timeout = NodeJS.Timeout;
@@ -27,6 +27,14 @@ class Game {
     this.timeToMove = 10;
     this.cards = [];
     this.currentPlayerIndex = 0;
+  }
+
+  findEmptyPositions() {
+    const positions = [ "left", "right", "up", "down" ];
+    const occupiedPositions = this.players.reduce( ( a: any, pl: Player ) => ( a.push( pl.position ), a ), [] );
+    return positions.filter( function ( el ) {
+      return !occupiedPositions.includes( el );
+    } );
   }
 
   startGame() {
@@ -59,7 +67,17 @@ class Game {
   }
 
   getPlayersData() {
-    return this.players.reduce( ( a: any, player: Player ) => ( a[ player.position ] = player.getPlayerData() , a ), {} );
+    const playerData = this.players.reduce( ( a: any, player: Player ) => ( a[ player.position ] = player.getPlayerData() , a ), {} );
+    for ( const post of this.findEmptyPositions() ) {
+      const emptyPosition = {
+        taken: false,
+        name: "",
+        progress: 0,
+        cards: [new Card(CardSuit.CLUBS, "", 1)]
+      };
+      playerData.push(emptyPosition);
+    }
+    return playerData;
   }
 
 
@@ -83,7 +101,16 @@ class Game {
     }, 1000 );
   }
 
-  joinPlayer( player: Player, position: string = "" ) {
+  joinPlayer( player: Player, position: string = null ) {
+    if ( position == null ) {
+      const emptyPositions = this.findEmptyPositions();
+      if ( emptyPositions.length > 0 )
+        position = emptyPositions[ 0 ];
+    }
+
+    if ( ![ "left", "right", "up", "down" ].includes( position ) ||
+      this.players.reduce( ( a: any, pl: Player ) => ( a.push( pl.position ), a ), [] ).includes( position ) )
+      throw new Error( "incorrect position" );
     player.position = position;
     if ( this.players.length >= this.numberOfPlayers )
       throw new Error( "Game is fool" );
@@ -99,7 +126,7 @@ class Game {
       id: this.getGameId(),
       inRoomSize: this.players.length,
       size: this.numberOfPlayers,
-      creator: {name: "giorgi"}
+      creator: { name: "giorgi" }
     }
   }
 

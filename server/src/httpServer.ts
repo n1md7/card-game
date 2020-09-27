@@ -70,7 +70,7 @@ setInterval( () => {
         const user = store.getUserById( userId );
         const game = user.player.getGame();
         if ( ![ undefined, null ].includes( user.player ) ) {
-          io.to( user.socketId ).emit( "player-cards", [ { rank: "queen", suit: "spades" } ] );
+          io.to( user.socketId ).emit( "player-cards", user.player.getHandCards() );
           io.to( user.socketId ).emit( "table-cards:add", game.getCardsList() );
           io.to( user.socketId ).emit( "players", game.getPlayersData() );
         }
