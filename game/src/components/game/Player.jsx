@@ -2,20 +2,14 @@ import React, { Fragment, useState } from "react";
 import Card from "../cards/Card";
 import { list } from "../../helpers/Protos";
 
-export default ( { taken, cards, progress, ...props } ) => {
+export default ( { taken, cards, progress, joinHandler, ...props } ) => {
   const style = {};
   if ( !isNaN( progress ) ) { style.width = progress + "%"}
-  const [ seat, setSeat ] = useState( false );
-
-  const joinHandler = () => {
-    setSeat( true );
-  };
-
 
   return (
     <div { ...props }>
       {
-        !seat && !taken ?
+        !taken ?
           <div className={ "x-join" }>
             <button onClick={ joinHandler } className="btn btn-link">
               Join
