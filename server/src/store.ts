@@ -8,6 +8,10 @@ class Store {
   private games: { [ id: string ]: Game } = {/**/ };
 
 
+  public getUsers() {
+    return this.users;
+  }
+
   public addPlayerToken( player: Player, userId: string ) {
     try {
       this.users[ userId ].player = player;

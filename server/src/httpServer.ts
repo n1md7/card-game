@@ -42,8 +42,9 @@ game.joinPlayer( new Player( "megan fox" ), 'right' );
 
 io.on( "connection", ( socket ) => {
   const user = store.getUserById(socket.handshake.query['userId']);
-  console.log(user);
-  console.log(store);
+  if([undefined, null].includes(user))
+    return;
+  user.socketId = socket.id;
 } );
 
 

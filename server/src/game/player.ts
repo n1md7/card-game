@@ -3,6 +3,8 @@ import { ActionType } from "./constants";
 import { id } from "../helpers/ids";
 import Game from "./game";
 import { random } from "../../../game/src/libs/Formulas";
+import gameController from "../controller/gameController";
+import { store } from "../store";
 
 function getRandomInt( max: number ) {
   return Math.floor( Math.random() * Math.floor( max ) );
@@ -15,7 +17,7 @@ class Player {
   private readonly name: string;
   public cards: Card[];
   private takenCards: Card[];
-  private game: Game = null;
+  private gameId: string = null;
   private playerId: string;
   public position: string;
 
@@ -44,7 +46,11 @@ class Player {
   }
 
   setGame(game: Game) {
-    this.game = game;
+    this.gameId = game.getGameId();
+  }
+
+  getGame() {
+    return this.gameId == null ? null : store.getGameById(this.gameId);
   }
 
   getPlayerId() {
@@ -52,7 +58,7 @@ class Player {
   }
 
   getGameId() {
-    return this.game?.getGameId();
+    return this.gameId;
   }
 
   equals(player: Player) {
