@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import socketIOClient from "socket.io-client";
 import Card from "../cards/Card";
-import Ellipse, { ellipseRanges, random, Pythagoras } from "../../libs/Formulas";
-import { suits, ranks, Rank, Suit, fullDeck } from "../../libs/Deck";
+import Ellipse, { random, Pythagoras } from "../../libs/Formulas";
 import Player from "./Player";
 import { SOCKET_ENDPOINT } from "../../constants/urls";
 import defaultsValue, { playersValue, draggingValue } from "../../constants/defaults";
@@ -45,7 +44,11 @@ export default () => {
   }, [] );
 
   useEffect( () => {
-    const socket = socketIOClient( SOCKET_ENDPOINT, { query: `userId=${ localStorage.getItem( "token" ) }` } );
+    const token = localStorage.getItem( "token" );
+    const options = {
+      query: `token=${ token }`
+    };
+    const socket = socketIOClient( SOCKET_ENDPOINT, options );
     // player-cards expecting an array of objects with { suit, rank }
     socket.on( "players", setPlayers );
     socket.on( "player-cards", setPlayerCards );
