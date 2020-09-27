@@ -29,6 +29,7 @@ const io = SocketIO( httpServer );
 
 if ( process.env.NODE_ENV.trim() === 'development' ) {
   koaApp.use( cors() );
+  console.log("development")
 }
 
 
@@ -40,9 +41,9 @@ game.joinPlayer( new Player( "fifaia" ), 'down' );
 game.joinPlayer( new Player( "megan fox" ), 'right' );
 
 io.on( "connection", ( socket ) => {
-  console.log( "socket connection" );
-
-
+  const user = store.getUserById(socket.handshake.query['userId']);
+  console.log(user);
+  console.log(store);
 } );
 
 
@@ -51,7 +52,6 @@ setInterval( () => {
   io.emit( "table-cards:add", game.getCardsList());
   io.emit( "players", game.getPlayersData() );
 }, 1000 );
-
 
 koaApp
   .use( bodyParser() )

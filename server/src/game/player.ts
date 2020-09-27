@@ -35,6 +35,10 @@ class Player {
     }
   }
 
+  getHandCards() {
+    return this.cards.reduce( ( a: any, card: Card ) => ( a.push({rank: card.name, suit: card.suit }) , a ), [] );
+  }
+
   giveCards(cards: Card[]) {
     this.cards = [...this.cards, ...cards];
   }

@@ -5,6 +5,7 @@ import { updateUser } from "../../redux/actions";
 import { ajax } from "../../services/ajax";
 import { urls } from "../../constants/urls";
 import { Alert, AlertType } from "../../helpers/toaster";
+import GameRoom from "../game/Room";
 
 // id is prop passed from Lobby
 // when redirect happens prop id is null
@@ -50,9 +51,7 @@ export default function Room( { id } ) {
   }, [] );
 
   return user.roomId ? (
-    <div className="text-center">
-      This is your game room #{ user.roomId }
-    </div>
+    <GameRoom/>
   ) : joining ? "loading..." : (
     <h3 className="text-center">
       Requested room ID: { user.roomId } does not exist or
