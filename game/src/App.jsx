@@ -10,10 +10,6 @@ import { Alert, AlertType } from "./helpers/toaster";
 import GameRoom from "./components/game/Room";
 import { ToastContainer } from "react-toastify";
 
-import "./css/app.scss";
-import "react-toastify/dist/ReactToastify.css";
-
-
 // when user.name is not defined
 // it always shows auth component
 export default function App() {
@@ -55,8 +51,8 @@ export default function App() {
           // save it into permanent storage
           localStorage.setItem( tokenKey, token );
         } )
-        .catch( error => {
-          Alert( AlertType.ERROR, error.message, 10 );
+        .catch( ( { message } ) => {
+          Alert( AlertType.ERROR, message, 10 );
         } );
     } )
   }, [] );
@@ -68,14 +64,7 @@ export default function App() {
     <Router>
       {
         !tokenIsSet ? "loading..." : (
-          <div className="container my-5">
-            <div className="jumbotron">
-              <h1 className="text-muted text-center">Card game</h1>
-              {
-                !user.name ? <Authenticate/> : <Lobby/>
-              }
-            </div>
-          </div>
+          !user.name ? <Authenticate/> : <Lobby/>
         )
       }
       <ToastContainer/>

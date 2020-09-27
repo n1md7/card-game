@@ -4,59 +4,19 @@ import Card from "../cards/Card";
 import Ellipse, { ellipseRanges, random, Pythagoras } from "../../libs/Formulas";
 import { suits, ranks, Rank, Suit, fullDeck } from "../../libs/Deck";
 import Player from "./Player";
+import { SOCKET_ENDPOINT } from "../../constants/urls";
+import defaultsValue, { playersValue, draggingValue } from "../../constants/defaults";
 import "../../css/game.scss";
-import jsonWebToken from "jsonwebtoken";
-
-const SOCKET_ENDPOINT = "localhost:8000";
 
 export default () => {
-  const [ defaults, setDefaults ] = useState( {
-    windowWidth: 640,
-    tableWidth: 740,
-    tableHeight: 360,
-    cardWidth: 60,
-    cardHeight: 90,
-    cardDiagonal: 10,
-    xActionsHeight: 0,
-    table: {
-      top: 0,
-      left: 0
-    }
-  } );
   const borderWidth = 4;
+  const [ defaults, setDefaults ] = useState( defaultsValue );
   const tableRef = useRef( null );
-  const [ players, setPlayers ] = useState( {
-    left: {
-      taken: false,
-      name: "",
-      progress: 0,
-      cards: 0
-    },
-    up: {
-      taken: false,
-      name: "",
-      progress: 0,
-      cards: 0
-    },
-    right: {
-      taken: false,
-      name: "",
-      progress: 0,
-      cards: 0
-    },
-    down: {
-      taken: false,
-      name: "",
-      progress: 0,
-      cards: 0
-    },
-  } );
+  const [ players, setPlayers ] = useState( playersValue );
   const [ playerCards, setPlayerCards ] = useState( [] );
   const [ zIndex, setZIndex ] = useState( 0 );
   const [ deck, setDeck ] = useState( {} );
-  const [ dragging, setDragging ] = useState( {
-    id: null, left: 0, top: 0, target: null
-  } );
+  const [ dragging, setDragging ] = useState( draggingValue );
   const cardDiagonal = Pythagoras(
     defaults.cardHeight,
     defaults.cardWidth
@@ -85,7 +45,7 @@ export default () => {
   }, [] );
 
   useEffect( () => {
-    const socket = socketIOClient( SOCKET_ENDPOINT, { query: `userId=${localStorage.getItem("token")}`} );
+    const socket = socketIOClient( SOCKET_ENDPOINT, { query: `userId=${ localStorage.getItem( "token" ) }` } );
     // player-cards expecting an array of objects with { suit, rank }
     socket.on( "players", setPlayers );
     socket.on( "player-cards", setPlayerCards );

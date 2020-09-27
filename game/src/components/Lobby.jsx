@@ -17,7 +17,7 @@ export default function Lobby() {
   // Button hide/unhide
   const [ resume, setResume ] = useState( false );
   // roomId for Resume component
-  const [ id, setId ] = useState( false );
+  const [ id, setId ] = useState( '' );
 
   useEffect( () => {
     // check whether user has already in the room
@@ -31,13 +31,13 @@ export default function Lobby() {
         return user?.roomId;
       } )
       // trigger redux user store object update
-      // which will be caught then redirected
-      .then( roomId => {
-        if ( !roomId ) return;
+      // which will be caught then re directed
+      .then( $roomId => {
+        if ( !$roomId ) return;
         setResume( true );
         // update state to show Resume button
         // changes will be triggered when Resume component does
-        setId( roomId );
+        setId( $roomId );
       } )
       .catch( error => {
         Alert(AlertType.ERROR, error.message, 10);
