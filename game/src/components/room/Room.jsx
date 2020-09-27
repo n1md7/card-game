@@ -27,7 +27,6 @@ export default function Room( { id } ) {
         .then( ( { data } ) => data )
         .then( ( { ok, room, msg } ) => {
           if ( !ok || !room ) {
-            // todo log error
             // hmm that's bad
             throw new Error( msg );
           }
