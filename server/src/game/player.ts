@@ -3,6 +3,8 @@ import { ActionType } from "./constants";
 import { id } from "../helpers/ids";
 import Game from "./game";
 import { random } from "../../../game/src/libs/Formulas";
+import gameController from "../controller/gameController";
+import { store } from "../store";
 
 function getRandomInt( max: number ) {
   return Math.floor( Math.random() * Math.floor( max ) );
@@ -15,7 +17,7 @@ class Player {
   private readonly name: string;
   public cards: Card[];
   private takenCards: Card[];
-  private game: Game = null;
+  private gameId: string = null;
   private playerId: string;
   public position: string;
 
@@ -30,7 +32,7 @@ class Player {
     return {
       taken: true,
       name: this.name,
-      progress: this.game === null || [null, undefined].includes(this.game.activePlayer) || !this.game.activePlayer.equals(this) ? 0 : 100 * this.game.timeToMove / 10,
+      progress: this.getGame() === null || [null, undefined].includes(this.getGame().activePlayer) || !this.getGame().activePlayer.equals(this) ? 0 : 100 * this.getGame().timeToMove / 10,
       cards: this.cards.length
     }
   }
@@ -44,7 +46,11 @@ class Player {
   }
 
   setGame(game: Game) {
-    this.game = game;
+    this.gameId = game.getGameId();
+  }
+
+  getGame() {
+    return this.gameId == null ? null : store.getGameById(this.gameId);
   }
 
   getPlayerId() {
@@ -52,7 +58,7 @@ class Player {
   }
 
   getGameId() {
-    return this.game?.getGameId();
+    return this.gameId;
   }
 
   equals(player: Player) {
@@ -78,7 +84,7 @@ class Player {
   placeCard(card: Card) {
     if(this.cards.find(c => c.equals(card)) === undefined)
       throw Error("incorrect card");
-    this.game.playerAction(this, ActionType.PLACE_CARD, card, []);
+    this.getGame().playerAction(this, ActionType.PLACE_CARD, card, []);
   }
 
   takeCardsFromTable(card: Card, tableCards: Card[]) {
@@ -86,7 +92,7 @@ class Player {
       throw Error("incorrect card");
     if(tableCards.length === 0)
       throw Error("Ups error");
-    this.game.playerAction(this, ActionType.PLACE_CARD, card, []);
+    this.getGame().playerAction(this, ActionType.PLACE_CARD, card, []);
   }
 
 }

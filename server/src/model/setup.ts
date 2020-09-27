@@ -42,7 +42,8 @@ class Setup {
 
     const newPlayer = new Player( user.name );
     game.joinPlayer( newPlayer );
-    store.setPlayerById( newPlayer.getPlayerId(), newPlayer )
+    store.setPlayerById( newPlayer.getPlayerId(), newPlayer );
+    store.addPlayerToken(newPlayer, userId);
     return game;
   }
 
