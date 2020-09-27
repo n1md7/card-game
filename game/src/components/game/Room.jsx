@@ -9,6 +9,8 @@ import "../../css/game.scss";
 
 export default () => {
   const borderWidth = 4;
+  const [ socket, setSocket ] = useState( null );
+  const [ token, setToken ] = useState( "" );
   const [ defaults, setDefaults ] = useState( defaultsValue );
   const tableRef = useRef( null );
   const [ players, setPlayers ] = useState( playersValue );
@@ -44,15 +46,16 @@ export default () => {
   }, [] );
 
   useEffect( () => {
-    const token = localStorage.getItem( "token" );
+    setToken( localStorage.getItem( "token" ) );
     const options = {
       query: `token=${ token }`
     };
-    const socket = socketIOClient( SOCKET_ENDPOINT, options );
+    const io = socketIOClient( SOCKET_ENDPOINT, options );
+    setSocket( io );
     // player-cards expecting an array of objects with { suit, rank }
-    socket.on( "players", setPlayers );
-    socket.on( "player-cards", setPlayerCards );
-    socket.on( "table-cards:add", cards => {
+    io.on( "players", setPlayers );
+    io.on( "player-cards", setPlayerCards );
+    io.on( "table-cards:add", cards => {
       const {
         cardDiagonal,
         tableHeight,
@@ -85,7 +88,7 @@ export default () => {
         return prevState;
       } );
     } );
-    socket.on( "table-cards:remove", cards => {
+    io.on( "table-cards:remove", cards => {
       setDeck( prevState => {
         cards
           .forEach( ( { suit, rank } ) => {
@@ -99,6 +102,14 @@ export default () => {
       } );
     } );
   }, [] );
+
+  const playerJoinHandler = seat => {
+    if ( null === socket ) return;
+    socket.emit( "player:join", {
+      seat,
+      token
+    } );
+  };
 
   const calculatedValues = e => {
     // 4px is table border width
@@ -169,25 +180,29 @@ export default () => {
       </div>
       <div className="x-2d-room">
         <Player
-          taken={ false }
+          joinHandler={ playerJoinHandler.bind( 0, "left" ) }
+          taken={ players.left.taken }
           name={ players.left.name }
           cards={ players.left.cards }
           progress={ players.left.progress }
           className={ "x-seat x-one" }/>
         <Player
-          taken={ true }
+          joinHandler={ playerJoinHandler.bind( 0, "up" ) }
+          taken={ players.up.taken }
           name={ players.up.name }
           cards={ players.up.cards }
           progress={ players.up.progress }
           className={ "x-seat x-two" }/>
         <Player
-          taken={ true }
+          joinHandler={ playerJoinHandler.bind( 0, "right" ) }
+          taken={ players.right.taken }
           name={ players.right.name }
           cards={ players.right.cards }
           progress={ players.right.progress }
           className={ "x-seat x-three" }/>
         <Player
-          taken={ true }
+          joinHandler={ playerJoinHandler.bind( 0, "down" ) }
+          taken={ players.down.taken }
           name={ players.down.name }
           cards={ players.down.cards }
           progress={ players.down.progress }
