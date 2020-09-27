@@ -3,7 +3,7 @@ import Game from "./game/game";
 import User from "./user";
 
 class Store {
-  private users: { [ id: string ]: User } = {/**/ };
+  public users: { [ id: string ]: User } = {/**/ };
   private players: { [ id: string ]: Player } = {/**/ };
   private games: { [ id: string ]: Game } = {/**/ };
 

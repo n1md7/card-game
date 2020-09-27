@@ -83,6 +83,7 @@ class GameController {
     let room : Game;
     try {
       room = setup.joinRoom( id, userId);
+
     } catch ( { message } ) {
       this.createContextBody(ctx, false, message);
       return;

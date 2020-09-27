@@ -32,7 +32,7 @@ class Player {
     return {
       taken: true,
       name: this.name,
-      progress: this.game === null || [null, undefined].includes(this.game.activePlayer) || !this.game.activePlayer.equals(this) ? 0 : 100 * this.game.timeToMove / 10,
+      progress: this.getGame() === null || [null, undefined].includes(this.getGame().activePlayer) || !this.getGame().activePlayer.equals(this) ? 0 : 100 * this.getGame().timeToMove / 10,
       cards: this.cards.length
     }
   }
@@ -84,7 +84,7 @@ class Player {
   placeCard(card: Card) {
     if(this.cards.find(c => c.equals(card)) === undefined)
       throw Error("incorrect card");
-    this.game.playerAction(this, ActionType.PLACE_CARD, card, []);
+    this.getGame().playerAction(this, ActionType.PLACE_CARD, card, []);
   }
 
   takeCardsFromTable(card: Card, tableCards: Card[]) {
@@ -92,7 +92,7 @@ class Player {
       throw Error("incorrect card");
     if(tableCards.length === 0)
       throw Error("Ups error");
-    this.game.playerAction(this, ActionType.PLACE_CARD, card, []);
+    this.getGame().playerAction(this, ActionType.PLACE_CARD, card, []);
   }
 
 }
