@@ -7,7 +7,6 @@ class Store {
   private players: { [ id: string ]: Player } = {/**/ };
   private games: { [ id: string ]: Game } = {/**/ };
 
-
   public getUsers() {
     return this.users;
   }
