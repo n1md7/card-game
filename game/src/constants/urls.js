@@ -1,5 +1,8 @@
-const { REACT_APP_SERVER_PORT: port } = process.env;
-export const baseURL = `http://localhost:${ port }/api/`;
+const {
+  REACT_APP_SERVER_PORT: port,
+  REACT_APP_BASE_URL
+} = process.env;
+export const baseURL = `${ REACT_APP_BASE_URL }:${ port }/api/`;
 export const urls = {
   init: "init",
   statusCheck: "status-check",
@@ -10,4 +13,4 @@ export const urls = {
   userInfo: "user-info",
 };
 export const token = "token";
-export const SOCKET_ENDPOINT = `http://localhost:${ port }`;
+export const SOCKET_ENDPOINT = `${ REACT_APP_BASE_URL }:${ port }`;

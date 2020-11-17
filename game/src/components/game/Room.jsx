@@ -67,7 +67,10 @@ export default () => {
             const id = suit + rank;
             if ( !prevState.hasOwnProperty( id ) ) {
               const xMax = (defaults.tableWidth) / 2;
-              const x = random( - xMax + cardDiagonal / 2, xMax - cardDiagonal );
+              const x = random(
+                - xMax + cardDiagonal / 2,
+                + xMax - cardDiagonal
+              );
               const [ yMin, yMax ] = outerEllipse.y( x );
               const y = random( yMin, yMax - cardDiagonal );
               const top = (tableHeight / 2) - borderWidth + y;

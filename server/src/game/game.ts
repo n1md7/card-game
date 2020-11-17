@@ -8,24 +8,28 @@ import Timeout = NodeJS.Timeout;
 class Game {
   public isStarted: boolean;
   private deck: Deck;
-  private readonly players: Player[];
+  private players: Player[];
   public activePlayer: Player;
   private readonly gameId: string;
   private readonly numberOfPlayers: number;
   public timeToMove: number;
-  private timer: Timeout;
+  private timer: number;
   private currentPlayerIndex: number;
   private cards: Card[];
+  private isPublic: boolean;
+  private creator: string;
 
-  constructor( numberOfPlayers: number ) {
+  constructor( numberOfPlayers: number, gameId: string, isPublic: boolean, userId: string ) {
     this.numberOfPlayers = numberOfPlayers;
     this.deck = new Deck();
-    this.gameId = id.game();
+    this.gameId = gameId;
     this.players = [];
     this.isStarted = false;
     this.timeToMove = 10;
     this.cards = [];
     this.currentPlayerIndex = 0;
+    this.creator = userId;
+    this.isPublic = isPublic;
   }
 
   private occupiedPositions() {
@@ -61,6 +65,7 @@ class Game {
     if ( this.deck.isEmpty() ) {
       return;
     }
+
     for ( const player of this.players ) {
       const numberOfCards = 4 - player.cards.length;
       if ( numberOfCards > 0 ) {
@@ -77,6 +82,7 @@ class Game {
       ...players,
       [ player.position ]: player.getPlayerData()
     } ), {} );
+
     for ( const post of this.findEmptyPositions() ) {
       const emptyPosition = {
         taken: false,
@@ -101,7 +107,7 @@ class Game {
   }
 
   startTimer() {
-    this.timer = setInterval( () => {
+    this.timer = window.setInterval( () => {
       this.timeToMove--;
       if ( this.timeToMove <= 0 ) {
         this.activePlayer.placeRandomCard();
@@ -122,11 +128,11 @@ class Game {
     const positionIsInvalid = ![ "left", "right", "up", "down" ].includes( position );
     const positionsAreOccupied = this.occupiedPositions().includes( position );
 
-    if ( positionIsInvalid || positionsAreOccupied){
+    if ( positionIsInvalid || positionsAreOccupied ) {
       throw new Error( "incorrect position" );
     }
 
-    if ( this.players.length >= this.numberOfPlayers ){
+    if ( this.players.length >= this.numberOfPlayers ) {
       throw new Error( "Game is full" );
     }
 
@@ -155,9 +161,17 @@ class Game {
     return this.players;
   }
 
+  removePlayerFromTheGame( playerId: string ) {
+    const index = this.players.findIndex(player => player.playerId === playerId);
+    if(index){
+      // remove from the array
+      this.players.splice(index, 1);
+    }
+  }
+
   removeCardsFromTable( cards: Card[] ) {
     for ( const card of cards ) {
-      if ( this.cards.find( c => c.equals( card ) ) !== undefined ){
+      if ( this.cards.find( c => c.equals( card ) ) !== undefined ) {
         this.cards.remove( card );
       }
     }
@@ -165,7 +179,7 @@ class Game {
 
   tableContainsCards( cards: Card[] ) {
     for ( const card of cards ) {
-      if ( this.cards.find( c => c.equals( card ) ) === undefined ){
+      if ( this.cards.find( c => c.equals( card ) ) === undefined ) {
         return false;
       }
     }

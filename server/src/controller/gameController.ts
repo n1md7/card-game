@@ -26,7 +26,7 @@ class GameController extends BaseGameController {
   }
 
   public create( ctx: Context ) {
-    const roomId = Id.room();
+    const roomId = Id.game();
     const userId = ctx.state.user.id;
     const { isPublic, size, name } = ctx.request.body;
     const roomSizes = [ Room.two, Room.three, Room.four ];
@@ -46,7 +46,7 @@ class GameController extends BaseGameController {
 
     let player: Player | Error = null;
     try {
-      player = setup.createRoom( userId, roomId, size, isPublic );
+      player = setup.createRoom( userId, roomId, size, isPublic, name );
     } catch ( { message } ) {
       return super.clientReject( ctx, message );
     }
@@ -63,6 +63,7 @@ class GameController extends BaseGameController {
   }
 
   public joinRoom( ctx: Context ) {
+    // id is roomId/gameId, name is playerName
     const { id, name } = ctx.request.body;
     const userId = ctx.state.user.id;
     if ( !id ) {

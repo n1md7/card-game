@@ -15,7 +15,8 @@
     },
     "lib": ["es2018", "dom", "esnext"],
     "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "types": []
   },
   "include": [
     "src/**/*"
