@@ -22,7 +22,7 @@ class Setup {
 
   public createRoom( userId: string, roomId: string, size: number, isPublic: boolean, name: string ): Player {
     const player = new Player( userId, name );
-    const game = new Game( size, roomId, isPublic, userId );
+    const game = new Game( size, roomId, isPublic, userId, name );
     game.joinPlayer( player );
     store.setPlayerById( player.getPlayerId(), player );
     store.setGameById( game.getGameId(), game );
@@ -30,7 +30,7 @@ class Setup {
     return player;
   }
 
-  public joinRoom( id: string, userId: string ): Game {
+  public joinRoom( id: string, userId: string, name: string ): Game {
     const game = store.getGameById( id );
     if ( !game ) {
       throw new Error( `could not find a room to join with the id:${ id }` );
@@ -39,11 +39,16 @@ class Setup {
     if ( !user ) {
       throw new Error( `could not find a user with the id:${ userId }` );
     }
-    if ( game.isStarted ) {
-      throw new Error( `could not join. Reason: game is started` );
+
+    if ( game.playerAlreadyInGameRoom( user.id ) ) {
+      return game;
     }
 
-    const player = new Player( user.id, user.name );
+    if ( game.isStarted ) {
+      throw new Error( `this game is already started` );
+    }
+
+    const player = new Player( user.id, name || user.name );
     game.joinPlayer( player );
     store.setPlayerById( player.getPlayerId(), player );
     store.addPlayerToken( player, userId );
@@ -63,16 +68,6 @@ class Setup {
     }
 
     game.removePlayerFromTheGame( userId );
-    // kick out a user from the room
-    // room.users.remove( userId );
-    // store.updateRoomById( roomId, {
-    //  users: room.users,
-    //  inRoomSize: room.inRoomSize - 1
-    // } );
-    // remove from user object as well
-    // store.updateUserById( userId, {
-    //  roomId: null
-    // } );
   }
 
   public getUserInfo( userId: string ) {

@@ -2,8 +2,6 @@ import Deck from "./deck";
 import Player from "./player";
 import { ActionType, CardSuit } from "./constants";
 import { Card } from "./card";
-import { id } from "../helpers/ids";
-import Timeout = NodeJS.Timeout;
 
 class Game {
   public isStarted: boolean;
@@ -13,13 +11,14 @@ class Game {
   private readonly gameId: string;
   private readonly numberOfPlayers: number;
   public timeToMove: number;
-  private timer: number;
+  private timer: any;
   private currentPlayerIndex: number;
   private cards: Card[];
   private isPublic: boolean;
-  private creator: string;
+  private creatorId: string;
+  private creatorName: string;
 
-  constructor( numberOfPlayers: number, gameId: string, isPublic: boolean, userId: string ) {
+  constructor( numberOfPlayers: number, gameId: string, isPublic: boolean, userId: string, name: string ) {
     this.numberOfPlayers = numberOfPlayers;
     this.deck = new Deck();
     this.gameId = gameId;
@@ -28,7 +27,8 @@ class Game {
     this.timeToMove = 10;
     this.cards = [];
     this.currentPlayerIndex = 0;
-    this.creator = userId;
+    this.creatorId = userId;
+    this.creatorName = name;
     this.isPublic = isPublic;
   }
 
@@ -107,7 +107,7 @@ class Game {
   }
 
   startTimer() {
-    this.timer = window.setInterval( () => {
+    this.timer = setInterval( () => {
       this.timeToMove--;
       if ( this.timeToMove <= 0 ) {
         this.activePlayer.placeRandomCard();
@@ -149,8 +149,14 @@ class Game {
       id: this.getGameId(),
       inRoomSize: this.players.length,
       size: this.numberOfPlayers,
-      creator: { name: "--G--" }
+      creator: {
+        name: this.creatorName
+      }
     }
+  }
+
+  playerAlreadyInGameRoom( playerId: string ): boolean {
+    return this.players.findIndex( player => player.getPlayerId() === playerId ) !== -1;
   }
 
   getGameId() {
@@ -162,10 +168,10 @@ class Game {
   }
 
   removePlayerFromTheGame( playerId: string ) {
-    const index = this.players.findIndex(player => player.playerId === playerId);
-    if(index){
+    const index = this.players.findIndex( player => player.playerId === playerId );
+    if ( index ) {
       // remove from the array
-      this.players.splice(index, 1);
+      this.players.splice( index, 1 );
     }
   }
 

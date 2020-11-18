@@ -76,7 +76,7 @@ class GameController extends BaseGameController {
 
     let room: Game;
     try {
-      room = setup.joinRoom( id, userId );
+      room = setup.joinRoom( id, userId, name );
     } catch ( { message } ) {
       return super.clientReject( ctx, message );
     }
