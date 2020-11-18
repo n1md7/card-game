@@ -1,95 +1,89 @@
 import setup from "../model/setup";
 import { store } from "../store";
-
 import { room as Room, token } from "../config";
 import { id as Id } from "../helpers/ids";
 import { Context } from "../types";
-import jwt from "jsonwebtoken";
 import Game from "../game/game";
 import Player from "../game/player";
+import BaseGameController from "./baseGameController";
 
-class GameController {
-
-  private createContextBody(ctx: Context, status: boolean, message: string, others: any = {}) {
-    ctx.body = {
-      ok: status,
-      msg: message,
-      ...others
-    }
-  }
+class GameController extends BaseGameController {
 
   public status( ctx: Context ) {
-    this.createContextBody(ctx, true, "up");
+    super.clientReturn( ctx, {
+      status: "up"
+    } );
   }
 
   public init( ctx: Context ) {
     const userId = Id.user();
     const jwToken = Id.jwt( { [ token.userId ]: userId } );
     setup.signUp( userId, null );
-    this.createContextBody(ctx, true, "up", { [ token.self ]: jwToken, userId, jwToken: jwt.verify( jwToken, token.secret ) });
+    super.clientReturn( ctx, {
+      [ token.self ]: jwToken,
+      userId
+    } );
   }
 
   public create( ctx: Context ) {
-    const roomId = Id.room();
+    const roomId = Id.game();
     const userId = ctx.state.user.id;
     const { isPublic, size, name } = ctx.request.body;
     const roomSizes = [ Room.two, Room.three, Room.four ];
 
     if ( !roomSizes.includes( size ) ) {
-      this.createContextBody(ctx, false, `allowed sizes are for the room are ${ roomSizes }`);
-      return;
+      const errorMsg = `allowed sizes are for the room are ${ roomSizes }`;
+      return super.clientReject( ctx, errorMsg );
     }
 
     if ( [ null, undefined ].includes( isPublic ) ) {
-      this.createContextBody(ctx, false, 'isPublic param is required');
-      return;
+      return super.clientReject( ctx, 'isPublic param is required' );
     }
 
     if ( !name ) {
-      this.createContextBody(ctx, false, 'name param is required');
-      return;
+      return super.clientReject( ctx, 'name param is required' );
     }
-    let player : Player | Error = null;
+
+    let player: Player | Error = null;
     try {
-      player = setup.createRoom( userId, roomId, size, isPublic );
+      player = setup.createRoom( userId, roomId, size, isPublic, name );
     } catch ( { message } ) {
-      this.createContextBody(ctx, false, message);
-      return;
+      return super.clientReject( ctx, message );
     }
 
-    store.addPlayerToken(player, userId);
+    store.addPlayerToken( player, userId );
 
-    this.createContextBody(ctx, true, "", {roomId});
-
+    super.clientReturn( ctx, { roomId } );
   }
 
   public showRooms( ctx: Context ) {
-    this.createContextBody(ctx, true, "", {rooms: store.getGamesList()});
+    super.clientReturn( ctx, {
+      rooms: store.getGamesList()
+    } );
   }
 
   public joinRoom( ctx: Context ) {
+    // id is roomId/gameId, name is playerName
     const { id, name } = ctx.request.body;
     const userId = ctx.state.user.id;
     if ( !id ) {
-      this.createContextBody(ctx, false, 'required param [id] is missing');
-      return;
+      return super.clientReject( ctx, 'required param [id] is missing' );
     }
 
     if ( !name ) {
-      this.createContextBody(ctx, false, 'name param is required');
-      return;
+      return super.clientReject( ctx, 'name param is required' );
     }
 
-    let room : Game;
+    let room: Game;
     try {
-      room = setup.joinRoom( id, userId);
-
+      room = setup.joinRoom( id, userId, name );
     } catch ( { message } ) {
-      this.createContextBody(ctx, false, message);
-      return;
+      return super.clientReject( ctx, message );
     }
 
-    this.createContextBody(ctx, true, "", {room: room.getGameData()});
+    super.clientReturn( ctx, {
+      room: room.getGameData()
+    } );
   }
 
   public leaveRoom( ctx: Context ) {
@@ -98,11 +92,10 @@ class GameController {
     try {
       setup.leaveRoom( id );
     } catch ( { message } ) {
-      this.createContextBody(ctx, false, message);
-      return;
+      return super.clientReject( ctx, message );
     }
 
-    this.createContextBody(ctx, true, "");
+    super.clientReturnOk( ctx );
   }
 
   public getUserInfo( ctx: Context ) {
@@ -111,10 +104,9 @@ class GameController {
     try {
       user = setup.getUserInfo( id );
     } catch ( { message } ) {
-      this.createContextBody(ctx, false, message);
-      return;
+      return super.clientReject( ctx, message );
     }
-    this.createContextBody(ctx, true, "", {user});
+    super.clientReturn( ctx, { user } );
   }
 
 }

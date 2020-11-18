@@ -12,45 +12,58 @@ function getRandomInt( max: number ) {
 
 class Player {
   player(): Player {
-      throw new Error("Method not implemented.");
+    throw new Error( "Method not implemented." );
   }
+
   private readonly name: string;
   public cards: Card[];
   private takenCards: Card[];
-  private gameId: string = null;
-  private playerId: string;
+  public gameId: string = null;
+  public playerId: string;
   public position: string;
 
-  constructor(name:string) {
+  constructor( playerId: string, name = '' ) {
     this.name = name;
-    this.playerId = id.player()
+    this.playerId = playerId;
     this.cards = [];
     this.takenCards = [];
   }
 
   getPlayerData() {
+    const progress = (
+      this.getGame() &&
+      this.getGame().activePlayer &&
+      !this.getGame().activePlayer.equals( this )
+    ) ? 100 * this.getGame().timeToMove / 10 : 0;
+
     return {
       taken: true,
       name: this.name,
-      progress: this.getGame() === null || [null, undefined].includes(this.getGame().activePlayer) || !this.getGame().activePlayer.equals(this) ? 0 : 100 * this.getGame().timeToMove / 10,
+      progress,
       cards: this.cards.length
     }
   }
 
   getHandCards() {
-    return this.cards.reduce( ( a: any, card: Card ) => ( a.push({rank: card.name, suit: card.suit }) , a ), [] );
+    return this.cards
+      .reduce( ( acc: any, card: Card ) => [
+        ...acc, {
+          rank: card.name,
+          suit: card.suit
+        }
+      ], [] );
   }
 
-  giveCards(cards: Card[]) {
-    this.cards = [...this.cards, ...cards];
+  giveCards( cards: Card[] ) {
+    this.cards = [ ...this.cards, ...cards ];
   }
 
-  setGame(game: Game) {
+  setGame( game: Game ) {
     this.gameId = game.getGameId();
   }
 
   getGame() {
-    return this.gameId == null ? null : store.getGameById(this.gameId);
+    return store.getGameById( this.gameId );
   }
 
   getPlayerId() {
@@ -61,41 +74,39 @@ class Player {
     return this.gameId;
   }
 
-  equals(player: Player) {
+  equals( player: Player ) {
     // TODO change equality check
     return this.name === player.name;
   }
 
-  takeCards(cards: Card[]) {
-    this.takenCards = [...this.takenCards, ...cards];
+  takeCards( cards: Card[] ) {
+    this.takenCards = [ ...this.takenCards, ...cards ];
   }
 
-  removeCardFromHand(card: Card) {
-    if(this.cards.find(c => c.equals(card)) !== undefined)
-      this.cards.remove(card);
+  removeCardFromHand( card: Card ) {
+    if ( this.cards.find( c => c.equals( card ) ) !== undefined )
+      this.cards.remove( card );
   }
-
 
 
   placeRandomCard() {
-    this.placeCard(this.cards[getRandomInt(this.cards.length - 1)]);
+    this.placeCard( this.cards[ getRandomInt( this.cards.length - 1 ) ] );
   }
 
-  placeCard(card: Card) {
-    if(this.cards.find(c => c.equals(card)) === undefined)
-      throw Error("incorrect card");
-    this.getGame().playerAction(this, ActionType.PLACE_CARD, card, []);
+  placeCard( card: Card ) {
+    if ( this.cards.find( c => c.equals( card ) ) === undefined )
+      throw Error( "incorrect card" );
+    this.getGame().playerAction( this, ActionType.PLACE_CARD, card, [] );
   }
 
-  takeCardsFromTable(card: Card, tableCards: Card[]) {
-    if(this.cards.find(c => c.equals(card)) === undefined)
-      throw Error("incorrect card");
-    if(tableCards.length === 0)
-      throw Error("Ups error");
-    this.getGame().playerAction(this, ActionType.PLACE_CARD, card, []);
+  takeCardsFromTable( card: Card, tableCards: Card[] ) {
+    if ( this.cards.find( c => c.equals( card ) ) === undefined )
+      throw Error( "incorrect card" );
+    if ( tableCards.length === 0 )
+      throw Error( "Ups error WTF?" );
+    this.getGame().playerAction( this, ActionType.PLACE_CARD, card, [] );
   }
 
 }
-
 
 export default Player;

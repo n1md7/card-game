@@ -11,6 +11,7 @@ import ResumeRoom from "./room/Resume";
 import {Alert, AlertType} from "../helpers/toaster"
 
 export default function Lobby() {
+  // roomId and GameId are more or less the same things
   // watches dynamic updates from different components
   // when changes redirects to Room
   const { roomId } = useSelector( ( { user } ) => user );
@@ -28,16 +29,16 @@ export default function Lobby() {
         if ( !ok || !user ) {
           throw new Error( msg );
         }
-        return user?.roomId;
+        return user?.player?.gameId;
       } )
       // trigger redux user store object update
       // which will be caught then re directed
-      .then( $roomId => {
-        if ( !$roomId ) return;
+      .then( gameId => {
+        if ( !gameId ) return;
         setResume( true );
         // update state to show Resume button
         // changes will be triggered when Resume component does
-        setId( $roomId );
+        setId( gameId );
       } )
       .catch( error => {
         Alert(AlertType.ERROR, error.message, 10);

@@ -2,39 +2,45 @@ import Deck from "./deck";
 import Player from "./player";
 import { ActionType, CardSuit } from "./constants";
 import { Card } from "./card";
-import { id } from "../helpers/ids";
-import Timeout = NodeJS.Timeout;
 
 class Game {
   public isStarted: boolean;
-
   private deck: Deck;
   private players: Player[];
   public activePlayer: Player;
-  private gameId: string;
-  private numberOfPlayers: number;
+  private readonly gameId: string;
+  private readonly numberOfPlayers: number;
   public timeToMove: number;
-  private timer: Timeout;
+  private timer: any;
   private currentPlayerIndex: number;
   private cards: Card[];
+  private isPublic: boolean;
+  private creatorId: string;
+  private creatorName: string;
 
-  constructor( numberOfPlayers: number ) {
+  constructor( numberOfPlayers: number, gameId: string, isPublic: boolean, userId: string, name: string ) {
     this.numberOfPlayers = numberOfPlayers;
     this.deck = new Deck();
-    this.gameId = id.game();
+    this.gameId = gameId;
     this.players = [];
     this.isStarted = false;
     this.timeToMove = 10;
     this.cards = [];
     this.currentPlayerIndex = 0;
+    this.creatorId = userId;
+    this.creatorName = name;
+    this.isPublic = isPublic;
+  }
+
+  private occupiedPositions() {
+    return this.players.reduce( ( op, { position }: Player ) => [ ...op, position ], [] );
   }
 
   findEmptyPositions() {
     const positions = [ "left", "right", "up", "down" ];
-    const occupiedPositions = this.players.reduce( ( a: any, pl: Player ) => ( a.push( pl.position ), a ), [] );
-    return positions.filter( function ( el ) {
-      return !occupiedPositions.includes( el );
-    } );
+    const occupiedPositions = this.occupiedPositions();
+
+    return positions.filter( item => !occupiedPositions.includes( item ) );
   }
 
   startGame() {
@@ -46,8 +52,9 @@ class Game {
 
   getCardsList() {
     return this.cards
-      .reduce( ( a: any[], card: Card ) => ( [
-          ...a, {
+      .reduce( ( cards, card: Card ) => ( [
+          ...cards,
+          {
             rank: card.name,
             suit: card.suit
           } ]
@@ -55,28 +62,37 @@ class Game {
   }
 
   dealCards( firstDeal: boolean = false ) {
-    if ( this.deck.isEmpty() )
+    if ( this.deck.isEmpty() ) {
       return;
+    }
+
     for ( const player of this.players ) {
       const numberOfCards = 4 - player.cards.length;
-      if ( numberOfCards > 0 )
+      if ( numberOfCards > 0 ) {
         player.giveCards( this.deck.getCards( numberOfCards ) );
+      }
     }
-    if ( firstDeal )
+    if ( firstDeal ) {
       this.cards = this.deck.getCards( 4 );
+    }
   }
 
   getPlayersData() {
-    const playerData = this.players.reduce( ( a: any, player: Player ) => ( a[ player.position ] = player.getPlayerData() , a ), {} );
+    const playerData = this.players.reduce( ( players: any, player: Player ) => ( {
+      ...players,
+      [ player.position ]: player.getPlayerData()
+    } ), {} );
+
     for ( const post of this.findEmptyPositions() ) {
       const emptyPosition = {
         taken: false,
         name: "",
         progress: 0,
-        cards: [new Card(CardSuit.CLUBS, "", 1)]
+        cards: [ new Card( CardSuit.CLUBS, "", 1 ) ]
       };
-      playerData.push(emptyPosition);
+      playerData.push( emptyPosition );
     }
+
     return playerData;
   }
 
@@ -102,18 +118,25 @@ class Game {
   }
 
   joinPlayer( player: Player, position: string = null ) {
-    if ( position == null ) {
+    if ( position === null ) {
       const emptyPositions = this.findEmptyPositions();
-      if ( emptyPositions.length > 0 )
+      if ( emptyPositions.length > 0 ) {
         position = emptyPositions[ 0 ];
+      }
     }
 
-    if ( ![ "left", "right", "up", "down" ].includes( position ) ||
-      this.players.reduce( ( a: any, pl: Player ) => ( a.push( pl.position ), a ), [] ).includes( position ) )
+    const positionIsInvalid = ![ "left", "right", "up", "down" ].includes( position );
+    const positionsAreOccupied = this.occupiedPositions().includes( position );
+
+    if ( positionIsInvalid || positionsAreOccupied ) {
       throw new Error( "incorrect position" );
+    }
+
+    if ( this.players.length >= this.numberOfPlayers ) {
+      throw new Error( "Game is full" );
+    }
+
     player.position = position;
-    if ( this.players.length >= this.numberOfPlayers )
-      throw new Error( "Game is fool" );
     player.setGame( this );
     this.players.push( player );
     if ( this.players.length === this.numberOfPlayers ) {
@@ -126,8 +149,14 @@ class Game {
       id: this.getGameId(),
       inRoomSize: this.players.length,
       size: this.numberOfPlayers,
-      creator: { name: "giorgi" }
+      creator: {
+        name: this.creatorName
+      }
     }
+  }
+
+  playerAlreadyInGameRoom( playerId: string ): boolean {
+    return this.players.findIndex( player => player.getPlayerId() === playerId ) !== -1;
   }
 
   getGameId() {
@@ -138,21 +167,30 @@ class Game {
     return this.players;
   }
 
+  removePlayerFromTheGame( playerId: string ) {
+    const index = this.players.findIndex( player => player.playerId === playerId );
+    if ( index ) {
+      // remove from the array
+      this.players.splice( index, 1 );
+    }
+  }
+
   removeCardsFromTable( cards: Card[] ) {
     for ( const card of cards ) {
-      if ( this.cards.find( c => c.equals( card ) ) !== undefined )
+      if ( this.cards.find( c => c.equals( card ) ) !== undefined ) {
         this.cards.remove( card );
+      }
     }
   }
 
   tableContainsCards( cards: Card[] ) {
     for ( const card of cards ) {
-      if ( this.cards.find( c => c.equals( card ) ) === undefined )
+      if ( this.cards.find( c => c.equals( card ) ) === undefined ) {
         return false;
+      }
     }
     return true;
   }
-
 
   playerAction( player: Player, type: ActionType, playerCard: Card, tableCards: Card[] ) {
     this.validateAction( player, type, playerCard, tableCards );
