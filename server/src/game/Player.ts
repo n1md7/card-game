@@ -1,9 +1,9 @@
-import { Card } from "./card";
-import { ActionType } from "./constants";
+import { Card } from "./Card";
+import { ActionType } from "../constant/cardConstants";
 import { id } from "../helpers/ids";
-import Game from "./game";
+import Game from "./Game";
 import { random } from "../../../game/src/libs/Formulas";
-import gameController from "../controller/gameController";
+import gameController from "../controller/GameController";
 import { gameStore } from "../store";
 
 function getRandomInt( max: number ) {

@@ -1,7 +1,7 @@
 import { userStore, gameStore, playerStore } from "../store/index";
 import "../helpers/index";
-import Player from "../game/player";
-import Game from "../game/game";
+import Player from "../game/Player";
+import Game from "../game/Game";
 
 class RoomModel {
 

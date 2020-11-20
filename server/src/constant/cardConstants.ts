@@ -53,4 +53,4 @@ const cardSuitsByName: Map<string, CardSuit> = new Map( [
 
 export const CARD_SUM_VALUE = 11;
 
-export {CardType, cardTypesByName, cardSuitsByName, ActionType, CardSuit }
+export { CardType, cardTypesByName, cardSuitsByName, ActionType, CardSuit }

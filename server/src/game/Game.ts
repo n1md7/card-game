@@ -1,7 +1,7 @@
-import Deck from "./deck";
-import Player from "./player";
-import { ActionType, CardSuit } from "./constants";
-import { Card } from "./card";
+import Deck from "./Deck";
+import Player from "./Player";
+import { ActionType, CardSuit } from "../constant/cardConstants";
+import { Card } from "./Card";
 
 class Game {
   public isStarted: boolean;

@@ -1,16 +1,16 @@
 import { room as Room, token } from "../config";
 import { id as Id } from "../helpers/ids";
 import { Context } from "../types";
-import Game from "../game/game";
-import Player from "../game/player";
-import BaseGameController from "./baseGameController";
-import PlayerModel from "../model/player";
-import GameModel from "../model/game";
-import RoomModel from "../model/room";
-import AuthModel from "../model/auth";
-import UserModel from "../model/user";
+import Game from "../game/Game";
+import Player from "../game/Player";
+import BaseController from "./BaseController";
+import PlayerModel from "../model/PlayerModel";
+import GameModel from "../model/GameModel";
+import RoomModel from "../model/RoomModel";
+import AuthModel from "../model/AuthModel";
+import UserModel from "../model/UserModel";
 
-class GameController extends BaseGameController {
+class GameController extends BaseController {
 
   public status( ctx: Context ) {
     super.clientReturn( ctx, {

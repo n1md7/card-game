@@ -1,4 +1,4 @@
-const {default: setup} = require('../../../model/auth');
+const {default: setup} = require('../../../model/AuthModel');
 const {store} = require('../../../store');
 
 describe('Test setup CRUD operations', () => {

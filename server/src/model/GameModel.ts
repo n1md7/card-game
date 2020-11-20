@@ -1,5 +1,5 @@
 import { gameStore, Game } from "../store/index";
-import BaseModel from "./baseModel";
+import BaseModel from "./BaseModel";
 
 class GameModel extends BaseModel<Game> {
   public getGamesList() {

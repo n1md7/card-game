@@ -1,5 +1,5 @@
 import { userStore, User } from "../store/index";
-import BaseModel from "./baseModel";
+import BaseModel from "./BaseModel";
 
 class UserModel extends BaseModel<User>{
   public getUserInfo( userId: string ) {

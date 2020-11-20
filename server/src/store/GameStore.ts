@@ -1,5 +1,5 @@
-import BaseStore, { Storage } from "./baseStore";
-import Game from "../game/game";
+import BaseStore, { Storage } from "./BaseStore";
+import Game from "../game/Game";
 
 export default class GameStore extends BaseStore<Game> {
   constructor( defaultData: Storage<Game> = {} ) {

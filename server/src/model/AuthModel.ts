@@ -1,7 +1,7 @@
 import { userStore, playerStore } from "../store/index";
 import "../helpers/index";
-import Player from "../game/player";
-import User from "../game/user";
+import Player from "../game/Player";
+import User from "../game/User";
 
 class AuthModel {
 

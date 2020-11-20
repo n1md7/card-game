@@ -1,22 +1,24 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import http from "http";
 import Koa from "koa";
 import cors from "@koa/cors";
 import Router from "koa-router";
-import dotenv from "dotenv";
 import bodyParser from "koa-bodyparser";
-import Deck from "./game/deck";
+import Deck from "./game/Deck";
 import path from "path";
 import serve from "koa-static";
 import SocketIO from "socket.io"
 import { id } from "./helpers/ids";
-import Game from "./game/game";
-import Player from "./game/player";
+import Game from "./game/Game";
+import Player from "./game/Player";
 import jwt from "jsonwebtoken";
 import { token } from "./config";
 import { cat } from "shelljs";
-import UserModel from "./model/user";
+import UserModel from "./model/UserModel";
+import { isset } from "./helpers/extras";
 
-dotenv.config();
 
 // port is now available to the Node.js runtime
 // as if it were an environment variable
@@ -69,12 +71,14 @@ setInterval( () => {
       try {
         const user = UserModel.getById( userId );
         const game = user.player.getGame();
-        if ( ![ undefined, null ].includes( user.player ) ) {
+        // FIXME: user.player probably does not exist in this context need to double check 🤨
+        if ( isset(user?.player) ) {
           io.to( user.socketId ).emit( "player-cards", user.player.getHandCards() );
           io.to( user.socketId ).emit( "table-cards:add", game.getCardsList() );
           io.to( user.socketId ).emit( "players", game.getPlayersData() );
         }
-      } catch ( e ) {}
+      } catch ( e ) {
+      }
     }
   }
 }, 1000 );

@@ -6,14 +6,14 @@ type ResponseBody = {
   [ key: string ]: any
 };
 
-export default class BaseGameController {
+export default class BaseController {
 
   protected clientReturn( ctx: Context, others: ResponseBody = {} ): void {
     ctx.body = {
       ok: true,
       ...others
     };
-  };
+  }
 
   protected clientReject( ctx: Context, msg: string ) {
     this.clientReturn( ctx, {

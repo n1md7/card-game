@@ -1,20 +1,17 @@
-import { Card } from "./card";
-import { cardSuitsByName, cardTypesByName } from "./constants";
+import { Card } from "./Card";
+import { cardSuitsByName, cardTypesByName } from "../constant/cardConstants";
+import { getRandomInt } from "../helpers/extras";
 
-function getRandomInt( max: number ) {
-  return Math.floor( Math.random() * Math.floor( max ) );
-}
-
-class Deck {
+export default class Deck {
   private readonly cards: Card[];
 
   constructor() {
     this.cards = [];
     cardSuitsByName.forEach( ( suitType, suitName ) => {
-        cardTypesByName.forEach( ( cardType, name ) => {
-          this.cards.push( new Card( suitType, name, cardType ) );
-        } )
-    } )
+      cardTypesByName.forEach( ( cardType, name ) => {
+        this.cards.push( new Card( suitType, name, cardType ) );
+      } );
+    } );
     this.shuffle();
   }
 
@@ -33,13 +30,16 @@ class Deck {
   }
 
   getCards( count: number ) {
-    if ( this.cards.length < count )
-      throw new Error( "Not enough cards in deck!" )
+    if ( this.cards.length < count ) {
+      throw new Error( "Not enough cards in deck!" );
+    }
+
     return this.cards.splice( 0, count );
   }
 
   containsCards( cards: Card[] ) {
     for ( const card of cards ) {
+      // FIXME: improve this
       if ( this.cards.find( c => c.equals( card ) ) === undefined )
         return false;
     }
@@ -48,10 +48,9 @@ class Deck {
 
   removeCards( cards: Card[] ) {
     for ( const card of cards ) {
+      // FIXME: this one too
       if ( this.cards.find( c => c.equals( card ) ) !== undefined )
         this.cards.remove( card );
     }
   }
 }
-
-export default Deck;

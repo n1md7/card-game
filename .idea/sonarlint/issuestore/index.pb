@@ -29,3 +29,23 @@ C
 server/src/index.ts,f/2/f27a644fa76ab25c036ed0d55631152ba9e8f9f0
 H
 server/public/index.html,b/b/bb3e641c71891c3fc669df24e5a0d810327312c0
+A
+game/package.json,f/4/f4fc5acad66e69907ffa9ee56a890f9b2663a4d4
+M
+game/src/components/Lobby.jsx,b/b/bba66ceeb2992eaed483df55d4cfc73eb3c28e3b
+T
+$game/src/components/Authenticate.jsx,4/f/4f2b475375645d2dc066863ded1438277fb7eaea
+O
+game/src/redux/reducers/user.js,4/9/49ccd4449abff4ec467d9ad9cbd12b885dc44341
+G
+game/src/redux/store.js,4/9/4949ac63d1732ae566e42bd3a90f649071b80d00
+\
+,server/src/__tests__/api/create-room.test.js,c/5/c51d451012d0470414491bb1bb1ad91e66a6fb08
+W
+'server/src/__tests__/api/routes.test.js,b/6/b6a2cbf2d9ab79d71dda5d0ddbe9f5b7b2176641
+I
+server/src/helpers/ids.ts,4/4/44bf6951cd803bc6aaae3a91421751fe6967ab56
+K
+server/src/helpers/index.ts,a/f/af34fe2a1c7477cfc834f5a7d35cfa404a364ef3
+G
+server/src/game/card.ts,1/c/1c957843584e826a993db0d504e0037fbf216218

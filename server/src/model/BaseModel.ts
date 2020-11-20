@@ -1,4 +1,4 @@
-import BaseStore from "../store/baseStore";
+import BaseStore from "../store/BaseStore";
 
 export default class BaseModel<T> {
   protected store: BaseStore<T>;
