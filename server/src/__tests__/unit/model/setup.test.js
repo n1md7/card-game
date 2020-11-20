@@ -1,4 +1,4 @@
-const {default: setup} = require('../../../model/setup');
+const {default: setup} = require('../../../model/auth');
 const {store} = require('../../../store');
 
 describe('Test setup CRUD operations', () => {
@@ -176,7 +176,7 @@ describe('Test setup CRUD operations', () => {
     });
 
     it('should fail with the exception message', () => {
-        // empty users Store
+        // empty users BaseStore
         store.clearUsers();
         // which does not exist
         const tmpUserId = 'U-0000';

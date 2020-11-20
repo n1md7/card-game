@@ -1,11 +1,14 @@
-import setup from "../model/setup";
-import { store } from "../store";
 import { room as Room, token } from "../config";
 import { id as Id } from "../helpers/ids";
 import { Context } from "../types";
 import Game from "../game/game";
 import Player from "../game/player";
 import BaseGameController from "./baseGameController";
+import PlayerModel from "../model/player";
+import GameModel from "../model/game";
+import RoomModel from "../model/room";
+import AuthModel from "../model/auth";
+import UserModel from "../model/user";
 
 class GameController extends BaseGameController {
 
@@ -18,7 +21,7 @@ class GameController extends BaseGameController {
   public init( ctx: Context ) {
     const userId = Id.user();
     const jwToken = Id.jwt( { [ token.userId ]: userId } );
-    setup.signUp( userId, null );
+    AuthModel.signUp( userId, null );
     super.clientReturn( ctx, {
       [ token.self ]: jwToken,
       userId
@@ -32,7 +35,7 @@ class GameController extends BaseGameController {
     const roomSizes = [ Room.two, Room.three, Room.four ];
 
     if ( !roomSizes.includes( size ) ) {
-      const errorMsg = `allowed sizes are for the room are ${ roomSizes }`;
+      const errorMsg = `allowed sizes for the room are ${ roomSizes }`;
       return super.clientReject( ctx, errorMsg );
     }
 
@@ -46,19 +49,19 @@ class GameController extends BaseGameController {
 
     let player: Player | Error = null;
     try {
-      player = setup.createRoom( userId, roomId, size, isPublic, name );
+      player = RoomModel.create( userId, roomId, size, isPublic, name );
     } catch ( { message } ) {
       return super.clientReject( ctx, message );
     }
 
-    store.addPlayerToken( player, userId );
+    PlayerModel.addPlayer( player, userId );
 
     super.clientReturn( ctx, { roomId } );
   }
 
   public showRooms( ctx: Context ) {
     super.clientReturn( ctx, {
-      rooms: store.getGamesList()
+      rooms: GameModel.getGamesList()
     } );
   }
 
@@ -76,7 +79,7 @@ class GameController extends BaseGameController {
 
     let room: Game;
     try {
-      room = setup.joinRoom( id, userId, name );
+      room = RoomModel.join( id, userId, name );
     } catch ( { message } ) {
       return super.clientReject( ctx, message );
     }
@@ -90,7 +93,7 @@ class GameController extends BaseGameController {
     const { id } = ctx.state.user;
 
     try {
-      setup.leaveRoom( id );
+      RoomModel.leave( id );
     } catch ( { message } ) {
       return super.clientReject( ctx, message );
     }
@@ -102,7 +105,7 @@ class GameController extends BaseGameController {
     const { id } = ctx.state.user;
     let user = {};
     try {
-      user = setup.getUserInfo( id );
+      user = UserModel.getUserInfo( id );
     } catch ( { message } ) {
       return super.clientReject( ctx, message );
     }

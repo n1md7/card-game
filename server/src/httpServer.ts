@@ -8,13 +8,13 @@ import Deck from "./game/deck";
 import path from "path";
 import serve from "koa-static";
 import SocketIO from "socket.io"
-import { store } from "./store";
 import { id } from "./helpers/ids";
 import Game from "./game/game";
 import Player from "./game/player";
 import jwt from "jsonwebtoken";
 import { token } from "./config";
 import { cat } from "shelljs";
+import UserModel from "./model/user";
 
 dotenv.config();
 
@@ -55,7 +55,7 @@ io.on( "connection", ( socket ) => {
   } catch ( error ) {
     return;
   }
-  const user = store.getUserById( ( verifiedToken as TokenProps )[ token.userId ] );
+  const user = UserModel.getById( ( verifiedToken as TokenProps )[ token.userId ] );
   if ( [ undefined, null ].includes( user ) )
     return;
   user.socketId = socket.id;
@@ -63,11 +63,11 @@ io.on( "connection", ( socket ) => {
 
 
 setInterval( () => {
-  const users = store.getUsers();
+  const users = UserModel.getUsers();
   for ( const userId in users ) {
     if ( users.hasOwnProperty( userId ) ) {
       try {
-        const user = store.getUserById( userId );
+        const user = UserModel.getById( userId );
         const game = user.player.getGame();
         if ( ![ undefined, null ].includes( user.player ) ) {
           io.to( user.socketId ).emit( "player-cards", user.player.getHandCards() );
