@@ -4,7 +4,7 @@ import { id } from "../helpers/ids";
 import Game from "./game";
 import { random } from "../../../game/src/libs/Formulas";
 import gameController from "../controller/gameController";
-import { store } from "../store";
+import { gameStore } from "../store";
 
 function getRandomInt( max: number ) {
   return Math.floor( Math.random() * Math.floor( max ) );
@@ -63,7 +63,7 @@ class Player {
   }
 
   getGame() {
-    return store.getGameById( this.gameId );
+    return gameStore.getById(this.gameId);
   }
 
   getPlayerId() {

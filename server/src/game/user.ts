@@ -1,4 +1,4 @@
-import Player from "./game/player";
+import Player from "./player";
 
 class User {
   public id: string;
