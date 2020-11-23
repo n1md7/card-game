@@ -2,7 +2,7 @@ import { userStore, User } from "../store/index";
 import BaseModel from "./BaseModel";
 
 class UserModel extends BaseModel<User>{
-  public getUserInfo( userId: string ) {
+  public getUserInfoById( userId: string ) {
     const user = userStore.getById( userId );
     if ( !user ) {
       throw new Error( `could not find a user with the id:${ userId }` );

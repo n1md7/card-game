@@ -6,11 +6,11 @@ import Player from "./Player";
 import { SOCKET_ENDPOINT } from "../../constants/urls";
 import defaultsValue, { playersValue, draggingValue } from "../../constants/defaults";
 import "../../css/game.scss";
+import { Alert, AlertType } from "../../helpers/toaster";
 
 export default () => {
   const borderWidth = 4;
   const [ socket, setSocket ] = useState( null );
-  const [ token, setToken ] = useState( "" );
   const [ defaults, setDefaults ] = useState( defaultsValue );
   const tableRef = useRef( null );
   const [ players, setPlayers ] = useState( playersValue );
@@ -46,13 +46,16 @@ export default () => {
   }, [] );
 
   useEffect( () => {
-    setToken( localStorage.getItem( "token" ) );
-    const options = {
+    const token = localStorage.getItem( "token" );
+    // send token on init request
+    const io = socketIOClient( SOCKET_ENDPOINT, {
       query: `token=${ token }`
-    };
-    const io = socketIOClient( SOCKET_ENDPOINT, options );
+    } );
     setSocket( io );
     // player-cards expecting an array of objects with { suit, rank }
+    io.on( "error", message => {
+      Alert( AlertType.ERROR, message, 10 );
+    } );
     io.on( "players", setPlayers );
     io.on( "player-cards", setPlayerCards );
     io.on( "table-cards:add", cards => {
@@ -108,10 +111,7 @@ export default () => {
 
   const playerJoinHandler = seat => {
     if ( null === socket ) return;
-    socket.emit( "player:join", {
-      seat,
-      token
-    } );
+    socket.emit( "player:join", { seat } );
   };
 
   const calculatedValues = e => {

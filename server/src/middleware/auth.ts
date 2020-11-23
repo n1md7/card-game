@@ -17,7 +17,7 @@ export default async ( ctx: Context, next: Next ) => {
   let verified: TokenProps | any;
 
   try {
-    verified = jwt.verify( jwToken, token.secret );
+    verified = jwt.verify( jwToken, process.env.JWT_SECRET );
   } catch ( error ) {
     ctx.body = {
       ok: false,
@@ -29,7 +29,7 @@ export default async ( ctx: Context, next: Next ) => {
 
   let user: User;
   try {
-    user = UserModel.getUserInfo( ( verified as TokenProps )[ token.userId ] );
+    user = UserModel.getUserInfoById( ( verified as TokenProps )[ token.userId ] );
   } catch ( error ) {
     ctx.body = {
       ok: false,

@@ -1,4 +1,4 @@
-import { userStore, gameStore, playerStore } from "../store/index";
+import { userStore, gameStore, playerStore } from "../store";
 import "../helpers/index";
 import Player from "../game/Player";
 import Game from "../game/Game";
