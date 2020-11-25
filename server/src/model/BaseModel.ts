@@ -1,6 +1,6 @@
 import BaseStore from "../store/BaseStore";
 
-export default class BaseModel<T> {
+export default abstract class BaseModel<T> {
   protected store: BaseStore<T>;
 
   public constructor( store: BaseStore<T> ) {

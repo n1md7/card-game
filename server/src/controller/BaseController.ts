@@ -6,7 +6,7 @@ type ResponseBody = {
   [ key: string ]: any
 };
 
-export default class BaseController {
+export default abstract class BaseController {
 
   protected clientReturn( ctx: Context, others: ResponseBody = {} ): void {
     ctx.body = {
