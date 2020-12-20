@@ -1,12 +1,11 @@
 export enum token {
-    self = 'token',
-    userId = 'userId',
-    name = 'name',
-    secret = 'GFD^5rIUlbsa#@!dasdh98'
+  self = 'token',
+  userId = 'userId',
+  name = 'name'
 }
 
 export enum room {
-    two = 2,
-    three,
-    four
+  two = 2,
+  three,
+  four
 }

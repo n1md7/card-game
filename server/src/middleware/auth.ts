@@ -1,10 +1,10 @@
 import { token } from "../config";
 import { Context, Next } from "koa";
-import setup from "../model/auth";
+import setup from "../model/AuthModel";
 import jwt from "jsonwebtoken";
-import Player from "../game/player";
-import User from "../game/user";
-import UserModel from "../model/user";
+import Player from "../game/Player";
+import User from "../game/User";
+import UserModel from "../model/UserModel";
 
 interface TokenProps {
   "userId": string,
@@ -17,7 +17,7 @@ export default async ( ctx: Context, next: Next ) => {
   let verified: TokenProps | any;
 
   try {
-    verified = jwt.verify( jwToken, token.secret );
+    verified = jwt.verify( jwToken, process.env.JWT_SECRET );
   } catch ( error ) {
     ctx.body = {
       ok: false,
@@ -29,7 +29,7 @@ export default async ( ctx: Context, next: Next ) => {
 
   let user: User;
   try {
-    user = UserModel.getUserInfo( ( verified as TokenProps )[ token.userId ] );
+    user = UserModel.getUserInfoById( ( verified as TokenProps )[ token.userId ] );
   } catch ( error ) {
     ctx.body = {
       ok: false,

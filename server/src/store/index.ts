@@ -1,9 +1,9 @@
-import PlayerStore from "./player";
-import GameStore from "./game";
-import UserStore from "./user";
-import User from "../game/user";
-import Player from "../game/player";
-import Game from "../game/game";
+import PlayerStore from "./PlayerStore";
+import GameStore from "./GameStore";
+import UserStore from "./UserStore";
+import User from "../game/User";
+import Player from "../game/Player";
+import Game from "../game/Game";
 
 const playerStore = new PlayerStore();
 const gameStore = new GameStore();

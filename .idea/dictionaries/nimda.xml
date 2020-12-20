@@ -2,6 +2,7 @@
   <dictionary name="nimda">
     <words>
       <w>axios</w>
+      <w>dotenv</w>
       <w>fifaia</w>
     </words>
   </dictionary>
