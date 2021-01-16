@@ -84,8 +84,9 @@ class Player {
   }
 
   removeCardFromHand( card: Card ) {
-    if ( this.cards.find( c => c.equals( card ) ) !== undefined )
-      this.cards.remove( card );
+    const handCard = this.cards.find( c => c.equals( card ) );
+    if (handCard  !== undefined )
+      this.cards.remove( handCard );
   }
 
 

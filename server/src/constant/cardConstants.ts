@@ -1,4 +1,4 @@
-enum CardType {
+enum CardRank {
   ACE = 1,
   TWO,
   THREE,
@@ -27,20 +27,20 @@ enum ActionType {
   TAKE_CARDS
 }
 
-const cardTypesByName: Map<string, CardType> = new Map( [
-  [ "ace", CardType.ACE ],
-  [ "2", CardType.TWO ],
-  [ "3", CardType.THREE ],
-  [ "4", CardType.FOUR ],
-  [ "5", CardType.FIVE ],
-  [ "6", CardType.SIX ],
-  [ "7", CardType.SEVEN ],
-  [ "8", CardType.EIGHT ],
-  [ "9", CardType.NINE ],
-  [ "10", CardType.TEN ],
-  [ "jack", CardType.JACK ],
-  [ "queen", CardType.QUEEN ],
-  [ "king", CardType.KING ]
+const cardRanksByName: Map<string, CardRank> = new Map( [
+  [ "1", CardRank.ACE ],
+  [ "2", CardRank.TWO ],
+  [ "3", CardRank.THREE ],
+  [ "4", CardRank.FOUR ],
+  [ "5", CardRank.FIVE ],
+  [ "6", CardRank.SIX ],
+  [ "7", CardRank.SEVEN ],
+  [ "8", CardRank.EIGHT ],
+  [ "9", CardRank.NINE ],
+  [ "10", CardRank.TEN ],
+  [ "11", CardRank.JACK ],
+  [ "12", CardRank.QUEEN ],
+  [ "13", CardRank.KING ]
 ] );
 
 
@@ -53,4 +53,4 @@ const cardSuitsByName: Map<string, CardSuit> = new Map( [
 
 export const CARD_SUM_VALUE = 11;
 
-export { CardType, cardTypesByName, cardSuitsByName, ActionType, CardSuit }
+export { CardRank, cardRanksByName, cardSuitsByName, ActionType, CardSuit }

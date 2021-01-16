@@ -96,14 +96,22 @@ class Game {
     return playerData;
   }
 
+  playersHaveCard() {
+    return this.players.some(p => p.cards.length > 0);
+  }
 
   changePlayer() {
     this.currentPlayerIndex++;
     if ( this.currentPlayerIndex >= this.players.length ) {
       this.currentPlayerIndex = 0;
-      this.dealCards();
+      if(!this.playersHaveCard())
+        this.dealCards();
     }
     this.activePlayer = this.players[ this.currentPlayerIndex ];
+    console.dir(this.players[0]);
+    console.dir(this.players[1]);
+    console.dir(this.cards);
+
   }
 
   startTimer() {
@@ -111,7 +119,7 @@ class Game {
       this.timeToMove--;
       if ( this.timeToMove <= 0 ) {
         this.activePlayer.placeRandomCard();
-        this.timeToMove = 10;
+        this.timeToMove = 5;
         this.changePlayer();
       }
     }, 1000 );

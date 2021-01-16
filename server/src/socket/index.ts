@@ -3,7 +3,7 @@ import UserModel from "../model/UserModel";
 import { isset } from "../helpers/extras";
 import { JWTProps } from "../types";
 import { token } from "../config";
-import { playerJoin } from "./events";
+import { playerJoin, playerMove } from "./events";
 import jwt from "jsonwebtoken";
 
 export default class SocketModule {
@@ -23,11 +23,13 @@ export default class SocketModule {
           throw new Error( `We couldn't find a user with the id:${ userId }` );
         }
         user.socketId = socket.id;
+        socket.on( "player:move", playerMove(user) );
+        socket.on( "player:join", playerJoin(user) );
+
       } catch ( { message } ) {
         this.io.to( socket.id ).emit( "error", message );
       }
 
-      socket.on( "player:join", playerJoin );
     } );
   }
 

@@ -111,7 +111,8 @@ export default () => {
 
   const playerJoinHandler = seat => {
     if ( null === socket ) return;
-    socket.emit( "player:join", { seat } );
+    //socket.emit( "player:join", { seat } );
+    socket.emit( "player:move", { playerCard : {suit: "hearts", rank: "5" }, tableCards: []});
   };
 
   const calculatedValues = e => {

@@ -1,4 +1,4 @@
-import { CARD_SUM_VALUE, CardSuit, CardType } from "../constant/cardConstants";
+import { CARD_SUM_VALUE, CardSuit, CardRank } from "../constant/cardConstants";
 import { isset } from "../helpers/extras";
 
 class Card {
@@ -31,8 +31,8 @@ class Card {
       return true;
     }
 
-    if ( this.value === CardType.JACK ) {
-      const paintedCards = cards.filter( card => card.value > CardType.JACK );
+    if ( this.value === CardRank.JACK ) {
+      const paintedCards = cards.filter( card => card.value > CardRank.JACK );
       const paintedCardsSum = paintedCards.reduce( ( accumulator, card ) =>
         [ CardSuit.SPADES, CardSuit.CLUBS ].includes( card.suit ) ?
           accumulator - card.value : accumulator + card.value, 0 );

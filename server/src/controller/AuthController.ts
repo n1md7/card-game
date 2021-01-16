@@ -1,12 +1,9 @@
 import { room as Room, token } from "../config";
 import { id as Id } from "../helpers/ids";
 import { Context } from "../types";
-import Game from "../game/Game";
-import Player from "../game/Player";
 import BaseController from "./BaseController";
 import PlayerModel from "../model/PlayerModel";
 import GameModel from "../model/GameModel";
-import RoomModel from "../model/RoomModel";
 import AuthModel from "../model/AuthModel";
 import UserModel from "../model/UserModel";
 

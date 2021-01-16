@@ -1,5 +1,5 @@
 import { Card } from "./Card";
-import { cardSuitsByName, cardTypesByName } from "../constant/cardConstants";
+import { cardSuitsByName, cardRanksByName } from "../constant/cardConstants";
 import { getRandomInt } from "../helpers/extras";
 
 export default class Deck {
@@ -8,7 +8,7 @@ export default class Deck {
   constructor() {
     this.cards = [];
     cardSuitsByName.forEach( ( suitType, suitName ) => {
-      cardTypesByName.forEach( ( cardType, name ) => {
+      cardRanksByName.forEach( ( cardType, name ) => {
         this.cards.push( new Card( suitType, name, cardType ) );
       } );
     } );
