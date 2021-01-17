@@ -101,6 +101,16 @@ export default () => {
         tableWidth
       } = defaults;
       setDeck( prevState => {
+        // remove card(s) that is(are) already taken
+        for ( let prevStateKey in prevState ) {
+          if(!cards.hasOwnProperty(prevStateKey)){
+            // this card has been removed from the server
+            // need to remove from the table too
+            delete prevState[prevStateKey];
+          }
+        }
+
+        // add new card
         cards
           .forEach( ( { suit, rank } ) => {
             const id = suit + rank;
