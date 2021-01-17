@@ -54,7 +54,8 @@ class Game {
           ...cards,
           {
             rank: card.name,
-            suit: card.suit
+            suit: card.suit,
+            key: card.suit + card.name
           } ]
       ), [] );
   }
@@ -104,7 +105,7 @@ class Game {
     if ( this.currentPlayerIndex >= this.players.length ) {
       this.currentPlayerIndex = 0;
       if ( !this.playersHaveCard() ) {
-        if (this.cards.length === 0) {
+        if (this.deck.isEmpty()) {
           this.finishGame();
         } else {
           this.dealCards();
@@ -112,6 +113,8 @@ class Game {
       }
     }
     this.activePlayer = this.players[ this.currentPlayerIndex ];
+    this.timeToMove = PLAYER_MOVER_INTERVAL;
+    console.dir(this.players);
   }
 
   finishGame() {
@@ -125,8 +128,6 @@ class Game {
       this.timeToMove--;
       if ( this.timeToMove <= 0 ) {
         this.activePlayer.placeRandomCard();
-        this.timeToMove = PLAYER_MOVER_INTERVAL;
-        this.changePlayer();
       }
     }, 1000 );
   }
@@ -217,6 +218,7 @@ class Game {
       this.cards.push( playerCard );
       player.removeCardFromHand( playerCard );
     }
+    this.changePlayer();
   }
 
   validateAction( player: Player, type: ActionType, playerCard: Card, tableCards: Card[] ) {

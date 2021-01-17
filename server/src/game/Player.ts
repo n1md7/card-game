@@ -36,9 +36,8 @@ class Player {
     const progress = (
       this.getGame() &&
       this.getGame().activePlayer &&
-      !this.getGame().activePlayer.equals( this )
+      this.getGame().activePlayer.equals( this )
     ) ? 100 * this.getGame().timeToMove / PLAYER_MOVER_INTERVAL : 0;
-    // TODO: percent calculation should be constant value
 
     return {
       taken: true,

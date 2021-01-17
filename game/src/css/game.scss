@@ -59,7 +59,7 @@ body, #root {
         position: absolute;
 
         &.x-card-selected {
-          box-shadow: 0 0 10px rgba(252, 192, 12, 0.93);
+          box-shadow: 0 0 30px rgba(252, 192, 12, 0.93);
         }
 
         &:hover {
@@ -186,7 +186,7 @@ body, #root {
       margin: 0 4px;
 
       &.x-card-selected {
-        box-shadow: 0 0 10px rgba(252, 192, 12, 0.93);
+        box-shadow: 0 0 30px rgba(252, 192, 12, 0.93);
       }
 
       &:hover {
