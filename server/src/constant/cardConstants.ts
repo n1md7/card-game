@@ -28,7 +28,7 @@ enum ActionType {
 }
 
 const cardRanksByName: Map<string, CardRank> = new Map( [
-  [ "1", CardRank.ACE ],
+  [ "ace", CardRank.ACE ],
   [ "2", CardRank.TWO ],
   [ "3", CardRank.THREE ],
   [ "4", CardRank.FOUR ],
@@ -38,9 +38,9 @@ const cardRanksByName: Map<string, CardRank> = new Map( [
   [ "8", CardRank.EIGHT ],
   [ "9", CardRank.NINE ],
   [ "10", CardRank.TEN ],
-  [ "11", CardRank.JACK ],
-  [ "12", CardRank.QUEEN ],
-  [ "13", CardRank.KING ]
+  [ "jack", CardRank.JACK ],
+  [ "queen", CardRank.QUEEN ],
+  [ "king", CardRank.KING ]
 ] );
 
 
