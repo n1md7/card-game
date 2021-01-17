@@ -18,6 +18,42 @@ export default () => {
   const [ zIndex, setZIndex ] = useState( 0 );
   const [ deck, setDeck ] = useState( {} );
   const [ dragging, setDragging ] = useState( draggingValue );
+  const [ playerCardSelected, setPlayerCardSelected ] = useState( {} );
+  const [ tableCardsSelected, setTableCardsSelected ] = useState( {} );
+  const playerCardRefs = [
+    useRef( null ),
+    useRef( null ),
+    useRef( null ),
+    useRef( null )
+  ];
+
+  const makeAMoveHandler = () => {
+    if ( null === socket ) return;
+
+    socket.emit( "player:move", {
+      playerCard: playerCardSelected,
+      tableCards: Object.values( tableCardsSelected )
+    } );
+  };
+
+  const playerCardClickHandler = ( { rank, suit } ) => ( { target } ) => {
+    setPlayerCardSelected( { rank, suit } );
+    playerCardRefs.forEach( ( { current } ) => current?.classList.remove( "x-card-selected" ) );
+    target.classList.add( "x-card-selected" );
+  };
+
+  const tableCardClickHandler = ( { rank, suit } ) => ( { target } ) => {
+    const key = rank + suit;
+    const tmpTableCardsSelected = { ...tableCardsSelected };
+    if ( tmpTableCardsSelected.hasOwnProperty( key ) ) {
+      delete tmpTableCardsSelected[ key ];
+      setTableCardsSelected( tmpTableCardsSelected );
+    } else {
+      setTableCardsSelected( { ...tmpTableCardsSelected, [ key ]: { rank, suit } } );
+    }
+    target.classList.toggle( "x-card-selected" );
+  };
+
   const cardDiagonal = Pythagoras(
     defaults.cardHeight,
     defaults.cardWidth
@@ -108,12 +144,6 @@ export default () => {
       } );
     } );
   }, [] );
-
-  const playerJoinHandler = seat => {
-    if ( null === socket ) return;
-    //socket.emit( "player:join", { seat } );
-    socket.emit( "player:move", { playerCard: { suit: "hearts", rank: "5" }, tableCards: [] } );
-  };
 
   const calculatedValues = e => {
     // 4px is table border width
@@ -224,9 +254,7 @@ export default () => {
                   rank={ rank }
                   onMouseDown={ e => cardMouseDownHandler( id, e ) }
                   onMouseUp={ cardMouseUpHandler }
-                  onClick={ function ( { target } ) {
-                    // target.style.transform = `rotate(${ random( 0, 180 ) }deg)`;
-                  }.bind( id ) }
+                  onClick={ tableCardClickHandler( { rank, suit } ) }
                 />
               )
           }
@@ -235,8 +263,10 @@ export default () => {
       <div className="x-playing-actions">
         {
           playerCards.map(
-            ( { suit, rank } ) =>
+            ( { suit, rank }, index ) =>
               <Card
+                ref={ playerCardRefs[ index ] }
+                onClick={ playerCardClickHandler( { rank, suit } ) }
                 key={ suit + rank }
                 w={ 64 }
                 rank={ rank }
@@ -244,6 +274,12 @@ export default () => {
               />
           )
         }
+        <button
+          onClick={ makeAMoveHandler }
+          className="btn btn-outline-danger btn-group-lg"
+        >
+          Make a move
+        </button>
       </div>
     </div>
   );

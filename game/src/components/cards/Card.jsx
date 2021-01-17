@@ -2,9 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import cover from "../../img/card-cover.svg";
 import { ReactSVG } from "react-svg";
 
-export default (( { rank, suit, svg, x, y, w, h, rotate, ...props } ) => {
+export default React.forwardRef( ( { rank, suit, svg, x, y, w, h, rotate, selected, ...props }, ref ) => {
   const [ src, setSrc ] = useState( cover );
-  const [ selected, setSelected ] = useState( false );
   const cardName = `${ rank }_of_${ suit }`;
   const style = {};
   // covert to lowercase string
@@ -15,10 +14,6 @@ export default (( { rank, suit, svg, x, y, w, h, rotate, ...props } ) => {
   if ( w ) { style.width = w + "px"}
   if ( h ) { style.height = h + "px";}
   if ( rotate ) { style.transform = `rotate(${ rotate }deg)`;}
-
-  const clickHandler = e => {
-    setSelected( !selected );
-  }
 
   useEffect( () => {
     if ( suit && rank ) {
@@ -42,9 +37,9 @@ export default (( { rank, suit, svg, x, y, w, h, rotate, ...props } ) => {
 
   if ( !svg ) {
     return <img
+      ref={ ref }
       style={ style }
-      onClick={ clickHandler }
-      className={ "x-card " + (selected ? "x-card-selected " : "") }
+      className={ "x-card" }
       { ...props }
       src={ src }
       alt={ rank && suit && cardName || "cover" }
@@ -66,4 +61,4 @@ export default (( { rank, suit, svg, x, y, w, h, rotate, ...props } ) => {
     } }
     { ...props }
   />;
-});
+} );

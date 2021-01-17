@@ -34,7 +34,8 @@ class Player {
       this.getGame() &&
       this.getGame().activePlayer &&
       !this.getGame().activePlayer.equals( this )
-    ) ? 100 * this.getGame().timeToMove / 10 : 0;
+    ) ? 100 * this.getGame().timeToMove / 30 : 0;
+    // TODO: percent calculation should be constant value
 
     return {
       taken: true,
