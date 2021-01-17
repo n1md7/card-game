@@ -23,7 +23,7 @@ export default class Deck {
     const N = this.cards.length;
     for ( let i = 0; i < N; i++ ) {
       const r = i + getRandomInt( N - i );
-      const temp = this.cards[ r ];
+      const temp = this.cards[ i ];
       this.cards[ i ] = this.cards[ r ];
       this.cards[ r ] = temp;
     }

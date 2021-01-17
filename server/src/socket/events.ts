@@ -25,18 +25,11 @@ const getCardFromCardObject = ( cardObject: CardObject ): Card => {
   return new Card( cardSuit, cardRank, cardValue );
 }
 
-export const playerJoin = ( user: User ) => ( { seat }: Seat ) => {
-  console.log( `user connected ${ seat }` )
-};
-
 export const playerMove = ( user: User ) => ( playerMoveObject: PlayerMoveObject ) => {
   try {
-    console.log( `user connected ${ playerMoveObject }` );
     const player = PlayerModel.getById( user.id );
-    console.dir( player );
     const playerCard = getCardFromCardObject( playerMoveObject.playerCard );
     const tableCards = playerMoveObject.tableCards.map( getCardFromCardObject );
-
     if ( tableCards.length === 0 ) {
       player.placeCard( playerCard );
     } else {

@@ -5,6 +5,8 @@ import Game from "./Game";
 import { random } from "../../../game/src/libs/Formulas";
 import gameController from "../controller/GameController";
 import { gameStore } from "../store";
+import { PLAYER_MOVER_INTERVAL } from "../constant/gameConfig";
+import { PlayerResult } from "./PlayerResult";
 
 function getRandomInt( max: number ) {
   return Math.floor( Math.random() * Math.floor( max ) );
@@ -21,6 +23,7 @@ class Player {
   public gameId: string = null;
   public playerId: string;
   public position: string;
+  public result: PlayerResult;
 
   constructor( playerId: string, name = '' ) {
     this.name = name;
@@ -34,7 +37,7 @@ class Player {
       this.getGame() &&
       this.getGame().activePlayer &&
       !this.getGame().activePlayer.equals( this )
-    ) ? 100 * this.getGame().timeToMove / 30 : 0;
+    ) ? 100 * this.getGame().timeToMove / PLAYER_MOVER_INTERVAL : 0;
     // TODO: percent calculation should be constant value
 
     return {
@@ -106,7 +109,13 @@ class Player {
       throw Error( "incorrect card" );
     if ( tableCards.length === 0 )
       throw Error( "Ups error WTF?" );
-    this.getGame().playerAction( this, ActionType.PLACE_CARD, card, [] );
+    console.dir(card);
+    console.dir(tableCards);
+    this.getGame().playerAction( this, ActionType.TAKE_CARDS, card, tableCards );
+  }
+
+  calculateResult() {
+    this.result = new PlayerResult(this.cards);
   }
 
 }
