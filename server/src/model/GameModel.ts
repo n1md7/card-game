@@ -1,9 +1,15 @@
-import { userStore, gameStore, playerStore } from "../store";
 import "../helpers/index";
 import Player from "../game/Player";
 import Game from "../game/Game";
+import BaseModel from "./BaseModel";
+import {
+  gameStore,
+  userStore,
+  playerStore,
+  Game as GameProps
+} from "../store/index";
 
-class GameModel {
+class GameModel extends BaseModel<GameProps> {
 
   public getGamesList() {
     return Object.values( gameStore.getStorage() )
@@ -61,4 +67,4 @@ class GameModel {
 
 }
 
-export default new GameModel();
+export default new GameModel( gameStore );

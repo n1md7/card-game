@@ -112,7 +112,7 @@ export default () => {
   const playerJoinHandler = seat => {
     if ( null === socket ) return;
     //socket.emit( "player:join", { seat } );
-    socket.emit( "player:move", { playerCard : {suit: "hearts", rank: "5" }, tableCards: []});
+    socket.emit( "player:move", { playerCard: { suit: "hearts", rank: "5" }, tableCards: [] } );
   };
 
   const calculatedValues = e => {
@@ -184,29 +184,21 @@ export default () => {
       </div>
       <div className="x-2d-room">
         <Player
-          joinHandler={ playerJoinHandler.bind( 0, "left" ) }
-          taken={ players.left.taken }
           name={ players.left.name }
           cards={ players.left.cards }
           progress={ players.left.progress }
           className={ "x-seat x-one" }/>
         <Player
-          joinHandler={ playerJoinHandler.bind( 0, "up" ) }
-          taken={ players.up.taken }
           name={ players.up.name }
           cards={ players.up.cards }
           progress={ players.up.progress }
           className={ "x-seat x-two" }/>
         <Player
-          joinHandler={ playerJoinHandler.bind( 0, "right" ) }
-          taken={ players.right.taken }
           name={ players.right.name }
           cards={ players.right.cards }
           progress={ players.right.progress }
           className={ "x-seat x-three" }/>
         <Player
-          joinHandler={ playerJoinHandler.bind( 0, "down" ) }
-          taken={ players.down.taken }
           name={ players.down.name }
           cards={ players.down.cards }
           progress={ players.down.progress }

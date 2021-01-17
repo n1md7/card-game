@@ -5,12 +5,12 @@ import { Card } from "./Card";
 
 class Game {
   public isStarted: boolean;
+  public activePlayer: Player;
+  public timeToMove: number;
   private deck: Deck;
   private players: Player[];
-  public activePlayer: Player;
   private readonly gameId: string;
   private readonly numberOfPlayers: number;
-  public timeToMove: number;
   private timer: any;
   private currentPlayerIndex: number;
   private cards: Card[];
@@ -30,10 +30,6 @@ class Game {
     this.creatorId = userId;
     this.creatorName = name;
     this.isPublic = isPublic;
-  }
-
-  private occupiedPositions() {
-    return this.players.reduce( ( op, { position }: Player ) => [ ...op, position ], [] );
   }
 
   findEmptyPositions() {
@@ -83,34 +79,35 @@ class Game {
       [ player.position ]: player.getPlayerData()
     } ), {} );
 
-    for ( const post of this.findEmptyPositions() ) {
-      const emptyPosition = {
+
+    for ( const position of this.findEmptyPositions() ) {
+      playerData[ position ] = {
         taken: false,
         name: "",
         progress: 0,
-        cards: [ new Card( CardSuit.CLUBS, "", 1 ) ]
+        cards: 0 // [ new Card( CardSuit.CLUBS, "", 1 ) ]
       };
-      playerData.push( emptyPosition );
     }
 
+    console.debug( { playerData } );
     return playerData;
   }
 
   playersHaveCard() {
-    return this.players.some(p => p.cards.length > 0);
+    return this.players.some( p => p.cards.length > 0 );
   }
 
   changePlayer() {
     this.currentPlayerIndex++;
     if ( this.currentPlayerIndex >= this.players.length ) {
       this.currentPlayerIndex = 0;
-      if(!this.playersHaveCard())
+      if ( !this.playersHaveCard() )
         this.dealCards();
     }
     this.activePlayer = this.players[ this.currentPlayerIndex ];
-    console.dir(this.players[0]);
-    console.dir(this.players[1]);
-    console.dir(this.cards);
+    console.dir( this.players[ 0 ] );
+    console.dir( this.players[ 1 ] );
+    console.dir( this.cards );
 
   }
 
@@ -219,6 +216,10 @@ class Game {
       throw Error( "incorrect cards" );
     if ( type === ActionType.TAKE_CARDS && !playerCard.canTakeCards( tableCards ) )
       throw Error( "incorrect move" );
+  }
+
+  private occupiedPositions() {
+    return this.players.reduce( ( op, { position }: Player ) => [ ...op, position ], [] );
   }
 
 }

@@ -1,7 +1,7 @@
 import { Card } from "../game/Card";
 import { cardRanksByName, cardSuitsByName } from "../constant/cardConstants";
 import User from "../game/User";
-import { playerStore } from "../store";
+import PlayerModel from "../model/PlayerModel";
 
 type Seat = {
   seat: "up" | "down" | "left" | "right"
@@ -32,7 +32,7 @@ export const playerJoin = ( user: User ) => ( { seat }: Seat ) => {
 export const playerMove = ( user: User ) => ( playerMoveObject: PlayerMoveObject ) => {
   try {
     console.log( `user connected ${ playerMoveObject }` );
-    const player = playerStore.getById( user.id );
+    const player = PlayerModel.getById( user.id );
     console.dir( player );
     const playerCard = getCardFromCardObject( playerMoveObject.playerCard );
     const tableCards = playerMoveObject.tableCards.map( getCardFromCardObject );
