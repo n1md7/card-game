@@ -185,6 +185,10 @@ body, #root {
       transition: 150ms all;
       margin: 0 4px;
 
+      &.x-card-selected {
+        box-shadow: 0 0 10px rgba(252, 192, 12, 0.93);
+      }
+
       &:hover {
         filter: drop-shadow(0 0 0.75rem #32282b);
       }

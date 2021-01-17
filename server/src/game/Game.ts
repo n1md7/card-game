@@ -89,7 +89,7 @@ class Game {
       };
     }
 
-    console.debug( { playerData } );
+    // console.debug( { playerData } );
     return playerData;
   }
 
@@ -116,7 +116,7 @@ class Game {
       this.timeToMove--;
       if ( this.timeToMove <= 0 ) {
         this.activePlayer.placeRandomCard();
-        this.timeToMove = 5;
+        this.timeToMove = 30;
         this.changePlayer();
       }
     }, 1000 );
@@ -207,6 +207,7 @@ class Game {
       this.cards.push( playerCard );
       player.removeCardFromHand( playerCard );
     }
+    this.changePlayer();
   }
 
   validateAction( player: Player, type: ActionType, playerCard: Card, tableCards: Card[] ) {

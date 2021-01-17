@@ -52,7 +52,7 @@ export default class SocketModule {
             const player = PlayerModel.getById( user.id );
             if ( player ) {
               const game = GameModel.getById( player.gameId );
-              console.log( { user, player, game } );
+              // console.log( { user, player, game } );
               if ( game ) {
                 this.io.to( user.socketId ).emit( "players", game.getPlayersData() );
                 this.io.to( user.socketId ).emit( "player-cards", player.getHandCards() );
