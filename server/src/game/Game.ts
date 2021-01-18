@@ -2,9 +2,11 @@ import Deck from "./Deck";
 import Player from "./Player";
 import { ActionType, CardSuit } from "../constant/cardConstants";
 import { Card } from "./Card";
+import { PLAYER_MOVER_INTERVAL } from "../constant/gameConfig";
 
 class Game {
   public isStarted: boolean;
+  public isFinished: boolean;
   public activePlayer: Player;
   public timeToMove: number;
   private deck: Deck;
@@ -24,7 +26,7 @@ class Game {
     this.gameId = gameId;
     this.players = [];
     this.isStarted = false;
-    this.timeToMove = 10;
+    this.timeToMove = PLAYER_MOVER_INTERVAL;
     this.cards = [];
     this.currentPlayerIndex = 0;
     this.creatorId = userId;
@@ -52,7 +54,8 @@ class Game {
           ...cards,
           {
             rank: card.name,
-            suit: card.suit
+            suit: card.suit,
+            key: card.suit + card.name
           } ]
       ), [] );
   }
@@ -85,7 +88,7 @@ class Game {
         taken: false,
         name: "",
         progress: 0,
-        cards: 0 // [ new Card( CardSuit.CLUBS, "", 1 ) ]
+        cards: 0
       };
     }
 
@@ -101,14 +104,23 @@ class Game {
     this.currentPlayerIndex++;
     if ( this.currentPlayerIndex >= this.players.length ) {
       this.currentPlayerIndex = 0;
-      if ( !this.playersHaveCard() )
-        this.dealCards();
+      if ( !this.playersHaveCard() ) {
+        if (this.deck.isEmpty()) {
+          this.finishGame();
+        } else {
+          this.dealCards();
+        }
+      }
     }
     this.activePlayer = this.players[ this.currentPlayerIndex ];
-    console.dir( this.players[ 0 ] );
-    console.dir( this.players[ 1 ] );
-    console.dir( this.cards );
+    this.timeToMove = PLAYER_MOVER_INTERVAL;
+    console.dir(this.players);
+  }
 
+  finishGame() {
+    clearInterval(this.timer);
+    this.isFinished = true;
+    this.players.forEach(player => player.calculateResult());
   }
 
   startTimer() {
@@ -116,8 +128,6 @@ class Game {
       this.timeToMove--;
       if ( this.timeToMove <= 0 ) {
         this.activePlayer.placeRandomCard();
-        this.timeToMove = 30;
-        this.changePlayer();
       }
     }, 1000 );
   }
@@ -182,8 +192,9 @@ class Game {
 
   removeCardsFromTable( cards: Card[] ) {
     for ( const card of cards ) {
-      if ( this.cards.find( c => c.equals( card ) ) !== undefined ) {
-        this.cards.remove( card );
+      const tableCardIndex = this.cards.findIndex( c => c.equals( card ) );
+      if ( tableCardIndex > -1 ) {
+        this.cards.splice(tableCardIndex, 1);
       }
     }
   }
@@ -221,6 +232,10 @@ class Game {
 
   private occupiedPositions() {
     return this.players.reduce( ( op, { position }: Player ) => [ ...op, position ], [] );
+  }
+
+  public statistics() {
+    return {message: "Game finished!"};
   }
 
 }

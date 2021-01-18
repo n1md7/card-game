@@ -16,7 +16,6 @@ class Card {
     if ( !isset( card ) ) {
       return false;
     }
-    console.log( card );
     return this.suit === card.suit && this.name === card.name;
   }
 

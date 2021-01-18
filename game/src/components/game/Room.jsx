@@ -29,7 +29,8 @@ export default () => {
 
   const makeAMoveHandler = () => {
     if ( null === socket ) return;
-
+    setPlayerCardSelected({});
+    setTableCardsSelected({});
     socket.emit( "player:move", {
       playerCard: playerCardSelected,
       tableCards: Object.values( tableCardsSelected )
@@ -103,7 +104,7 @@ export default () => {
       setDeck( prevState => {
         // remove card(s) that is(are) already taken
         for ( let prevStateKey in prevState ) {
-          if(!cards.hasOwnProperty(prevStateKey)){
+          if(cards.findIndex(item => item.key === prevStateKey) === -1) {
             // this card has been removed from the server
             // need to remove from the table too
             delete prevState[prevStateKey];

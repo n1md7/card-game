@@ -3,7 +3,7 @@ import UserModel from "../model/UserModel";
 import { isset } from "../helpers/extras";
 import { JWTProps } from "../types";
 import { token } from "../config";
-import { playerJoin, playerMove } from "./events";
+import { playerMove } from "./events";
 import jwt from "jsonwebtoken";
 import PlayerModel from "../model/PlayerModel";
 import GameModel from "../model/GameModel";
@@ -26,8 +26,6 @@ export default class SocketModule {
         }
         user.socketId = socket.id;
         socket.on( "player:move", playerMove( user ) );
-        // FIXME: playerJoin no longer needed
-        socket.on( "player:join", playerJoin( user ) );
 
       } catch ( { message } ) {
         this.io.to( socket.id ).emit( "error", message );
@@ -52,11 +50,14 @@ export default class SocketModule {
             const player = PlayerModel.getById( user.id );
             if ( player ) {
               const game = GameModel.getById( player.gameId );
-              // console.log( { user, player, game } );
               if ( game ) {
-                this.io.to( user.socketId ).emit( "players", game.getPlayersData() );
-                this.io.to( user.socketId ).emit( "player-cards", player.getHandCards() );
-                this.io.to( user.socketId ).emit( "table-cards:add", game.getCardsList() );
+                if(game.isFinished) {
+                  this.io.to( user.socketId ).emit( "game:finished", game.statistics() );
+                } else {
+                  this.io.to( user.socketId ).emit( "players", game.getPlayersData() );
+                  this.io.to( user.socketId ).emit( "player-cards", player.getHandCards() );
+                  this.io.to( user.socketId ).emit( "table-cards:add", game.getCardsList() );
+                }
               }
             }
           }
