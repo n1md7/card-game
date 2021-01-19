@@ -94,6 +94,8 @@ export default () => {
       Alert( AlertType.ERROR, message, 10 );
     } );
     io.on( "players", setPlayers );
+    io.on( "game:take-cards", data => console.dir(data) );
+    io.on( "game:finish", data => console.dir(data) );
     io.on( "player-cards", setPlayerCards );
     io.on( "table-cards:add", cards => {
       const {

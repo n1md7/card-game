@@ -1,8 +1,9 @@
 import Deck from "./Deck";
 import Player from "./Player";
-import { ActionType, CardSuit } from "../constant/cardConstants";
+import { ActionType } from "../constant/cardConstants";
 import { Card } from "./Card";
 import { PLAYER_MOVER_INTERVAL } from "../constant/gameConfig";
+import { socketManager } from '../index'
 
 class Game {
   public isStarted: boolean;
@@ -19,8 +20,10 @@ class Game {
   private isPublic: boolean;
   private creatorId: string;
   private creatorName: string;
+  private lastTaker: Player;
+  private maxScores: number;
 
-  constructor( numberOfPlayers: number, gameId: string, isPublic: boolean, userId: string, name: string ) {
+  constructor( numberOfPlayers: number, gameId: string, isPublic: boolean, userId: string, name: string, maxScores = 11 ) {
     this.numberOfPlayers = numberOfPlayers;
     this.deck = new Deck();
     this.gameId = gameId;
@@ -32,6 +35,7 @@ class Game {
     this.creatorId = userId;
     this.creatorName = name;
     this.isPublic = isPublic;
+    this.maxScores = maxScores;
   }
 
   findEmptyPositions() {
@@ -105,7 +109,7 @@ class Game {
     if ( this.currentPlayerIndex >= this.players.length ) {
       this.currentPlayerIndex = 0;
       if ( !this.playersHaveCard() ) {
-        if (this.deck.isEmpty()) {
+        if ( this.deck.isEmpty() ) {
           this.finishGame();
         } else {
           this.dealCards();
@@ -114,13 +118,17 @@ class Game {
     }
     this.activePlayer = this.players[ this.currentPlayerIndex ];
     this.timeToMove = PLAYER_MOVER_INTERVAL;
-    console.dir(this.players);
   }
 
   finishGame() {
-    clearInterval(this.timer);
+    this.playerAction( this.lastTaker, ActionType.TAKE_CARDS, null, this.cards, true );
+    clearInterval( this.timer );
     this.isFinished = true;
-    this.players.forEach(player => player.calculateResult());
+    this.players.forEach( player => {
+      player.calculateResult();
+
+    } );
+    this.players.forEach( player => socketManager.sendMessage( player, "game:finish", player.result ) );
   }
 
   startTimer() {
@@ -194,7 +202,7 @@ class Game {
     for ( const card of cards ) {
       const tableCardIndex = this.cards.findIndex( c => c.equals( card ) );
       if ( tableCardIndex > -1 ) {
-        this.cards.splice(tableCardIndex, 1);
+        this.cards.splice( tableCardIndex, 1 );
       }
     }
   }
@@ -208,16 +216,26 @@ class Game {
     return true;
   }
 
-  playerAction( player: Player, type: ActionType, playerCard: Card, tableCards: Card[] ) {
-    this.validateAction( player, type, playerCard, tableCards );
+  playerAction( player: Player, type: ActionType, playerCard: Card, tableCards: Card[], forceMove: boolean = false ) {
+    if ( !forceMove ) {
+      this.validateAction( player, type, playerCard, tableCards );
+    }
     if ( type === ActionType.TAKE_CARDS ) {
       this.removeCardsFromTable( tableCards );
-      player.takeCards( [ ...tableCards, playerCard ] );
-      player.removeCardFromHand( playerCard );
+      if ( playerCard != null ) {
+        player.takeCards( [ ...tableCards, playerCard ] );
+        player.removeCardFromHand( playerCard );
+      } else {
+        player.takeCards( [ ...tableCards ] );
+      }
+      this.lastTaker = player;
     } else if ( type === ActionType.PLACE_CARD ) {
       this.cards.push( playerCard );
       player.removeCardFromHand( playerCard );
     }
+
+    this.players.forEach( pl => socketManager
+      .sendMessage( pl, "game:take-cards", { playerId: player.getPlayerId(), playerCard, tableCards } ) );
     this.changePlayer();
   }
 
@@ -235,7 +253,7 @@ class Game {
   }
 
   public statistics() {
-    return {message: "Game finished!"};
+    return { message: "Game finished!" };
   }
 
 }

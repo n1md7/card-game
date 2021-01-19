@@ -19,6 +19,10 @@ export default class Deck {
     return this.cards.length === 0;
   }
 
+  size() {
+    return this.cards.length;
+  }
+
   shuffle() {
     const N = this.cards.length;
     for ( let i = 0; i < N; i++ ) {
