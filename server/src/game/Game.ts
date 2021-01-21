@@ -166,7 +166,8 @@ class Game {
       size: this.numberOfPlayers,
       creator: {
         name: this.creatorName
-      }
+      },
+      isPublic: this.isPublic
     }
   }
 

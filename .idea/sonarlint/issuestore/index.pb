@@ -5,8 +5,6 @@ I
 game/src/serviceWorker.ts,d/c/dce92d967ff60cb25899a9b0f91d4ea48d821826
 K
 server/src/socket/events.ts,7/c/7c1dff914e506917e4f35db07c4fa4d8a74b6a84
-P
- server/src/socket/setup/store.ts,2/c/2c6ae1a94207367c0fb0d0a03baceb67101a8ce4
 ;
 server/.env,7/4/74c0224311d9cb9feca55cc2c27a2b847c0286e7
 F
@@ -17,8 +15,6 @@ D
 server/tsconfig.json,3/d/3d7d95880241a5b8b6b4711c4fa9494745ed9aa3
 C
 server/package.json,5/4/54e8f14248f674b305c14bde70fadbe1da1edb31
-P
- server/src/socket/setup/index.ts,1/5/158d2b1dfef67569e8838bdab4cbc06e8913243b
 H
 server/src/httpServer.ts,f/a/faed62f68ab148ed7dce3ee91e0d73e99960d65e
 G

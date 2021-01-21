@@ -3,7 +3,7 @@ import Authenticate from "./components/Authenticate";
 import Lobby from "./components/Lobby";
 import { useSelector } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
-import { ajax } from "./services/ajax";
+import { httpClient } from "./services/httpClient";
 import { urls, baseURL, token as tokenKey } from "./constants/urls";
 import { tokenStore } from "./services/token";
 import { Alert, AlertType } from "./helpers/toaster";
@@ -22,7 +22,7 @@ export default function App() {
     // ajax config update and set the headers
     tokenStore.setToken( token );
     // check whether or not our token is valid
-    ajax.get( baseURL + urls.statusCheck )
+    httpClient.get( baseURL + urls.statusCheck )
       .then( ( { data } ) => data )
       .then( ( { ok, msg } ) => {
         if ( !ok ) {
@@ -35,7 +35,7 @@ export default function App() {
         // update token state to tell component to move forward
         setTokenIsSet( true );
       } ).catch( () => {
-      ajax
+      httpClient
         .get( baseURL + urls.init )
         .then( ( { data } ) => data )
         .then( ( { ok, token, msg } ) => {

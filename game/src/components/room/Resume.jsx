@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ajax } from "../../services/ajax";
+import { httpClient } from "../../services/httpClient";
 import { urls } from "../../constants/urls";
 import { updateUser } from "../../redux/actions";
 import { Alert, AlertType } from "../../helpers/toaster";
@@ -11,7 +11,7 @@ export default ( { id } ) => {
 
   useEffect( () => {
     // dispatch redux user store and update
-    ajax.post( urls.joinRoom, {
+    httpClient.post( urls.joinRoom, {
         id, name
       } )
       .then( ( { data } ) => data )
