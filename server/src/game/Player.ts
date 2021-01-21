@@ -24,6 +24,7 @@ class Player {
   public playerId: string;
   public position: string;
   public result: PlayerResult;
+  public scores: number;
 
   constructor( playerId: string, name = '' ) {
     this.name = name;
@@ -114,7 +115,7 @@ class Player {
   }
 
   calculateResult() {
-    this.result = new PlayerResult(this.cards);
+    this.result = new PlayerResult(this.takenCards);
   }
 
 }
