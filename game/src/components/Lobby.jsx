@@ -4,7 +4,7 @@ import CreateRoom from "./room/Create";
 import { useSelector } from "react-redux";
 import { Link, Redirect, Route, Switch } from "react-router-dom";
 import EnterRoom from "./room/Room";
-import { ajax } from "../services/ajax";
+import { httpClient } from "../services/httpClient";
 import { urls } from "../constants/urls";
 import ResumeRoom from "./room/Resume";
 
@@ -23,7 +23,7 @@ export default function Lobby() {
   useEffect( () => {
     // check whether user has already in the room
     // if positive result then show Resume button
-    ajax.get( urls.userInfo )
+    httpClient.get( urls.userInfo )
       .then( ( { data } ) => data )
       .then( ( { ok, user, msg } ) => {
         if ( !ok || !user ) {

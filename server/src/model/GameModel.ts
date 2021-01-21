@@ -13,7 +13,8 @@ class GameModel extends BaseModel<GameProps> {
 
   public getGamesList() {
     return Object.values( gameStore.getStorage() )
-      .map( ( game: Game ) => game.getGameData() );
+      .map( ( game ) => game.getGameData() )
+      .filter(game => game.isPublic === true);
   }
 
   public join( id: string, userId: string, name: string ): Game {

@@ -1,67 +1,86 @@
-import React, { useEffect, useRef, useState } from "react";
-import socketIOClient from "socket.io-client";
-import Card from "../cards/Card";
-import Ellipse, { random, Pythagoras } from "../../libs/Formulas";
-import Player from "./Player";
-import { SOCKET_ENDPOINT } from "../../constants/urls";
-import defaultsValue, { playersValue, draggingValue } from "../../constants/defaults";
-import "../../css/game.scss";
-import { Alert, AlertType } from "../../helpers/toaster";
+import React, {useEffect, useRef, useState} from 'react';
+import socketIOClient from 'socket.io-client';
+import Card from '../cards/Card';
+import Ellipse, {random, Pythagoras} from '../../libs/Formulas';
+import Player from './Player';
+import {SOCKET_ENDPOINT} from '../../constants/urls';
+import defaultsValue, {playersValue, draggingValue} from '../../constants/defaults';
+import '../../css/game.scss';
+import {Alert, AlertType} from '../../helpers/toaster';
+import {httpClient} from '../../services/httpClient';
+import {Redirect} from 'react-router';
 
 export default () => {
   const borderWidth = 4;
-  const [ socket, setSocket ] = useState( null );
-  const [ defaults, setDefaults ] = useState( defaultsValue );
-  const tableRef = useRef( null );
-  const [ players, setPlayers ] = useState( playersValue );
-  const [ playerCards, setPlayerCards ] = useState( [] );
-  const [ zIndex, setZIndex ] = useState( 0 );
-  const [ deck, setDeck ] = useState( {} );
-  const [ dragging, setDragging ] = useState( draggingValue );
-  const [ playerCardSelected, setPlayerCardSelected ] = useState( {} );
-  const [ tableCardsSelected, setTableCardsSelected ] = useState( {} );
+  const [socket, setSocket] = useState(null);
+  const [defaults, setDefaults] = useState(defaultsValue);
+  const tableRef = useRef(null);
+  const [players, setPlayers] = useState(playersValue);
+  const [playerCards, setPlayerCards] = useState([]);
+  const [zIndex, setZIndex] = useState(0);
+  const [deck, setDeck] = useState({});
+  const [dragging, setDragging] = useState(draggingValue);
+  const [playerCardSelected, setPlayerCardSelected] = useState({});
+  const [tableCardsSelected, setTableCardsSelected] = useState({});
+  const [leaveRoom, setLeaveRoom] = useState(false);
+  const [redirect, setRedirect] = useState(false);
   const playerCardRefs = [
-    useRef( null ),
-    useRef( null ),
-    useRef( null ),
-    useRef( null )
+    useRef(null),
+    useRef(null),
+    useRef(null),
+    useRef(null),
   ];
 
   const makeAMoveHandler = () => {
-    if ( null === socket ) return;
+    if (null === socket) return;
     setPlayerCardSelected({});
     setTableCardsSelected({});
-    socket.emit( "player:move", {
+    socket.emit('player:move', {
       playerCard: playerCardSelected,
-      tableCards: Object.values( tableCardsSelected )
-    } );
+      tableCards: Object.values(tableCardsSelected),
+    });
   };
 
-  const playerCardClickHandler = ( { rank, suit } ) => ( { target } ) => {
-    setPlayerCardSelected( { rank, suit } );
-    playerCardRefs.forEach( ( { current } ) => current?.classList.remove( "x-card-selected" ) );
-    target.classList.add( "x-card-selected" );
+  const playerCardClickHandler = ({rank, suit}) => ({target}) => {
+    setPlayerCardSelected({rank, suit});
+    playerCardRefs.forEach(({current}) => current?.classList.remove('x-card-selected'));
+    target.classList.add('x-card-selected');
   };
 
-  const tableCardClickHandler = ( { rank, suit } ) => ( { target } ) => {
+  const tableCardClickHandler = ({rank, suit}) => ({target}) => {
     const key = rank + suit;
-    const tmpTableCardsSelected = { ...tableCardsSelected };
-    if ( tmpTableCardsSelected.hasOwnProperty( key ) ) {
-      delete tmpTableCardsSelected[ key ];
-      setTableCardsSelected( tmpTableCardsSelected );
+    const tmpTableCardsSelected = {...tableCardsSelected};
+    if (tmpTableCardsSelected.hasOwnProperty(key)) {
+      delete tmpTableCardsSelected[key];
+      setTableCardsSelected(tmpTableCardsSelected);
     } else {
-      setTableCardsSelected( { ...tmpTableCardsSelected, [ key ]: { rank, suit } } );
+      setTableCardsSelected({...tmpTableCardsSelected, [key]: {rank, suit}});
     }
-    target.classList.toggle( "x-card-selected" );
+    target.classList.toggle('x-card-selected');
   };
+
+  const leaveRoomHandler = async () => {
+    setLeaveRoom(true);
+  };
+
+  useEffect(() => {
+    if (leaveRoom) {
+      httpClient
+        .get('/leave-room')
+        .then(() => {
+          // setRedirect(true)
+        });
+    }
+  }, [leaveRoom]);
+
 
   const cardDiagonal = Pythagoras(
     defaults.cardHeight,
-    defaults.cardWidth
+    defaults.cardWidth,
   );
   const outerEllipse = new Ellipse(
     defaults.tableWidth - cardDiagonal / 2,
-    defaults.tableHeight - cardDiagonal / 2
+    defaults.tableHeight - cardDiagonal / 2,
   );
 
   const xTableStyle = {
@@ -69,44 +88,42 @@ export default () => {
     height: defaults.tableHeight,
   };
 
-  useEffect( () => {
+  useEffect(() => {
     const windowWidth = window.innerWidth;
     const xActionsHeight = window.innerHeight * 0.05;
 
-    setDefaults( prevState => {
+    setDefaults(prevState => {
       prevState.windowWidth = windowWidth;
       prevState.cardDiagonal = cardDiagonal;
       prevState.xActionsHeight = xActionsHeight;
 
       return prevState;
-    } );
-  }, [] );
+    });
+  }, []);
 
-  useEffect( () => {
-    const token = localStorage.getItem( "token" );
+  useEffect(() => {
+    const token = localStorage.getItem('token');
     // send token on init request
-    const io = socketIOClient( SOCKET_ENDPOINT, {
-      query: `token=${ token }`
-    } );
-    setSocket( io );
+    const io = socketIOClient(SOCKET_ENDPOINT, {
+      query: `token=${token}`,
+    });
+    setSocket(io);
     // player-cards expecting an array of objects with { suit, rank }
-    io.on( "error", message => {
-      Alert( AlertType.ERROR, message, 10 );
-    } );
-    io.on( "players", setPlayers );
-    io.on( "game:take-cards", data => console.dir(data) );
-    io.on( "game:finish", data => console.dir(data) );
-    io.on( "player-cards", setPlayerCards );
-    io.on( "table-cards:add", cards => {
+    io.on('error', message => {
+      Alert(AlertType.ERROR, message, 10);
+    });
+    io.on('players', setPlayers);
+    io.on('player-cards', setPlayerCards);
+    io.on('table-cards:add', cards => {
       const {
         cardDiagonal,
         tableHeight,
-        tableWidth
+        tableWidth,
       } = defaults;
-      setDeck( prevState => {
+      setDeck(prevState => {
         // remove card(s) that is(are) already taken
-        for ( let prevStateKey in prevState ) {
-          if(cards.findIndex(item => item.key === prevStateKey) === -1) {
+        for (let prevStateKey in prevState) {
+          if (cards.findIndex(item => item.key === prevStateKey) === - 1) {
             // this card has been removed from the server
             // need to remove from the table too
             delete prevState[prevStateKey];
@@ -115,48 +132,48 @@ export default () => {
 
         // add new card
         cards
-          .forEach( ( { suit, rank } ) => {
+          .forEach(({suit, rank}) => {
             const id = suit + rank;
-            if ( !prevState.hasOwnProperty( id ) ) {
+            if ( !prevState.hasOwnProperty(id)) {
               const xMax = (defaults.tableWidth) / 2;
               const x = random(
                 - xMax + cardDiagonal / 2,
-                + xMax - cardDiagonal
+                + xMax - cardDiagonal,
               );
-              const [ yMin, yMax ] = outerEllipse.y( x );
-              const y = random( yMin, yMax - cardDiagonal );
+              const [yMin, yMax] = outerEllipse.y(x);
+              const y = random(yMin, yMax - cardDiagonal);
               const top = (tableHeight / 2) - borderWidth + y;
               const left = (tableWidth / 2) - borderWidth + x;
-              const rotate = random( 0, 180 );
+              const rotate = random(0, 180);
 
-              prevState[ id ] = {
+              prevState[id] = {
                 id,
                 rank,
                 suit,
                 top,
                 left,
-                rotate
+                rotate,
               };
             }
-          } );
+          });
 
         return prevState;
-      } );
-    } );
-    io.on( "table-cards:remove", cards => {
-      setDeck( prevState => {
+      });
+    });
+    io.on('table-cards:remove', cards => {
+      setDeck(prevState => {
         cards
-          .forEach( ( { suit, rank } ) => {
+          .forEach(({suit, rank}) => {
             const id = suit + rank;
-            if ( prevState.hasOwnProperty( id ) ) {
-              delete prevState[ id ];
+            if (prevState.hasOwnProperty(id)) {
+              delete prevState[id];
             }
-          } );
+          });
 
         return prevState;
-      } );
-    } );
-  }, [] );
+      });
+    });
+  }, []);
 
   const calculatedValues = e => {
     // 4px is table border width
@@ -168,17 +185,17 @@ export default () => {
 
     return [
       calculatedX,
-      calculatedY
+      calculatedY,
     ];
   };
 
   const tableMouseMoveHandler = e => {
-    if ( dragging.id === null ) return;
+    if (dragging.id === null) return;
 
-    dragging.target.style.transition = "0ms all";
-    const [ calculatedX, calculatedY ] = calculatedValues( e );
-    let [ yMin, yMax ] = outerEllipse.y(
-      calculatedX - (defaults.tableWidth / 2) - borderWidth
+    dragging.target.style.transition = '0ms all';
+    const [calculatedX, calculatedY] = calculatedValues(e);
+    let [yMin, yMax] = outerEllipse.y(
+      calculatedX - (defaults.tableWidth / 2) - borderWidth,
     );
     yMin += (defaults.tableHeight / 2);
     yMax += (defaults.tableHeight / 2);
@@ -186,30 +203,30 @@ export default () => {
     const yOutRange = yMin > calculatedY || yMax < calculatedY;
     const xOutRange = defaults.cardDiagonal / 2 - borderWidth > calculatedX ||
       calculatedX > defaults.tableWidth - defaults.cardDiagonal / 2;
-    if ( xOutRange || yOutRange ) return;
+    if (xOutRange || yOutRange) return;
 
-    dragging.target.style.top = calculatedY - dragging.top + "px";
-    dragging.target.style.left = calculatedX - dragging.left + "px";
+    dragging.target.style.top = calculatedY - dragging.top + 'px';
+    dragging.target.style.left = calculatedX - dragging.left + 'px';
   };
 
-  const cardMouseDownHandler = ( id, e ) => {
-    const { currentTarget } = e;
-    const [ calculatedX, calculatedY ] = calculatedValues( e );
+  const cardMouseDownHandler = (id, e) => {
+    const {currentTarget} = e;
+    const [calculatedX, calculatedY] = calculatedValues(e);
     const cardOffset = {
       top: currentTarget.offsetTop,
       left: currentTarget.offsetLeft,
     };
     const left = calculatedX - cardOffset.left;
     const top = calculatedY - cardOffset.top;
-    setDragging( {
-      id, left, top, target: currentTarget
-    } );
+    setDragging({
+      id, left, top, target: currentTarget,
+    });
     currentTarget.style.zIndex = zIndex + 1;
   };
 
   const cardMouseUpHandler = e => {
-    setZIndex( zIndex + 1 );
-    setDragging( { id: null, left: 0, top: 0, target: null } );
+    setZIndex(zIndex + 1);
+    setDragging({id: null, left: 0, top: 0, target: null});
   };
 
   const disableDefaultDragging = e => {
@@ -218,57 +235,63 @@ export default () => {
     return false;
   };
 
-  return (
-    <div className={ "x-2d-area no-select" } style={ {
-      width: defaults.windowWidth
-    } }>
+  return redirect ? (
+    <Redirect to={`/rooms`}/>
+  ) : (
+    <div className={'x-2d-area no-select'} style={{
+      width: defaults.windowWidth,
+    }}>
       <div className="x-actions">
-        <button className="btn btn-sm btn-danger">Leave fu*kin room</button>
+        <button
+          onClick={leaveRoomHandler}
+          className="btn btn-sm btn-danger">
+          Leave fu*kin room
+        </button>
       </div>
       <div className="x-2d-room">
         <Player
-          name={ players.left.name }
-          cards={ players.left.cards }
-          progress={ players.left.progress }
-          className={ "x-seat x-one" }/>
+          name={players.left.name}
+          cards={players.left.cards}
+          progress={players.left.progress}
+          className={'x-seat x-one'}/>
         <Player
-          name={ players.up.name }
-          cards={ players.up.cards }
-          progress={ players.up.progress }
-          className={ "x-seat x-two" }/>
+          name={players.up.name}
+          cards={players.up.cards}
+          progress={players.up.progress}
+          className={'x-seat x-two'}/>
         <Player
-          name={ players.right.name }
-          cards={ players.right.cards }
-          progress={ players.right.progress }
-          className={ "x-seat x-three" }/>
+          name={players.right.name}
+          cards={players.right.cards}
+          progress={players.right.progress}
+          className={'x-seat x-three'}/>
         <Player
-          name={ players.down.name }
-          cards={ players.down.cards }
-          progress={ players.down.progress }
-          className={ "x-seat x-four" }/>
+          name={players.down.name}
+          cards={players.down.cards}
+          progress={players.down.progress}
+          className={'x-seat x-four'}/>
 
-        <div className="x-table" ref={ tableRef }
-             onMouseMove={ tableMouseMoveHandler }
-             style={ xTableStyle }
+        <div className="x-table" ref={tableRef}
+             onMouseMove={tableMouseMoveHandler}
+             style={xTableStyle}
         >
           {
-            Object.values( deck )
-              .map( ( { id, suit, rank, top, left, rotate } ) =>
+            Object.values(deck)
+              .map(({id, suit, rank, top, left, rotate}) =>
                 <Card
-                  draggable={ false }
-                  onDragStart={ disableDefaultDragging }
-                  y={ top }
-                  x={ left }
-                  key={ id }
-                  rotate={ rotate }
-                  w={ defaults.cardWidth }
-                  h={ defaults.cardHeight }
-                  suit={ suit }
-                  rank={ rank }
-                  onMouseDown={ e => cardMouseDownHandler( id, e ) }
-                  onMouseUp={ cardMouseUpHandler }
-                  onClick={ tableCardClickHandler( { rank, suit } ) }
-                />
+                  draggable={false}
+                  onDragStart={disableDefaultDragging}
+                  y={top}
+                  x={left}
+                  key={id}
+                  rotate={rotate}
+                  w={defaults.cardWidth}
+                  h={defaults.cardHeight}
+                  suit={suit}
+                  rank={rank}
+                  onMouseDown={e => cardMouseDownHandler(id, e)}
+                  onMouseUp={cardMouseUpHandler}
+                  onClick={tableCardClickHandler({rank, suit})}
+                />,
               )
           }
         </div>
@@ -276,19 +299,19 @@ export default () => {
       <div className="x-playing-actions">
         {
           playerCards.map(
-            ( { suit, rank }, index ) =>
+            ({suit, rank}, index) =>
               <Card
-                ref={ playerCardRefs[ index ] }
-                onClick={ playerCardClickHandler( { rank, suit } ) }
-                key={ suit + rank }
-                w={ 64 }
-                rank={ rank }
-                suit={ suit }
-              />
+                ref={playerCardRefs[index]}
+                onClick={playerCardClickHandler({rank, suit})}
+                key={suit + rank}
+                w={64}
+                rank={rank}
+                suit={suit}
+              />,
           )
         }
         <button
-          onClick={ makeAMoveHandler }
+          onClick={makeAMoveHandler}
           className="btn btn-outline-danger btn-group-lg"
         >
           Make a move

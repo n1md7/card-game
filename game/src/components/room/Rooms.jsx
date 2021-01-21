@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ajax } from "../../services/ajax";
+import { httpClient } from "../../services/httpClient";
 import { urls } from "../../constants/urls";
 import Row from "./table/Row";
 import { Alert, AlertType } from "../../helpers/toaster";
@@ -8,7 +8,7 @@ export default function Rooms() {
   const [ list, setList ] = useState( [] );
   useEffect( () => {
     const updateRoomsList = () => {
-      ajax
+      httpClient
         .get( urls.showRooms )
         .then( ( { data } ) => data )
         .then( ( { ok, rooms, msg } ) => {

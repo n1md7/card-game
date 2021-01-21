@@ -8,14 +8,14 @@ const config = {
   headers: {}
 };
 
-let ajax = axios.create( config );
+let httpClient = axios.create( config );
 
 // listener for the token update from App.jsx
 tokenStore.onUpdate( ( token ) => {
   config.headers[ tokenKey ] = token;
-  ajax = axios.create( config );
+  httpClient = axios.create( config );
 } );
 
 export {
-  ajax
+  httpClient
 };

@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import React, { useState } from "react";
-import { ajax } from "../../../services/ajax";
+import { httpClient } from "../../../services/httpClient";
 import { urls } from "../../../constants/urls";
 import { updateUser } from "../../../redux/actions";
 import {Alert, AlertType } from "../../../helpers/toaster";
@@ -14,7 +14,7 @@ export default function Row( { id, creator, inRoomSize, size } ) {
   const joinClickHandler = function () {
     setJoinText( "Joining..." );
     const { id, name } = this;
-    ajax.post( urls.joinRoom, {
+    httpClient.post( urls.joinRoom, {
         id, name
       } )
       .then( ( { data } ) => data )
