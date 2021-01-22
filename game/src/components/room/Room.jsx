@@ -11,7 +11,7 @@ import GameRoom from '../game/Room';
 // when redirect happens prop id is null
 export default function Room({id}){
   // roomId is URL route param
-  const user = useSelector(({user}) => user);
+  const $user = useSelector(({user}) => user);
   const [joining, setJoining] = useState(true);
   const {roomId} = useParams();
   const dispatch = useDispatch();
@@ -22,7 +22,7 @@ export default function Room({id}){
     // or the user is able to join the table
     if ( !id) {
       httpClient.post(urls.joinRoom, {
-          id: roomId, name: user.name,
+          id: roomId, name: $user.name,
         })
         .then(({data}) => data)
         .then(({ok, room, msg}) => {
@@ -35,8 +35,8 @@ export default function Room({id}){
         })
         // trigger redux user store object update
         // which will be caught from the component Lobby
-        .then(roomId => {
-          dispatch(updateUser({roomId}));
+        .then(roomID => {
+          dispatch(updateUser({roomId: roomID}));
           setJoining(false);
         })
         .catch(error => {
@@ -49,7 +49,7 @@ export default function Room({id}){
     }
   }, []);
 
-  return user.roomId ? (
+  return $user.roomId ? (
     <GameRoom/>
   ) : joining ? 'loading...' : (
     <div className={'row justify-content-center'}>

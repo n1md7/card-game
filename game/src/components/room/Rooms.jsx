@@ -1,38 +1,38 @@
-import React, { useEffect, useState } from "react";
-import { httpClient } from "../../services/httpClient";
-import { urls } from "../../constants/urls";
-import Row from "./table/Row";
-import { Alert, AlertType } from "../../helpers/toaster";
+import React, {useEffect, useState} from 'react';
+import {httpClient} from '../../services/httpClient';
+import {urls} from '../../constants/urls';
+import Row from './table/Row';
+import {Alert, AlertType} from '../../helpers/toaster';
 
-export default function Rooms() {
-  const [ list, setList ] = useState( [] );
-  useEffect( () => {
+export default function Rooms(){
+  const [list, setList] = useState([]);
+  useEffect(() => {
     const updateRoomsList = () => {
       httpClient
-        .get( urls.showRooms )
-        .then( ( { data } ) => data )
-        .then( ( { ok, rooms, msg } ) => {
-          if ( !ok ) {
+        .get(urls.showRooms)
+        .then(({data}) => data)
+        .then(({ok, rooms, msg}) => {
+          if ( !ok) {
             // hmm that's bad
             throw new Error(msg);
           }
 
-          return Object.entries( rooms );
-        } )
-        .then( setList )
-        .catch( error => {
+          return Object.entries(rooms);
+        })
+        .then(setList)
+        .catch(error => {
           Alert(AlertType.ERROR, error.message, 10);
-          setList( [] );
-        } );
+          setList([]);
+        });
     };
 
     // trigger first load
     updateRoomsList();
     // set up ticker for every 1s update
-    const interval = setInterval( updateRoomsList, 1000 );
+    const interval = setInterval(updateRoomsList, 1000);
     // clean up function
-    return () => clearInterval( interval );
-  }, [] );
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="row justify-content-center">
@@ -48,7 +48,7 @@ export default function Rooms() {
           </thead>
           <tbody>
           {
-            list.map( ( [ key, values ] ) => <Row key={ key } { ...values } /> )
+            list.map(([key, values]) => <Row key={key} {...values} />)
           }
           </tbody>
         </table>

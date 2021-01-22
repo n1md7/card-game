@@ -3,10 +3,6 @@ import { cardRanksByName, cardSuitsByName } from "../constant/cardConstants";
 import User from "../game/User";
 import PlayerModel from "../model/PlayerModel";
 
-type Seat = {
-  seat: "up" | "down" | "left" | "right"
-};
-
 type CardObject = {
   suit: string;
   rank: string;
@@ -25,6 +21,7 @@ const getCardFromCardObject = ( cardObject: CardObject ): Card => {
   return new Card( cardSuit, cardRank, cardValue );
 }
 
+// FIXME: try/catch რაღაცა
 export const playerMove = ( user: User ) => ( playerMoveObject: PlayerMoveObject ) => {
   try {
     const player = PlayerModel.getById( user.id );
