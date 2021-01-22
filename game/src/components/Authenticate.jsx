@@ -1,8 +1,10 @@
-import React, {useState, Fragment, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 import {updateUser} from '../redux/actions';
 import {httpClient} from '../services/httpClient';
 import {tokenStore} from '../services/token';
+import {urls, baseURL, token as tokenKey} from '../constants/urls';
+import {Alert, AlertType} from '../helpers/toaster';
 
 export default () => {
   const [name, setName] = useState('');
@@ -11,9 +13,25 @@ export default () => {
 
   const submitHandler = event => {
     event.preventDefault();
-    // save name into storage
-    localStorage.setItem('name', name);
-    dispatch(updateUser({name}));
+    httpClient
+      .get(baseURL + urls.init)
+      .then(({data}) => data)
+      .then(({ok, token, msg}) => {
+        if ( !ok) {
+          // hmm that's bad
+          throw new Error(msg);
+        }
+        // custom store for the token
+        tokenStore.setToken(token);
+        // save it into permanent storage
+        localStorage.setItem(tokenKey, token);
+        // save name into storage
+        localStorage.setItem('name', name);
+        dispatch(updateUser({name}));
+      })
+      .catch(({message}) => {
+        Alert(AlertType.ERROR, message, 10);
+      });
   };
 
   useEffect(() => {
