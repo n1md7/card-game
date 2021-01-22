@@ -1,6 +1,8 @@
 import React, {useState, Fragment, useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 import {updateUser} from '../redux/actions';
+import {httpClient} from '../services/httpClient';
+import {tokenStore} from '../services/token';
 
 export default () => {
   const [name, setName] = useState('');

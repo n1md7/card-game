@@ -1,28 +1,18 @@
-import React, {useEffect, useRef, useState} from 'react';
-import socketIOClient from 'socket.io-client';
+import React, { useRef, useState} from 'react';
 import Card from '../cards/Card';
-import Ellipse, {random, Pythagoras} from '../../libs/Formulas';
 import Player from './Player';
-import {SOCKET_ENDPOINT} from '../../constants/urls';
-import defaultsValue, {playersValue, draggingValue} from '../../constants/defaults';
+import {draggingValue} from '../../constants/defaults';
 import '../../css/game.scss';
-import {Alert, AlertType} from '../../helpers/toaster';
 import {httpClient} from '../../services/httpClient';
-import {Redirect} from 'react-router';
+import useSockets from './hooks/useSockets';
 
 export default () => {
   const borderWidth = 4;
-  const [socket, setSocket] = useState(null);
-  const [defaults, setDefaults] = useState(defaultsValue);
   const tableRef = useRef(null);
-  const [players, setPlayers] = useState(playersValue);
-  const [playerCards, setPlayerCards] = useState([]);
   const [zIndex, setZIndex] = useState(0);
-  const [deck, setDeck] = useState({});
   const [dragging, setDragging] = useState(draggingValue);
   const [playerCardSelected, setPlayerCardSelected] = useState({});
   const [tableCardsSelected, setTableCardsSelected] = useState({});
-  const [leaveRoom, setLeaveRoom] = useState(false);
   const [redirect, setRedirect] = useState(false);
   const playerCardRefs = [
     useRef(null),
@@ -30,6 +20,28 @@ export default () => {
     useRef(null),
     useRef(null),
   ];
+  const [
+    socket, playerCards,
+    players,
+    outerEllipse,
+    defaults,
+    deck,
+    xTableStyle
+  ] = useSockets();
+
+  const calculatedValues = e => {
+    // 4px is table border width
+    const calculatedX = e.clientX - tableRef.current?.offsetLeft - borderWidth;
+    const calculatedY = (
+      e.clientY - tableRef.current?.offsetTop
+      - borderWidth - defaults.xActionsHeight
+    );
+
+    return [
+      calculatedX,
+      calculatedY,
+    ];
+  };
 
   const makeAMoveHandler = () => {
     if (null === socket) return;
@@ -60,133 +72,8 @@ export default () => {
   };
 
   const leaveRoomHandler = async () => {
-    setLeaveRoom(true);
-  };
-
-  useEffect(() => {
-    if (leaveRoom) {
-      httpClient
-        .get('/leave-room')
-        .then(() => {
-          // setRedirect(true)
-        });
-    }
-  }, [leaveRoom]);
-
-
-  const cardDiagonal = Pythagoras(
-    defaults.cardHeight,
-    defaults.cardWidth,
-  );
-  const outerEllipse = new Ellipse(
-    defaults.tableWidth - cardDiagonal / 2,
-    defaults.tableHeight - cardDiagonal / 2,
-  );
-
-  const xTableStyle = {
-    width: defaults.tableWidth,
-    height: defaults.tableHeight,
-  };
-
-  useEffect(() => {
-    const windowWidth = window.innerWidth;
-    const xActionsHeight = window.innerHeight * 0.05;
-
-    setDefaults(prevState => {
-      prevState.windowWidth = windowWidth;
-      prevState.cardDiagonal = cardDiagonal;
-      prevState.xActionsHeight = xActionsHeight;
-
-      return prevState;
-    });
-  }, []);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    // send token on init request
-    const io = socketIOClient(SOCKET_ENDPOINT, {
-      query: `token=${token}`,
-    });
-    setSocket(io);
-    // player-cards expecting an array of objects with { suit, rank }
-    io.on('error', message => {
-      Alert(AlertType.ERROR, message, 10);
-    });
-    io.on('players', setPlayers);
-    io.on('player-cards', setPlayerCards);
-    io.on('table-cards:add', cards => {
-      const {
-        cardDiagonal,
-        tableHeight,
-        tableWidth,
-      } = defaults;
-      setDeck(prevState => {
-        // remove card(s) that is(are) already taken
-        for (let prevStateKey in prevState) {
-          if (cards.findIndex(item => item.key === prevStateKey) === - 1) {
-            // this card has been removed from the server
-            // need to remove from the table too
-            delete prevState[prevStateKey];
-          }
-        }
-
-        // add new card
-        cards
-          .forEach(({suit, rank}) => {
-            const id = suit + rank;
-            if ( !prevState.hasOwnProperty(id)) {
-              const xMax = (defaults.tableWidth) / 2;
-              const x = random(
-                - xMax + cardDiagonal / 2,
-                + xMax - cardDiagonal,
-              );
-              const [yMin, yMax] = outerEllipse.y(x);
-              const y = random(yMin, yMax - cardDiagonal);
-              const top = (tableHeight / 2) - borderWidth + y;
-              const left = (tableWidth / 2) - borderWidth + x;
-              const rotate = random(0, 180);
-
-              prevState[id] = {
-                id,
-                rank,
-                suit,
-                top,
-                left,
-                rotate,
-              };
-            }
-          });
-
-        return prevState;
-      });
-    });
-    io.on('table-cards:remove', cards => {
-      setDeck(prevState => {
-        cards
-          .forEach(({suit, rank}) => {
-            const id = suit + rank;
-            if (prevState.hasOwnProperty(id)) {
-              delete prevState[id];
-            }
-          });
-
-        return prevState;
-      });
-    });
-  }, []);
-
-  const calculatedValues = e => {
-    // 4px is table border width
-    const calculatedX = e.clientX - tableRef.current?.offsetLeft - borderWidth;
-    const calculatedY = (
-      e.clientY - tableRef.current?.offsetTop
-      - borderWidth - defaults.xActionsHeight
-    );
-
-    return [
-      calculatedX,
-      calculatedY,
-    ];
+    await httpClient.get('/leave-room');
+    setRedirect(true);
   };
 
   const tableMouseMoveHandler = e => {
@@ -236,17 +123,20 @@ export default () => {
   };
 
   return redirect ? (
-    <Redirect to={`/rooms`}/>
+    //FIXME: redirection is problem here
+    // <Redirect to={`/rooms`}/>
+    <span>redirecting...</span>
   ) : (
     <div className={'x-2d-area no-select'} style={{
       width: defaults.windowWidth,
     }}>
-      <div className="x-actions">
+      <div className="x-actions d-flex">
         <button
           onClick={leaveRoomHandler}
           className="btn btn-sm btn-danger">
           Leave fu*kin room
         </button>
+
       </div>
       <div className="x-2d-room">
         <Player

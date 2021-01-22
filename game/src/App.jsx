@@ -7,7 +7,6 @@ import { httpClient } from "./services/httpClient";
 import { urls, baseURL, token as tokenKey } from "./constants/urls";
 import { tokenStore } from "./services/token";
 import { Alert, AlertType } from "./helpers/toaster";
-import GameRoom from "./components/game/Room";
 import { ToastContainer } from "react-toastify";
 
 // when user.name is not defined
@@ -57,8 +56,6 @@ export default function App() {
     } )
   }, [] );
 
-
-  /*return <GameRoom/>*/
 
   return (
     <Router>
