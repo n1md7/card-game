@@ -5,6 +5,7 @@ import {draggingValue} from '../../constants/defaults';
 import '../../css/game.scss';
 import {httpClient} from '../../services/httpClient';
 import useSockets from './hooks/useSockets';
+import {CardColumns} from 'react-bootstrap';
 
 export default () => {
   const borderWidth = 4;
@@ -23,6 +24,7 @@ export default () => {
   const [
     socket, playerCards,
     players,
+    gameData,
     outerEllipse,
     defaults,
     deck,
@@ -136,28 +138,46 @@ export default () => {
           className="btn btn-sm btn-danger">
           Leave fu*kin room
         </button>
-
+      </div>
+      <div className="card-deck">
+        <Card
+          draggable={false}
+          onDragStart={disableDefaultDragging}
+          y={0}
+          x={0}
+          key={5}
+          rotate={0}
+          w={defaults.cardWidth}
+          h={defaults.cardHeight}
+          suit={"suit"}
+          rank={"rank"}
+        />
+        <span className="card-deck-digit">{gameData.remainedCards}</span>
       </div>
       <div className="x-2d-room">
         <Player
           name={players.left.name}
           cards={players.left.cards}
           progress={players.left.progress}
+          score={players.left.score}
           className={'x-seat x-one'}/>
         <Player
           name={players.up.name}
           cards={players.up.cards}
           progress={players.up.progress}
+          score={players.up.score}
           className={'x-seat x-two'}/>
         <Player
           name={players.right.name}
           cards={players.right.cards}
           progress={players.right.progress}
+          score={players.right.score}
           className={'x-seat x-three'}/>
         <Player
           name={players.down.name}
           cards={players.down.cards}
           progress={players.down.progress}
+          score={players.down.score}
           className={'x-seat x-four'}/>
 
         <div className="x-table" ref={tableRef}

@@ -123,6 +123,19 @@ body, #root {
         overflow: hidden;
       }
 
+      .x-score {
+        $my-height: calc(#{$avatar-w} * 0.43);
+        font-size: 12px;
+        font-weight: bold;
+        width: 100%;
+        color: white;
+        padding: 2px 4px;
+        height: $my-height;
+        background: rgba(28, 28, 28, 0.83);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
 
       &.x-one {
         top: 0;

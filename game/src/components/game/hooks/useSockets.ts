@@ -3,7 +3,7 @@ import {SOCKET_ENDPOINT} from '../../../constants/urls';
 import {Alert, AlertType} from '../../../helpers/toaster';
 import {random} from '../../../libs/Formulas';
 import socketIOClient, {Socket} from 'socket.io-client';
-import {playersValue} from '../../../constants/defaults';
+import {gameDataDefault} from '../../../constants/defaults';
 import useDefaults from './useDefaults';
 
 type EllipseType = {
@@ -40,7 +40,7 @@ const useSockets = () => {
   const borderWidth = 4;
 
   const [socket, setSocket] = useState<typeof Socket|null>(null);
-  const [players, setPlayers] = useState(playersValue);
+  const [gameData, setGameData] = useState(gameDataDefault);
   const [playerCards, setPlayerCards] = useState([]);
   const [deck, setDeck] = useState({});
   const [outerEllipse, defaults, xTableStyle] = useDefaults();
@@ -58,8 +58,9 @@ const useSockets = () => {
     io.on('error', (message: string) => {
       Alert(AlertType.ERROR, message, 10);
     });
-    io.on('players', setPlayers);
+    io.on('game:data', setGameData);
     io.on('player-cards', setPlayerCards);
+    io.on('game:take-cards', (data: any) => console.dir(data));
     io.on('table-cards:add', (cards: Card[]) => {
       const {
         cardDiagonal: $cardDiagonal,
@@ -127,7 +128,8 @@ const useSockets = () => {
   return [
     socket,
     playerCards,
-    players,
+    gameData.playerData,
+    gameData,
     outerEllipse,
     defaults,
     deck,
