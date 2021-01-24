@@ -59,6 +59,8 @@ const useSockets = () => {
       Alert(AlertType.ERROR, message, 10);
     });
     io.on('game:data', setGameData);
+    io.on('game:finish', (data: any) => console.dir(data));
+    io.on('game:finish-deck', (data: any) => console.dir(data));
     io.on('player-cards', setPlayerCards);
     io.on('game:take-cards', (data: any) => console.dir(data));
     io.on('table-cards:add', (cards: Card[]) => {
