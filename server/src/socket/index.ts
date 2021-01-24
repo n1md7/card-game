@@ -54,7 +54,7 @@ export default class SocketModule {
                 if(game.isFinished) {
                   this.io.to( user.socketId ).emit( "game:finished", game.statistics() );
                 } else {
-                  this.io.to( user.socketId ).emit( "players", game.getPlayersData() );
+                  this.io.to( user.socketId ).emit( "game:data", game.getGameData(player) );
                   this.io.to( user.socketId ).emit( "player-cards", player.getHandCards() );
                   this.io.to( user.socketId ).emit( "table-cards:add", game.getCardsList() );
                 }

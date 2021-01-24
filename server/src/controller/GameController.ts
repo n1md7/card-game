@@ -64,7 +64,7 @@ class GameController extends BaseController {
       const room = GameModel.join( id, userId, name );
 
       return super.clientReturn( ctx, {
-        room: room.getGameData()
+        room: room.getGameDetails()
       } );
     } catch ( { message } ) {
       return super.clientReject( ctx, message );

@@ -15,6 +15,7 @@ export default ( { cards, progress, ...props } ) => {
       </div>
       <div className="x-progress" style={ style }>{ "" }</div>
       <div className="x-name">{ props?.name || "default" }</div>
+      <div className="x-score">{ props?.score || 0 }</div>
     </div>
   );
 };
