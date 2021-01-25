@@ -79,3 +79,29 @@ J
 server/src/socket/index.ts,4/c/4cd3d9bc2b14ff6b84fee8e29abe5eddbe5ef42a
 \
 ,game/src/components/game/hooks/useSockets.ts,9/f/9f733e32ca3cdeaf94e5e69bb3a7aeae1addf66d
+I
+game/src/libs/Formulas.ts,4/c/4c04fcef8f90b2565875abcfec73aaa9d4c9830f
+P
+ game/src/redux/reducers/index.js,9/a/9a10ac5aff4496a8be96c428fe7e49917630e51a
+M
+server/src/middleware/auth.ts,6/8/68a410112f315ab486969ccae1b32f89e6e6641f
+W
+'server/src/controller/AuthController.ts,1/b/1bd56160453383013bd8515be0f6a6fb9ba9e9b6
+@
+game/src/App.jsx,4/d/4d930f8214489e4b44201e99784286261c2821cf
+O
+game/src/services/httpClient.js,e/d/edeb700f8bc9012e99324cef0d3f439ba77a1688
+Y
+)server/dist/server/src/model/AuthModel.js,e/2/e2f8a7612d788246908d08faf372d01c2cd23ce1
+M
+server/src/model/BaseModel.ts,a/8/a8daaa822e83e3bfbce747882a74b7991162ffe4
+Y
+)server/dist/server/src/model/BaseModel.js,9/a/9aa4046bdd8c1226b9a53ef1f41e5c92ba854118
+M
+server/src/model/AuthModel.ts,5/5/55e383235a01ba28a8bb367a33a40e7f30ad2937
+I
+server/src/store/index.ts,b/1/b1c7bcd619409986cb6751846215251737c868b7
+O
+server/src/store/PlayerStore.ts,8/7/87e9a1db3bb395405fcd82acc269662479c49749
+M
+server/src/store/BaseStore.ts,8/2/82d427d412283c1a05b9d811ba86a387423513ae
