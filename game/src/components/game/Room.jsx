@@ -1,7 +1,7 @@
-import React, { useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import Card from '../cards/Card';
 import Player from './Player';
-import {draggingValue} from '../../constants/defaults';
+import {draggingValue, gamePosition} from '../../constants/defaults';
 import '../../css/game.scss';
 import {httpClient} from '../../services/httpClient';
 import useSockets from './hooks/useSockets';
@@ -28,7 +28,7 @@ export default () => {
     outerEllipse,
     defaults,
     deck,
-    xTableStyle
+    xTableStyle,
   ] = useSockets();
 
   const calculatedValues = e => {
@@ -149,36 +149,23 @@ export default () => {
           rotate={0}
           w={defaults.cardWidth}
           h={defaults.cardHeight}
-          suit={"suit"}
-          rank={"rank"}
+          suit={'suit'}
+          rank={'rank'}
         />
         <span className="card-deck-digit">{gameData.remainedCards}</span>
       </div>
       <div className="x-2d-room">
-        <Player
-          name={players.left.name}
-          cards={players.left.cards}
-          progress={players.left.progress}
-          score={players.left.score}
-          className={'x-seat x-one'}/>
-        <Player
-          name={players.up.name}
-          cards={players.up.cards}
-          progress={players.up.progress}
-          score={players.up.score}
-          className={'x-seat x-two'}/>
-        <Player
-          name={players.right.name}
-          cards={players.right.cards}
-          progress={players.right.progress}
-          score={players.right.score}
-          className={'x-seat x-three'}/>
-        <Player
-          name={players.down.name}
-          cards={players.down.cards}
-          progress={players.down.progress}
-          score={players.down.score}
-          className={'x-seat x-four'}/>
+        {
+          Object.entries(players)
+            .map(([position, {taken, name, progress, cards, score}]) => {
+              return <Player
+                name={name}
+                cards={cards}
+                progress={progress}
+                score={score}
+                className={gamePosition[position]}/>
+            })
+        }
 
         <div className="x-table" ref={tableRef}
              onMouseMove={tableMouseMoveHandler}

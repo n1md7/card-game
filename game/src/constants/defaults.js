@@ -19,27 +19,31 @@ export const gameDataDefault = {
       name: '',
       progress: 0,
       cards: 0,
+      score: 0,
     },
     up: {
       taken: false,
       name: '',
       progress: 0,
       cards: 0,
+      score: 0,
     },
     right: {
       taken: false,
       name: '',
       progress: 0,
       cards: 0,
+      score: 0,
     },
     down: {
       taken: false,
       name: '',
       progress: 0,
       cards: 0,
+      score: 0,
     },
   },
-  remainedCards: 0
+  remainedCards: 0,
 };
 
 export const draggingValue = {
@@ -49,3 +53,9 @@ export const draggingValue = {
   target: null,
 };
 
+export const gamePosition = {
+  left: 'x-seat x-one',
+  up: 'x-seat x-two',
+  right: 'x-seat x-three',
+  down: 'x-seat x-four',
+};
