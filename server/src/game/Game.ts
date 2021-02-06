@@ -132,7 +132,7 @@ class Game {
       this.currentPlayerIndex = 0;
       if (!this.playersHaveCard()) {
         if (this.deck.isEmpty()) {
-          this.finishGame();
+          this.finishDeck();
         } else {
           this.dealCards();
         }
@@ -142,10 +142,8 @@ class Game {
     this.timeToMove = PLAYER_MOVER_INTERVAL;
   }
 
-  finishGame() {
+  finishDeck() {
     this.playerAction(this.lastTaker, ActionType.TAKE_CARDS, null, this.cards, true);
-    clearInterval(this.timer);
-    this.isFinished = true;
     let maxCards = 0;
     let maxClubs = 0;
     this.players.forEach(player => {
@@ -172,6 +170,29 @@ class Game {
         player.score ++;
       player.result.score = player.score;
     });
+    this.players.forEach(player => socketManager.sendMessage(player, "game:finish-deck", player.result));
+    const winnerScores = this.players
+      .filter(pl => pl.score >= this.maxScores)
+      .reduce((scores, pl: Player) => [...scores, pl.score], []).sort();
+    if(winnerScores.length > 0) {
+      const winnerScore = winnerScores[winnerScores.length - 1];
+      const winnerPlayers = this.players.filter(pl => pl.score === winnerScore);
+      if(winnerPlayers.length === 1) {
+        this.finishGame(winnerPlayers[0]);
+        return;
+      }
+    }
+    this.restartGame();
+  }
+
+  restartGame() {
+    this.deck = new Deck();
+    this.dealCards(true);
+  }
+
+  finishGame(winnerPlayer: Player) {
+    clearInterval(this.timer);
+    this.isFinished = true;
     this.players.forEach(player => socketManager.sendMessage(player, "game:finish", player.result));
   }
 
@@ -246,7 +267,7 @@ class Game {
   removeCardsFromTable(cards: Card[]) {
     for (const card of cards) {
       const tableCardIndex = this.cards.findIndex(c => c.equals(card));
-      if (tableCardIndex > -1) {
+      if (tableCardIndex >= 0) {
         this.cards.splice(tableCardIndex, 1);
       }
     }
@@ -266,19 +287,26 @@ class Game {
       this.validateAction(player, type, playerCard, tableCards);
     }
     if (type === ActionType.TAKE_CARDS) {
+      if(forceMove) {
+        console.dir("last move!");
+        console.dir(tableCards);
+      }
       this.removeCardsFromTable(tableCards);
       if (playerCard != null) {
         player.takeCards([...tableCards, playerCard]);
         player.removeCardFromHand(playerCard);
       } else {
-        player.takeCards([...tableCards]);
+        player.takeCards(tableCards);
       }
       this.lastTaker = player;
     } else if (type === ActionType.PLACE_CARD) {
       this.cards.push(playerCard);
       player.removeCardFromHand(playerCard);
     }
-
+    if(forceMove) {
+      console.dir("last moved!");
+      console.dir(this.cards);
+    }
     this.players.forEach(pl => {
       const positionShift = positions[pl.position];
       let movePlayerPositionIndex = positions[player.position] - positionShift;
