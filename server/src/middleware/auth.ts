@@ -1,8 +1,6 @@
 import { token } from "../config";
 import { Context, Next } from "koa";
-import setup from "../model/AuthModel";
 import jwt from "jsonwebtoken";
-import Player from "../game/Player";
 import User from "../game/User";
 import UserModel from "../model/UserModel";
 
@@ -17,7 +15,7 @@ export default async ( ctx: Context, next: Next ) => {
   let verified: TokenProps | any;
 
   try {
-    verified = jwt.verify( jwToken, process.env.JWT_SECRET );
+    verified = jwt.verify( jwToken as string, process.env.JWT_SECRET );
   } catch ( error ) {
     ctx.body = {
       ok: false,
