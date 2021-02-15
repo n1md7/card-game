@@ -7,7 +7,6 @@ import routes from "../routes";
 import ErrorHandler from "../middleware/ErrorHandler";
 import {Env} from "../types";
 import {ConfigOptions} from "../types/config";
-import {Server as httpServer} from "http";
 import path from "path";
 import fs from "fs";
 import http, {Server as HttpServer} from "http";
@@ -29,8 +28,6 @@ export default class App {
     this.config = config;
     this.koa = new Koa();
     this.httpServer = http.createServer(this.koa.callback());
-    // FIXME: socket.io is not accessible for the client
-    // FIXME FIXME ASAP
     this.io = SocketIO(this.httpServer, {
       path: '/socket.io',
       serveClient: false,
@@ -44,8 +41,8 @@ export default class App {
     // Makes publicly accessible React build folder
     this.staticFolderPath = path.join(__dirname, config.server.staticFolderPath);
     // Allow any cross-domain requests when not Production environment
-    if (process.env.NODE_ENV !== Env.Prod) {
-      this.config.origin = 'http://localhost:3000';
+    if (process.env.NODE_ENV === Env.Prod) {
+      this.config.origin = process.env.ORIGIN;
     }
   }
 
@@ -63,9 +60,6 @@ export default class App {
     this.koa.use(serve(this.staticFolderPath));
     // Redirect all requests to index.html - for React-router
     this.koa.use(async (ctx: Context, next) => {
-      if(ctx.path.indexOf('/socket.io') !== -1){
-        return await next();
-      }
       if (ctx.path.indexOf(this.config.server.apiContextPath) !== -1) {
         // Request came to api endpoint
         log.error(`${ctx.request.path} - is not a valid route!`);
@@ -108,10 +102,10 @@ export default class App {
     return this.socket;
   }
 
-  startServer(): httpServer {
+  startServer(): HttpServer {
     const {port, hostname, apiContextPath} = this.config.server;
 
-    return this.koa.listen(port, hostname, () => {
+    return this.httpServer.listen(port, hostname, () => {
       log.debug(`Health-check - http://${hostname}:${port}/health-check`);
       log.debug(`Example API endpoint - http://${hostname}:${port}${apiContextPath}/v1/users`);
       log.debug('Server (re)started!');

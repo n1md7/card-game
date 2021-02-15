@@ -18,7 +18,7 @@ export default {
     staticFolderPath: '../../../game/build',
     indexFile: '/index.html',
   },
-  origin: '*.domain.com',
+  origin: 'http://localhost:3000',
   loggerOptions: {
     fileOptions: {
       maxsize: 100000000,
