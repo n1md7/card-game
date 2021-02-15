@@ -49,8 +49,6 @@ R
 "game/src/components/room/Rooms.jsx,7/3/7342ec75ea9606d5d2aa0274ddcb64c3c11c17aa
 S
 #game/src/components/room/Create.jsx,a/e/ae05cfeb142ea34bfa5180f1c1f53a9f16b485f4
-I
-server/src/route/index.ts,9/1/91a708e621c3e6635ac0cccce726eb588b015a97
 W
 'server/src/controller/UserController.ts,3/3/3362d75ea15dc09c05942e823f1cd60760efd65e
 M
@@ -79,3 +77,17 @@ J
 server/src/socket/index.ts,4/c/4cd3d9bc2b14ff6b84fee8e29abe5eddbe5ef42a
 \
 ,game/src/components/game/hooks/useSockets.ts,9/f/9f733e32ca3cdeaf94e5e69bb3a7aeae1addf66d
+@
+game/src/App.jsx,4/d/4d930f8214489e4b44201e99784286261c2821cf
+J
+server/src/config/index.ts,f/3/f3ca08e9e639ebbe280a06e81747e8b9a819fb5e
+M
+server/src/middleware/auth.ts,6/8/68a410112f315ab486969ccae1b32f89e6e6641f
+W
+'server/src/controller/AuthController.ts,1/b/1bd56160453383013bd8515be0f6a6fb9ba9e9b6
+U
+%server/src/middleware/ErrorHandler.ts,0/1/01631e82fe8f9fc4a5d047c0b3248f2f90d91933
+J
+server/src/routes/index.ts,c/6/c6b95e5d65fa341e30d3f2ae3b4fbc22a000f27d
+J
+server/src/server/index.ts,4/9/49eca3a3cbd1d52b7dd6ef074500c571fb44c6b0
