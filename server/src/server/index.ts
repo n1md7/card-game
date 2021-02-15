@@ -32,7 +32,7 @@ export default class App {
     // FIXME: socket.io is not accessible for the client
     // FIXME FIXME ASAP
     this.io = SocketIO(this.httpServer, {
-      path: '/test',
+      path: '/socket.io',
       serveClient: false,
       // below are engine.IO options
       pingInterval: 10000,
@@ -62,11 +62,11 @@ export default class App {
     // Serve files from public static folder
     this.koa.use(serve(this.staticFolderPath));
     // Redirect all requests to index.html - for React-router
-    this.koa.use((ctx: Context, next) => {
-      /*if(ctx.path.indexOf('socket') !== -1){
-        ctx.status = 345;
-        return next();
-      }*/
+    this.koa.use(async (ctx: Context, next) => {
+      console.log(ctx.path)
+      //if(ctx.path.indexOf('/socket.io') !== -1){
+      //  return await next();
+      //}
       if (ctx.path.indexOf(this.config.server.apiContextPath) !== -1) {
         // Request came to api endpoint
         log.error(`${ctx.request.path} - is not a valid route!`);
