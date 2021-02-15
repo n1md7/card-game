@@ -3,7 +3,7 @@ import Player from "./Player";
 import {ActionType} from "../constant/cardConstants";
 import {Card} from "./Card";
 import {PLAYER_MOVER_INTERVAL} from "../constant/gameConfig";
-import {socketManager} from '../index'
+import {server} from '../index';
 
 
 const positions: {[key: string]: number;} = {
@@ -101,7 +101,7 @@ class Game {
         name: "",
         progress: 0,
         cards: 0,
-        score: 0
+        score: 0,
       };
     }
 
@@ -158,26 +158,26 @@ class Game {
     const clubWinners = this.players.filter(pl => pl.result.numberOfClubs === maxClubs);
     const cardWinners = this.players.filter(pl => pl.result.numberOfCards === maxCards);
     this.players.forEach(player => {
-      if(clubWinners.find(pl => pl.equals(player)) != null) {
+      if (clubWinners.find(pl => pl.equals(player)) != null) {
         player.score += 1;
       }
-      if(cardWinners.find(pl => pl.equals(player)) != null) {
+      if (cardWinners.find(pl => pl.equals(player)) != null) {
         player.score += cardWinners.length > 1 ? 1 : 2;
       }
       if (player.result.hasTenOfDiamonds)
-        player.score ++;
+        player.score++;
       if (player.result.hasTwoOfClubs)
-        player.score ++;
+        player.score++;
       player.result.score = player.score;
     });
-    this.players.forEach(player => socketManager.sendMessage(player, "game:finish-deck", player.result));
+    this.players.forEach(player => server.socketManager.sendMessage(player, "game:finish-deck", player.result));
     const winnerScores = this.players
       .filter(pl => pl.score >= this.maxScores)
       .reduce((scores, pl: Player) => [...scores, pl.score], []).sort();
-    if(winnerScores.length > 0) {
+    if (winnerScores.length > 0) {
       const winnerScore = winnerScores[winnerScores.length - 1];
       const winnerPlayers = this.players.filter(pl => pl.score === winnerScore);
-      if(winnerPlayers.length === 1) {
+      if (winnerPlayers.length === 1) {
         this.finishGame(winnerPlayers[0]);
         return;
       }
@@ -193,7 +193,7 @@ class Game {
   finishGame(winnerPlayer: Player) {
     clearInterval(this.timer);
     this.isFinished = true;
-    this.players.forEach(player => socketManager.sendMessage(player, "game:finish", player.result));
+    this.players.forEach(player => server.socketManager.sendMessage(player, "game:finish", player.result));
   }
 
   startTimer() {
@@ -287,7 +287,7 @@ class Game {
       this.validateAction(player, type, playerCard, tableCards);
     }
     if (type === ActionType.TAKE_CARDS) {
-      if(forceMove) {
+      if (forceMove) {
         console.dir("last move!");
         console.dir(tableCards);
       }
@@ -303,7 +303,7 @@ class Game {
       this.cards.push(playerCard);
       player.removeCardFromHand(playerCard);
     }
-    if(forceMove) {
+    if (forceMove) {
       console.dir("last moved!");
       console.dir(this.cards);
     }
@@ -311,7 +311,7 @@ class Game {
       const positionShift = positions[pl.position];
       let movePlayerPositionIndex = positions[player.position] - positionShift;
       movePlayerPositionIndex = movePlayerPositionIndex >= 0 ? movePlayerPositionIndex : 4 + movePlayerPositionIndex;
-      socketManager
+      server.socketManager
         .sendMessage(pl, "game:take-cards",
           {position: positionsArray[movePlayerPositionIndex], playerCard, tableCards})
     });
@@ -327,12 +327,12 @@ class Game {
       throw Error("incorrect move");
   }
 
-  private occupiedPositions() {
-    return this.players.reduce((op, {position}: Player) => [...op, position], []);
-  }
-
   public statistics() {
     return {message: "Game finished!"};
+  }
+
+  private occupiedPositions() {
+    return this.players.reduce((op, {position}: Player) => [...op, position], []);
   }
 
 }

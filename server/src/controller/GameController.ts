@@ -8,7 +8,7 @@ import { isset } from "../helpers/extras";
 
 class GameController extends BaseController {
 
-  public create( ctx: Context ) {
+  public create = ( ctx: Context ) => {
     const roomId = Id.game();
     const userId = ctx.state.user.id;
     const { isPublic, size, name } = ctx.request.body;
@@ -41,13 +41,13 @@ class GameController extends BaseController {
 
   }
 
-  public showAll( ctx: Context ) {
+  public showAll = ( ctx: Context ) => {
     super.clientReturn( ctx, {
       rooms: GameModel.getGamesList()
     } );
   }
 
-  public join( ctx: Context ) {
+  public join =( ctx: Context ) =>  {
     // id is roomId/gameId, name is playerName
     const { id, name } = ctx.request.body;
     const userId = ctx.state.user.id;
@@ -72,7 +72,7 @@ class GameController extends BaseController {
 
   }
 
-  public leave( ctx: Context ) {
+  public leave = ( ctx: Context ) => {
     const { id } = ctx.state.user;
 
     try {

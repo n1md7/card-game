@@ -24,6 +24,11 @@ interface JWTProps {
   "exp": number
 }
 
+export enum Env {
+  Dev = 'development',
+  Test = 'test',
+  Prod = 'production',
+}
 
 export {
   RoomSizeProps,
