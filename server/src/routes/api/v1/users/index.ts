@@ -1,14 +1,11 @@
 import Router from "@koa/router";
-//import UserController from "../../../../controllers/UserController";
+import UserController from "../../../../controller/v1/UserController";
+import handleAuthentication from '../../../../middleware/handleAuthVerification';
 
 const userRouter = new Router();
 
-userRouter.get('/hmm', ctx => {
-  ctx.body = {
-    opa: 123
-  };
-});
-//userRouter.get('/users', UserController.users);
-//userRouter.get('/users/top/:top?', UserController.topUsersRanks);
+userRouter.use('/user', handleAuthentication);
+
+userRouter.get('/user', UserController.getUserInfo);
 
 export default userRouter;
