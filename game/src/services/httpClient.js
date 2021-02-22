@@ -1,21 +1,24 @@
-import axios from "axios";
-import { baseURL, token as tokenKey } from "../constants/urls";
-import { tokenStore } from "./token";
+import axios from 'axios';
+import {baseURL, token as tokenKey} from '../constants/urls';
+import {tokenStore} from './token';
 
 const config = {
   baseURL,
-  timeout: 2000,
-  headers: {}
+  timeout: 5000,
+  headers: {},
+  validateStatus: function (status){
+    return status >= 200 && status < 300 || [401, 403].includes(status);
+  },
 };
 
-let httpClient = axios.create( config );
+let httpClient = axios.create(config);
 
 // listener for the token update from App.jsx
-tokenStore.onUpdate( ( token ) => {
-  config.headers[ tokenKey ] = token;
-  httpClient = axios.create( config );
-} );
+tokenStore.onUpdate((token) => {
+  config.headers[tokenKey] = token;
+  httpClient = axios.create(config);
+});
 
 export {
-  httpClient
+  httpClient,
 };

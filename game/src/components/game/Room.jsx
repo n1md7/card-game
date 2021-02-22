@@ -1,4 +1,4 @@
-import React, { useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import Card from '../cards/Card';
 import Player from './Player';
 import {draggingValue} from '../../constants/defaults';
@@ -7,14 +7,13 @@ import {httpClient} from '../../services/httpClient';
 import useSockets from './hooks/useSockets';
 import {CardColumns} from 'react-bootstrap';
 
-export default () => {
+export default ({history}) => {
   const borderWidth = 4;
   const tableRef = useRef(null);
   const [zIndex, setZIndex] = useState(0);
   const [dragging, setDragging] = useState(draggingValue);
   const [playerCardSelected, setPlayerCardSelected] = useState({});
   const [tableCardsSelected, setTableCardsSelected] = useState({});
-  const [redirect, setRedirect] = useState(false);
   const playerCardRefs = [
     useRef(null),
     useRef(null),
@@ -28,7 +27,7 @@ export default () => {
     outerEllipse,
     defaults,
     deck,
-    xTableStyle
+    xTableStyle,
   ] = useSockets();
 
   const calculatedValues = e => {
@@ -75,7 +74,7 @@ export default () => {
 
   const leaveRoomHandler = async () => {
     await httpClient.get('/leave-room');
-    setRedirect(true);
+    history.push('/join');
   };
 
   const tableMouseMoveHandler = e => {
@@ -124,11 +123,7 @@ export default () => {
     return false;
   };
 
-  return redirect ? (
-    //FIXME: redirection is problem here
-    // <Redirect to={`/rooms`}/>
-    <span>redirecting...</span>
-  ) : (
+  return (
     <div className={'x-2d-area no-select'} style={{
       width: defaults.windowWidth,
     }}>
@@ -149,8 +144,8 @@ export default () => {
           rotate={0}
           w={defaults.cardWidth}
           h={defaults.cardHeight}
-          suit={"suit"}
-          rank={"rank"}
+          suit={'suit'}
+          rank={'rank'}
         />
         <span className="card-deck-digit">{gameData.remainedCards}</span>
       </div>

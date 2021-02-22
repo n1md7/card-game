@@ -1,16 +1,16 @@
-export const tokenStore = (( Token ) => {
+export const tokenStore = ((Token) => {
   return new Token();
-})( function () {
+})(function (){
   const callbacks = [];
-  this.token = "";
+  this.token = '';
   this.onUpdate = callback => {
-    if ( typeof callback === "function" ) {
-      callbacks.push( callback );
+    if (typeof callback === 'function') {
+      callbacks.push(callback);
     }
   };
-  this.setToken = ( jwt = "" ) => {
+  this.setToken = (jwt) => {
     this.token = jwt;
     // trigger updates
-    callbacks.forEach( fn => fn( this.token ) );
+    callbacks.forEach(fn => fn(this.token));
   };
-} );
+});

@@ -1,11 +1,15 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {httpClient} from '../../services/httpClient';
 import {urls} from '../../constants/urls';
 import {useDispatch, useSelector} from 'react-redux';
 import {updateUser} from '../../redux/actions';
 import {Alert, AlertType} from '../../helpers/toaster';
+import Nav from '../Nav';
+import {Link} from 'react-router-dom';
+import Header from '../Header';
 
-export default function Create(){
+export default function Create(props){
+  const roomId = useSelector(({user}) => user.roomId);
   const dispatch = useDispatch();
   const [size, setSize] = useState(2);
   const [isPublic, setIsPublic] = useState(true);
@@ -46,10 +50,16 @@ export default function Create(){
     size,
     isPublic,
     name,
-  })
+  });
+
+  useEffect(() => {
+    if(roomId){
+      props.history.push(`/room/${roomId}`);
+    }
+  },[])
 
   return (
-    <Fragment>
+    <Header>
       <h3 className="text-center mt-5 mb-4 text-muted">Create Room</h3>
       <form onSubmit={formSubmitHandler}>
         <div className="form-row justify-content-center">
@@ -74,6 +84,6 @@ export default function Create(){
           </div>
         </div>
       </form>
-    </Fragment>
+    </Header>
   );
 };
