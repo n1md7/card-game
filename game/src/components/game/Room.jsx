@@ -5,7 +5,6 @@ import {draggingValue} from '../../constants/defaults';
 import '../../css/game.scss';
 import {httpClient} from '../../services/httpClient';
 import useSockets from './hooks/useSockets';
-import {CardColumns} from 'react-bootstrap';
 import {useHistory} from 'react-router';
 
 export default () => {
@@ -23,7 +22,8 @@ export default () => {
     useRef(null),
   ];
   const [
-    socket, playerCards,
+    socket,
+    playerCards,
     players,
     gameData,
     outerEllipse,
@@ -74,9 +74,11 @@ export default () => {
     target.classList.toggle('x-card-selected');
   };
 
-  const leaveRoomHandler = async () => {
-    await httpClient.get('/leave-room');
-    history.push('/join');
+  const leaveRoomHandler = () => {
+    httpClient.put('/v1/game/exit')
+      .then(() => {
+        history.push('/join');
+      });
   };
 
   const tableMouseMoveHandler = e => {
