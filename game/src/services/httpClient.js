@@ -7,11 +7,11 @@ const config = {
   timeout: 5000,
   headers: {},
   validateStatus: function (status){
-    return status >= 200 && status < 300 || [401, 403].includes(status);
+    return (status >= 200 && status < 300) || [401, 403].includes(status);
   },
 };
 
-let httpClient = axios.create(config);
+export let httpClient = axios.create(config);
 
 // listener for the token update from App.jsx
 tokenStore.onUpdate((token) => {
@@ -19,6 +19,3 @@ tokenStore.onUpdate((token) => {
   httpClient = axios.create(config);
 });
 
-export {
-  httpClient,
-};

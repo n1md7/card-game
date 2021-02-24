@@ -19,9 +19,9 @@ class ErrorHandler {
     });
   }
 
-  private static buildErrorMessage(error: Error, ctx: Context) {
+  private static buildErrorMessage(error: Error&{details?: ValidationErrorItem}, ctx: Context) {
     const status: number = ctx.status || HttpCode.internalServerError;
-    const errorMessage: string = error.message || HttpText.internalServerError;
+    const errorMessage: string = error.message || error.details?.toString() || HttpText.internalServerError;
 
     return `[${error.name}]:[${status} - ${errorMessage}]`;
   }
@@ -43,12 +43,12 @@ class ErrorHandler {
     ctx.app.emit('error:server', `[${ErrorType.mongoError}]:[${HttpCode.badRequest} - ${message}]`);
   }
 
-  private static handleEverythingElse(error: Error&{details?: ValidationErrorItem[]}, ctx: Context) {
+  private static handleEverythingElse(error: Error&{details?: ValidationErrorItem}, ctx: Context) {
 
     switch (error.name) {
       case ExceptionType.validationErrorException:
         ctx.status = HttpCode.badRequest;
-        ctx.body = error.details;
+        ctx.body = error.details.message;
         break;
       case ErrorType.jsonWebTokenError:
       case ErrorType.tokenExpiredError:

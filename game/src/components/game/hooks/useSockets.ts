@@ -45,7 +45,7 @@ const useSockets = () => {
   const [deck, setDeck] = useState({});
   const [outerEllipse, defaults, xTableStyle] = useDefaults();
 
-  useEffect(() => {
+  useEffect((): any => {
     const token = localStorage.getItem('token');
     // send token on init request
     const io = socketIOClient(SOCKET_ENDPOINT, {
@@ -124,7 +124,10 @@ const useSockets = () => {
     });
     io.on('game:take-cards', (cards: TakeCards) => {
       //const {playerId, playerCard, tableCards} = cards;
-    })
+    });
+
+    // Clean up
+    return () => io.close();
   }, []);
 
   return [

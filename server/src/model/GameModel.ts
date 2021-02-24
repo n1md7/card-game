@@ -39,6 +39,7 @@ class GameModel extends BaseModel<GameProps> {
     game.joinPlayer( player );
     playerStore.setById( player.getPlayerId(), player );
     playerStore.addPlayerById( player, userId );
+    userStore.setGameId(userId, game.getGameId());
 
     return game;
   }
@@ -54,6 +55,8 @@ class GameModel extends BaseModel<GameProps> {
     }
 
     game.removePlayerFromTheGame( userId );
+    // remove gameId from User
+    userStore.setGameId(userId, null);
   }
 
   public create( userId: string, roomId: string, size: number, isPublic: boolean, name: string ): Player {
@@ -62,6 +65,7 @@ class GameModel extends BaseModel<GameProps> {
     game.joinPlayer( player );
     playerStore.setById( player.getPlayerId(), player );
     gameStore.setById( game.getGameId(), game );
+    userStore.setGameId(userId, game.getGameId());
 
     return player;
   }
