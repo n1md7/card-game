@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {httpClient} from '../../../services/httpClient';
-import {baseURL} from '../../../constants/urls';
 import useUser from '../../../hooks/useUser';
 import {useHistory} from 'react-router';
 import handleError from '../../../helpers/handleError';
@@ -14,7 +13,7 @@ export default function Row(props){
   const joinClickHandler = room => () => {
     setJoinText('Joining...');
     httpClient
-      .post(`${baseURL}v1/game/enter`, {id: room.id, name})
+      .post(`v1/game/enter`, {id: room.id, name})
       .then(response => {
         if (response.status === 200) {
           // Redirect to game room

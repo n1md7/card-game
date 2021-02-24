@@ -19,7 +19,7 @@ export default ({history}) => {
 
   const submitHandler = event => {
     event.preventDefault();
-    httpClient.get(`${baseURL}v1/auth/init`)
+    httpClient.get(`v1/auth/init`)
       .then(response => {
         if (response.status === 200) {
           // custom store for the token

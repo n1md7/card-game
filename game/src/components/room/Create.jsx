@@ -19,7 +19,7 @@ export default function Create(){
 
   const formSubmitHandler = function (event){
     event.preventDefault();
-    httpClient.post(`${baseURL}v1/game/create`, {
+    httpClient.post(`v1/game/create`, {
         size: this.size,
         isPublic: this.isPublic,
         name: this.name,

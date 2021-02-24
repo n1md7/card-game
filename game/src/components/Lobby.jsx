@@ -5,7 +5,6 @@ import Header from './Header';
 export default function Lobby({history}){
   const [userInfo, isLoading] = useUserInfo();
 
-
   useEffect(() => {
     // check whether user has already in the room
     if (userInfo?.gameId) {

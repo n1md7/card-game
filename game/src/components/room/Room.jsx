@@ -3,16 +3,12 @@ import {useParams} from 'react-router-dom';
 import GameRoom from '../game/Room';
 import useJoinRoom from '../../hooks/useJoinRoom';
 import Header from '../Header';
-import {useDispatch} from 'react-redux';
-import {updateUser} from '../../redux/actions';
 
 export default function Room(){
-  const dispatch = useDispatch();
   // roomId is URL route param
   const {roomId} = useParams();
   // When user will be redirected to Auth endpoint
   // This will be used to return back to the game room
-  // dispatch(updateUser({roomToJoin: roomId}));
   // when accessed directly from the URL
   // we dont know that roomId definitely exists
   // or the user is able to join the table

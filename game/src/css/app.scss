@@ -17,3 +17,14 @@
 @import "~bootstrap/scss/nav";
 @import "~bootstrap/scss/alert";
 
+h1{
+  a {
+    text-decoration: none;
+    color: gray;
+    transition: 300ms all;
+
+    &:hover{
+      text-decoration: none!important;
+    }
+  }
+}
