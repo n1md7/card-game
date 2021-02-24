@@ -22,8 +22,7 @@ const useRooms = (): Room[] => {
         .get(`${baseURL}v1/games`)
         .then(({data, status}) => {
           if (status === 200) {
-            setList(data as Room[]);
-            return null;
+            return setList(data as Room[]);
           }
           throw new Error(data as string);
         }).catch(handleError);
