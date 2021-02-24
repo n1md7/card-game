@@ -19,7 +19,7 @@ export default function Rooms(){
           </thead>
           <tbody>
           {
-            list.map((values, key) => <Row key={key} {...values} />)
+            list.map((values, key) => <Row key={key} {...values}/>)
           }
           </tbody>
         </table>

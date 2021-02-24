@@ -4,14 +4,18 @@ import {updateUser} from '../redux/actions';
 import {httpClient} from '../services/httpClient';
 import {tokenStore} from '../services/token';
 import {baseURL, token as tokenKey} from '../constants/urls';
-import Nav from './Nav';
-import {random} from '../libs/Formulas';
 import handleError from '../helpers/handleError';
+import useAuth from '../hooks/useAuth';
+import {getRandomInt} from '../libs/Formulas';
+import {useParams} from 'react-router-dom';
+import Nav from './Nav';
 
-export default () => {
+export default ({history}) => {
+  const [isAuth, isLoading] = useAuth();
   const dispatch = useDispatch();
   const [name, setName] = useState('');
   const nameChangeHandler = ({target: {value}}) => setName(value);
+  const {roomId} = useParams();
 
   const submitHandler = event => {
     event.preventDefault();
@@ -35,13 +39,31 @@ export default () => {
     // get name from the storage when available
     // and set it as a default value
     const storageName = localStorage.getItem('name');
-    setName(storageName || `Noob${random(10, 999)}`);
+    setName(storageName || `Noob${getRandomInt(100, 999)}`);
   }, []);
+
+  // When authenticated redirect to Lobby
+  useEffect(() => {
+    if (isAuth) {
+      // When redirected from game room and auth
+      // Redirect back to game room
+      if (roomId && roomId !== 'null') {
+        return history.push(`/room/${roomId}`);
+      }
+      history.push('/lobby');
+    }
+  }, [isAuth, roomId]);
+
+  if (isLoading) {
+    return (
+      <div>Loading...</div>
+    );
+  }
 
   return (
     <Nav>
       <div className="row justify-content-center my-5 text-center">
-        <div className="col-sm-9 col-md-4 ">
+        <div className="col-sm-9 col-md-4">
           <form onSubmit={submitHandler}>
             <div className="form-group">
               <input

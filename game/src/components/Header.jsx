@@ -16,4 +16,4 @@ const Header = ({children}) => (
   </Nav>
 );
 
-export default Nav;
+export default Header;

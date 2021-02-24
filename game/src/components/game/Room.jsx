@@ -6,8 +6,10 @@ import '../../css/game.scss';
 import {httpClient} from '../../services/httpClient';
 import useSockets from './hooks/useSockets';
 import {CardColumns} from 'react-bootstrap';
+import {useHistory} from 'react-router';
 
-export default ({history}) => {
+export default () => {
+  const history = useHistory();
   const borderWidth = 4;
   const tableRef = useRef(null);
   const [zIndex, setZIndex] = useState(0);

@@ -1,62 +1,43 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {httpClient} from '../../services/httpClient';
-import {urls} from '../../constants/urls';
-import {useDispatch, useSelector} from 'react-redux';
-import {updateUser} from '../../redux/actions';
-import {Alert, AlertType} from '../../helpers/toaster';
-import Nav from '../Nav';
-import {Link} from 'react-router-dom';
+import {baseURL} from '../../constants/urls';
+import {useSelector} from 'react-redux';
 import Header from '../Header';
+import handleError from '../../helpers/handleError';
+import {useHistory} from 'react-router';
 
-export default function Create(props){
-  const roomId = useSelector(({user}) => user.roomId);
-  const dispatch = useDispatch();
+export default function Create(){
+  const [gameId, setGameId] = useState(null);
   const [size, setSize] = useState(2);
   const [isPublic, setIsPublic] = useState(true);
-  // get name value from the redux store
+  // Get name value from the redux store
   const {name} = useSelector(({user}) => user);
   // define event change handlers
   const sizeChangeHandler = ({target: {value}}) => setSize(+ value);
   const isPublicChangeHandler = ({target: {value}}) => setIsPublic( !!+ value);
+  const history = useHistory();
+
   const formSubmitHandler = function (event){
     event.preventDefault();
-    const {
-      size,
-      isPublic,
-      name,
-    } = this;
-    httpClient.post(urls.createRoom, {
-        size,
-        isPublic,
-        name,
+    httpClient.post(`${baseURL}v1/game/create`, {
+        size: this.size,
+        isPublic: this.isPublic,
+        name: this.name,
       })
-      .then(({data}) => data)
-      .then(({ok, roomId, msg}) => {
-        if ( !ok || !roomId) {
-          // todo log error
-          // hmm that's bad
-          throw new Error(msg);
+      .then(response => {
+        if (response.status === 200) {
+          return setGameId(response.data);
         }
+        throw new Error(response.data);
+      }).catch(handleError);
+  }.bind({size, isPublic, name});
 
-        return roomId;
-      })
-      // trigger redux user store object update
-      // which will be caught from the component Lobby
-      .then(roomId => dispatch(updateUser({roomId})))
-      .catch(error => {
-        Alert(AlertType.ERROR, error.message, 10);
-      });
-  }.bind({
-    size,
-    isPublic,
-    name,
-  });
-
+  // Redirect to Game when ID is available
   useEffect(() => {
-    if(roomId){
-      props.history.push(`/room/${roomId}`);
+    if (gameId) {
+      history.push(`/room/${gameId}`);
     }
-  },[])
+  }, [gameId])
 
   return (
     <Header>
