@@ -80,9 +80,7 @@ export default function Lobby() {
         <Route path="/resume">
           <ResumeRoom id={ id }/>
         </Route>
-        <Route path='/room/:roomId'>
-          <EnterRoom id={ roomId }/>
-        </Route>
+        <Route path='/room/:roomId' render={props => (<EnterRoom id={ roomId } {...props}/>)}/>
       </Switch>
     </Fragment>
   );

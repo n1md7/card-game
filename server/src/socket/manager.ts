@@ -11,6 +11,6 @@ export default class SocketManager {
 
   public sendMessage(player: Player, event : string, args: any) {
     const user = UserModel.getById(player.getPlayerId());
-    this.io.to(user.socketId).emit(event, args)
+    this.io.to(user.socketId).emit(event, args);
   }
 }

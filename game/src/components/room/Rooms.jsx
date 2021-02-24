@@ -1,38 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {httpClient} from '../../services/httpClient';
-import {urls} from '../../constants/urls';
+import React from 'react';
 import Row from './table/Row';
-import {Alert, AlertType} from '../../helpers/toaster';
+import useRooms from '../../hooks/useRooms';
 
 export default function Rooms(){
-  const [list, setList] = useState([]);
-  useEffect(() => {
-    const updateRoomsList = () => {
-      httpClient
-        .get(urls.showRooms)
-        .then(({data}) => data)
-        .then(({ok, rooms, msg}) => {
-          if ( !ok) {
-            // hmm that's bad
-            throw new Error(msg);
-          }
-
-          return Object.entries(rooms);
-        })
-        .then(setList)
-        .catch(error => {
-          Alert(AlertType.ERROR, error.message, 10);
-          setList([]);
-        });
-    };
-
-    // trigger first load
-    updateRoomsList();
-    // set up ticker for every 1s update
-    const interval = setInterval(updateRoomsList, 1000);
-    // clean up function
-    return () => clearInterval(interval);
-  }, []);
+  const list = useRooms();
 
   return (
     <div className="row justify-content-center">
@@ -48,7 +19,7 @@ export default function Rooms(){
           </thead>
           <tbody>
           {
-            list.map(([key, values]) => <Row key={key} {...values} />)
+            list.map((values, key) => <Row key={key} {...values} />)
           }
           </tbody>
         </table>

@@ -9,7 +9,7 @@ import GameRoom from '../game/Room';
 
 // id is prop passed from Lobby
 // when redirect happens prop id is null
-export default function Room({id}){
+export default function Room({history, id}){
   // roomId is URL route param
   const $user = useSelector(({user}) => user);
   const [joining, setJoining] = useState(true);
@@ -50,7 +50,7 @@ export default function Room({id}){
   }, []);
 
   return $user.roomId ? (
-    <GameRoom/>
+    <GameRoom history={history}/>
   ) : joining ? 'loading...' : (
     <div className={'row justify-content-center'}>
       <div className="col col-md-6 mx-3">

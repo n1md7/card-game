@@ -3,7 +3,7 @@ import Player from "./Player";
 import {ActionType} from "../constant/cardConstants";
 import {Card} from "./Card";
 import {PLAYER_MOVER_INTERVAL} from "../constant/gameConfig";
-import {server} from '../index';
+import server from '../index';
 
 
 const positions: {[key: string]: number;} = {
