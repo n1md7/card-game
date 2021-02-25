@@ -11,7 +11,7 @@ import Koa from 'koa';
 
 export default class SocketModule {
   private io: SocketIO.Server;
-  private koa: Koa;
+  private readonly koa: Koa;
 
   constructor(io: SocketIO.Server, koa: Koa) {
     this.io = io;
@@ -36,7 +36,6 @@ export default class SocketModule {
 
     });
 
-    // FIXME: errorHandling needs to be done
     this.io.on("error", (message: string) => {
       this.io.emit("error", message);
       this.koa.emit("error:socket", message);

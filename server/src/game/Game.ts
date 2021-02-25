@@ -321,7 +321,7 @@ class Game {
   validateAction(player: Player, type: ActionType, playerCard: Card, tableCards: Card[]) {
     if (!player.equals(this.activePlayer))
       throw Error("incorrect player");
-    if (type === ActionType.TAKE_CARDS && (tableCards.length === 0 || !this.tableContainsCards(tableCards)))
+    if (type === ActionType.TAKE_CARDS && (!tableCards.length || !this.tableContainsCards(tableCards)))
       throw Error("incorrect cards");
     if (type === ActionType.TAKE_CARDS && !playerCard.canTakeCards(tableCards))
       throw Error("incorrect move");

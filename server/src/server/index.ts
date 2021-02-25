@@ -70,6 +70,9 @@ export default class Server {
     this.koa.on('error:socket', errorMessage => {
       logWrite.error(`[socket] ${errorMessage}`);
     });
+    this.koa.on('debug', debugMessage => {
+      logWrite.error(`${debugMessage}`);
+    });
 
     return this;
   }

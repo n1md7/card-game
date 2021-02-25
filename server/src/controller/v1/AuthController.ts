@@ -1,5 +1,5 @@
 import {token} from "../../config";
-import {id as Id} from "../../helpers/ids";
+import {id} from "../../helpers/ids";
 import {Context} from "../../types";
 import AuthModel from "../../model/AuthModel";
 import Auth from './Auth';
@@ -18,12 +18,12 @@ class AuthController extends BaseController implements Auth {
   }
 
   public getInitialJsonWebToken = async (ctx: Context): Promise<void> => {
-    const userId = Id.user();
-    const jwt = Id.jwt({[token.userId]: userId});
+    const userId = id.user();
+    const jsonWebToken = id.jwt({[token.userId]: userId});
     AuthModel.signUp(userId, null);
 
     ctx.body = {
-      [token.self]: jwt,
+      [token.self]: jsonWebToken,
       userId,
     };
   }

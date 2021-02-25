@@ -11,8 +11,9 @@ export default (apiContextPath: string, koa: Koa) => {
         message: HttpText.notFound,
       };
       koa.emit("error:server", `${ctx.request.path} - is not a valid route!`);
+    } else {
+      await next();
     }
 
-    await next();
   }
 };

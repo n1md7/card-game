@@ -7,6 +7,7 @@ import Game from './Game';
 import {createGameSchema, enterGameSchema} from './validators/GameRequestValidator';
 import ValidationErrorException from '../../exceptions/ValidationErrorException';
 import {HttpCode} from '../../types/errorHandler';
+import {gameStore, playerStore, userStore} from '../../store';
 
 class GameController extends BaseController implements Game {
 
@@ -53,6 +54,14 @@ class GameController extends BaseController implements Game {
     GameModel.leave(ctx.state.user?.id);
 
     ctx.status = HttpCode.accepted;
+  }
+
+  public showStoreData = async (ctx: Context): Promise<void> => {
+    ctx.body = {
+      GameStore: gameStore.getStorage(),
+      PlayerStore: playerStore.getStorage(),
+      UserStore: userStore.getStorage(),
+    };
   }
 
 }

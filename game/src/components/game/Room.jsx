@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Card from '../cards/Card';
 import Player from './Player';
 import {draggingValue} from '../../constants/defaults';
@@ -6,6 +6,13 @@ import '../../css/game.scss';
 import {httpClient} from '../../services/httpClient';
 import useSockets from './hooks/useSockets';
 import {useHistory} from 'react-router';
+
+const posMap = {
+  left: 'x-one',
+  up: 'x-two',
+  right: 'x-three',
+  down: 'x-four',
+};
 
 export default () => {
   const history = useHistory();
@@ -46,7 +53,7 @@ export default () => {
     ];
   };
 
-  const makeAMoveHandler = () => {
+  const makeMoveHandler = () => {
     if (null === socket) return;
     setPlayerCardSelected({});
     setTableCardsSelected({});
@@ -69,10 +76,15 @@ export default () => {
       delete tmpTableCardsSelected[key];
       setTableCardsSelected(tmpTableCardsSelected);
     } else {
-      setTableCardsSelected({...tmpTableCardsSelected, [key]: {rank, suit}});
+      setTableCardsSelected({...tmpTableCardsSelected, [key]: {rank, suit, target}});
     }
     target.classList.toggle('x-card-selected');
   };
+
+  useEffect(() => {
+    Object.values(tableCardsSelected)
+      .forEach(({target}) => target.classList.add('x-card-selected'));
+  }, [tableCardsSelected])
 
   const leaveRoomHandler = () => {
     httpClient.put('/v1/game/exit')
@@ -138,46 +150,36 @@ export default () => {
           Leave fu*kin room
         </button>
       </div>
-      <div className="card-deck">
-        <Card
-          draggable={false}
-          onDragStart={disableDefaultDragging}
-          y={0}
-          x={0}
-          key={5}
-          rotate={0}
-          w={defaults.cardWidth}
-          h={defaults.cardHeight}
-          suit={'suit'}
-          rank={'rank'}
-        />
-        <span className="card-deck-digit">{gameData.remainedCards}</span>
-      </div>
       <div className="x-2d-room">
-        <Player
-          name={players.left.name}
-          cards={players.left.cards}
-          progress={players.left.progress}
-          score={players.left.score}
-          className={'x-seat x-one'}/>
-        <Player
-          name={players.up.name}
-          cards={players.up.cards}
-          progress={players.up.progress}
-          score={players.up.score}
-          className={'x-seat x-two'}/>
-        <Player
-          name={players.right.name}
-          cards={players.right.cards}
-          progress={players.right.progress}
-          score={players.right.score}
-          className={'x-seat x-three'}/>
-        <Player
-          name={players.down.name}
-          cards={players.down.cards}
-          progress={players.down.progress}
-          score={players.down.score}
-          className={'x-seat x-four'}/>
+        <div className="card-deck">
+          <Card
+            draggable={false}
+            onDragStart={disableDefaultDragging}
+            y={0}
+            x={0}
+            key={5}
+            rotate={0}
+            w={defaults.cardWidth}
+            h={defaults.cardHeight}
+            suit={'suit'}
+            rank={'rank'}
+          />
+          <span className="card-deck-digit">{gameData.remainedCards}</span>
+        </div>
+        {
+          Object.keys(players)
+            .map((pos, key) => {
+              return (
+                <Player
+                  key={key}
+                  name={players[pos].name}
+                  cards={players[pos].cards}
+                  progress={players[pos].progress}
+                  score={players[pos].score}
+                  className={'x-seat ' + posMap[pos]}/>
+              );
+            })
+        }
 
         <div className="x-table" ref={tableRef}
              onMouseMove={tableMouseMoveHandler}
@@ -220,7 +222,7 @@ export default () => {
           )
         }
         <button
-          onClick={makeAMoveHandler}
+          onClick={makeMoveHandler}
           className="btn btn-outline-danger btn-group-lg"
         >
           Make a move
