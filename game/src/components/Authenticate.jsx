@@ -3,7 +3,7 @@ import {useDispatch} from 'react-redux';
 import {updateUser} from '../redux/actions';
 import {httpClient} from '../services/httpClient';
 import {tokenStore} from '../services/token';
-import {baseURL, token as tokenKey} from '../constants/urls';
+import {token as tokenKey} from '../constants/urls';
 import handleError from '../helpers/handleError';
 import useAuth from '../hooks/useAuth';
 import {getRandomInt} from '../libs/Formulas';
