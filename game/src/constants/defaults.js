@@ -1,5 +1,5 @@
 export default {
-  windowWidth: 640,
+  windowWidth: 1024,
   tableWidth: 740,
   tableHeight: 360,
   cardWidth: 60,

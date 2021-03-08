@@ -2,10 +2,10 @@ import React, {useEffect, useRef, useState} from 'react';
 import Card from '../cards/Card';
 import Player from './Player';
 import {draggingValue} from '../../constants/defaults';
-import '../../css/game.scss';
 import {httpClient} from '../../services/httpClient';
 import useSockets from './hooks/useSockets';
 import {useHistory} from 'react-router';
+import '../../css/game.scss';
 
 const posMap = {
   left: 'x-one',

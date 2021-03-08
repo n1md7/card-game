@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useLayoutEffect, useState} from 'react';
 import defaultsValue from '../../../constants/defaults';
 import Ellipse, {Pythagoras} from '../../../libs/Formulas';
 
@@ -17,17 +17,20 @@ const useDefaults = () => {
     height: defaults.tableHeight,
   };
 
-  useEffect(() => {
-    const windowWidth = window.innerWidth;
-    const xActionsHeight = window.innerHeight * 0.05;
+  useLayoutEffect(() => {
+    function updateSize() {
+      setDefaults(prevState => {
+        prevState.windowWidth = window.innerWidth;
+        prevState.cardDiagonal = cardDiagonal;
+        prevState.xActionsHeight = window.innerHeight * 0.05;
 
-    setDefaults(prevState => {
-      prevState.windowWidth = windowWidth;
-      prevState.cardDiagonal = cardDiagonal;
-      prevState.xActionsHeight = xActionsHeight;
+        return prevState;
+      });
+    }
 
-      return prevState;
-    });
+    window.addEventListener('resize', updateSize);
+    updateSize();
+    return () => window.removeEventListener('resize', updateSize);
   }, []);
 
   return [outerEllipse, defaults, xTableStyle];
