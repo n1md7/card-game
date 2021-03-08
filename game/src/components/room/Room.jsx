@@ -1,6 +1,7 @@
 import React from 'react';
 import {useParams} from 'react-router-dom';
 import GameRoom from '../game/Room';
+import PlayGround from '../game/PlayGround';
 import useJoinRoom from '../../hooks/useJoinRoom';
 import Header from '../Header';
 
@@ -19,7 +20,7 @@ export default function Room(){
   }
 
   return gameId ? (
-    <GameRoom/>
+    <PlayGround/>
   ) : (
     <Header>
       <div className={'row justify-content-center'}>

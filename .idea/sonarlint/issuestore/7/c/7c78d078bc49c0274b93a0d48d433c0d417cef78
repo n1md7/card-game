@@ -1,0 +1,16 @@
+
+_javascript:S1481
+"<Remove the declaration of the unused 'setDefaults' variable.(ÖµÂ¤8Öº“×ş.
+bjavascript:S1854":Remove this useless assignment to variable "outerEllipse".(Úÿõôùÿÿÿÿ8ûÁôÖş.
+ejavascript:S1481"=Remove the declaration of the unused 'outerEllipse' variable.(Úÿõôùÿÿÿÿ8ûÁôÖş.
+]javascript:S1854":Remove this useless assignment to variable "setCardWidth".(Ó°áæ8ìâëÖş.
+cjavascript:S1854";Remove this useless assignment to variable "setTableWidth".(ö™Ö¼şÿÿÿÿ8êºøÖş.
+`javascript:S1481"=Remove the declaration of the unused 'setCardWidth' variable.(Ó°áæ8ìâëÖş.
+^javascript:S1854";Remove this useless assignment to variable "setCardHeight".(ŠáòÚ8ë¥êÖş.
+fjavascript:S1481">Remove the declaration of the unused 'setTableWidth' variable.(ö™Ö¼şÿÿÿÿ8êºøÖş.
+ajavascript:S1481">Remove the declaration of the unused 'setCardHeight' variable.(ŠáòÚ8ë¥êÖş.
+^javascript:S1854"<Remove this useless assignment to variable "setTableHeight".(ÉÍåF8Ü‹ùÖş.
+Njavascript:S1128"&Remove this unused import of 'useRef'.(‘€ıÏÿÿÿÿÿ8±±‘Õş.
+\javascript:S1854
+"9Remove this useless assignment to variable "setDefaults".(ÖµÂ¤8Öº“×ş.
+ajavascript:S1481"?Remove the declaration of the unused 'setTableHeight' variable.(ÉÍåF8Ü‹ùÖş.
