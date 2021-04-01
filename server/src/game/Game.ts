@@ -1,22 +1,22 @@
-import Deck from "./Deck";
-import Player from "./Player";
-import {ActionType} from "../constant/cardConstants";
-import {Card} from "./Card";
-import {PLAYER_MOVER_INTERVAL} from "../constant/gameConfig";
+import Deck from './Deck';
+import Player from './Player';
+import {ActionType} from '../constant/cardConstants';
+import {Card} from './Card';
+import {PLAYER_MOVER_INTERVAL} from '../constant/gameConfig';
 import server from '../index';
 
 
-const positions: {[key: string]: number;} = {
-  "down": 0,
-  "left": 1,
-  "up": 2,
-  "right": 3,
+const positions: { [key: string]: number; } = {
+  'down': 0,
+  'left': 1,
+  'up': 2,
+  'right': 3,
 };
 
-const positionsArray = ["down", "left", "up", "right"];
+const positionsArray = ['down', 'left', 'up', 'right'];
 
 
-class Game {
+export default class Game {
   public isStarted: boolean;
   public isFinished: boolean;
   public activePlayer: Player;
@@ -49,19 +49,19 @@ class Game {
     this.maxScores = maxScores;
   }
 
-  findEmptyPositions() {
+  findEmptyPositions(): any {
     const occupiedPositions = this.occupiedPositions();
     return positionsArray.filter(item => !occupiedPositions.includes(item));
   }
 
-  startGame() {
+  startGame(): void {
     this.isStarted = true;
     this.dealCards(true);
     this.activePlayer = this.players[this.currentPlayerIndex];
     this.startTimer();
   }
 
-  getCardsList() {
+  getCardsList(): any {
     return this.cards
       .reduce((cards, card: Card) => ([
           ...cards,
@@ -73,7 +73,7 @@ class Game {
       ), []);
   }
 
-  dealCards(firstDeal: boolean = false) {
+  dealCards(firstDeal = false): void|null {
     if (this.deck.isEmpty()) {
       return;
     }
@@ -89,8 +89,22 @@ class Game {
     }
   }
 
-  getGameData(requestPlayer: Player) {
-    const playerData = this.players.reduce((players: {[key: string]: Player}, player: Player) => ({
+  getGameData(requestPlayer: Player): {
+    playerData: {
+      [x: string]: {
+        taken: boolean;
+        name: string;
+        progress: number;
+        cards: number;
+        score?: number;
+      }
+    };
+    remainedCards: number;
+  } {
+    type ReducePlayers = {
+      [x: string]: string
+    }
+    const playerData = this.players.reduce((players: ReducePlayers, player: Player) => ({
       ...players,
       [player.position]: player.getPlayerData(),
     }), {});
@@ -98,35 +112,32 @@ class Game {
     for (const position of this.findEmptyPositions()) {
       playerData[position] = {
         taken: false,
-        name: "",
+        name: '',
         progress: 0,
         cards: 0,
         score: 0,
       };
     }
 
-
     const positionShift = positions[requestPlayer.position];
-    const result: {[key: string]: any;} = {};
+    const result: { [key: string]: any; } = {};
     for (const key of Object.keys(playerData)) {
       let newIndex = positions[key] - positionShift;
       newIndex = newIndex >= 0 ? newIndex : 4 + newIndex;
       result[positionsArray[newIndex]] = playerData[key];
     }
 
-    // console.debug( { playerData } );
     return {
       playerData: result,
       remainedCards: this.deck.size(),
-
     };
   }
 
-  playersHaveCard() {
+  playersHaveCard(): boolean {
     return this.players.some(p => p.cards.length > 0);
   }
 
-  changePlayer() {
+  changePlayer(): void {
     this.currentPlayerIndex++;
     if (this.currentPlayerIndex >= this.players.length) {
       this.currentPlayerIndex = 0;
@@ -142,7 +153,7 @@ class Game {
     this.timeToMove = PLAYER_MOVER_INTERVAL;
   }
 
-  finishDeck() {
+  finishDeck(): void {
     this.playerAction(this.lastTaker, ActionType.TAKE_CARDS, null, this.cards, true);
     let maxCards = 0;
     let maxClubs = 0;
@@ -170,7 +181,7 @@ class Game {
         player.score++;
       player.result.score = player.score;
     });
-    this.players.forEach(player => server.socketManager.sendMessage(player, "game:finish-deck", player.result));
+    this.players.forEach(player => server.socketManager.sendMessage(player, 'game:finish-deck', player.result));
     const winnerScores = this.players
       .filter(pl => pl.score >= this.maxScores)
       .reduce((scores, pl: Player) => [...scores, pl.score], []).sort();
@@ -185,18 +196,18 @@ class Game {
     this.restartGame();
   }
 
-  restartGame() {
+  restartGame(): void {
     this.deck = new Deck();
     this.dealCards(true);
   }
 
-  finishGame(winnerPlayer: Player) {
+  finishGame(winnerPlayer: Player): void {
     clearInterval(this.timer);
     this.isFinished = true;
-    this.players.forEach(player => server.socketManager.sendMessage(player, "game:finish", player.result));
+    this.players.forEach(player => server.socketManager.sendMessage(player, 'game:finish', player.result));
   }
 
-  startTimer() {
+  startTimer(): void {
     this.timer = setInterval(() => {
       this.timeToMove--;
       if (this.timeToMove <= 0) {
@@ -205,7 +216,7 @@ class Game {
     }, 1000);
   }
 
-  joinPlayer(player: Player, position: string = null) {
+  joinPlayer(player: Player, position: string = null): void {
     if (position === null) {
       const emptyPositions = this.findEmptyPositions();
       if (emptyPositions.length > 0) {
@@ -213,15 +224,15 @@ class Game {
       }
     }
 
-    const positionIsInvalid = !["left", "right", "up", "down"].includes(position);
+    const positionIsInvalid = !['left', 'right', 'up', 'down'].includes(position);
     const positionsAreOccupied = this.occupiedPositions().includes(position);
 
     if (positionIsInvalid || positionsAreOccupied) {
-      throw new Error("incorrect position");
+      throw new Error('incorrect position');
     }
 
     if (this.players.length >= this.numberOfPlayers) {
-      throw new Error("Game is full");
+      throw new Error('Game is full');
     }
 
     player.position = position;
@@ -232,7 +243,15 @@ class Game {
     }
   }
 
-  getGameDetails() {
+  getGameDetails(): {
+    id: string;
+    inRoomSize: number;
+    size: number;
+    creator: {
+      name: string;
+    },
+    isPublic: boolean
+  } {
     return {
       id: this.getGameId(),
       inRoomSize: this.players.length,
@@ -241,22 +260,22 @@ class Game {
         name: this.creatorName,
       },
       isPublic: this.isPublic,
-    }
+    };
   }
 
   playerAlreadyInGameRoom(playerId: string): boolean {
     return this.players.findIndex(player => player.getPlayerId() === playerId) !== -1;
   }
 
-  getGameId() {
+  getGameId(): string {
     return this.gameId;
   }
 
-  getPlayers() {
+  getPlayers(): Player[] {
     return this.players;
   }
 
-  removePlayerFromTheGame(playerId: string) {
+  removePlayerFromTheGame(playerId: string): void {
     const index = this.players.findIndex(player => player.playerId === playerId);
     if (index) {
       // remove from the array
@@ -264,7 +283,7 @@ class Game {
     }
   }
 
-  removeCardsFromTable(cards: Card[]) {
+  removeCardsFromTable(cards: Card[]): void {
     for (const card of cards) {
       const tableCardIndex = this.cards.findIndex(c => c.equals(card));
       if (tableCardIndex >= 0) {
@@ -273,7 +292,7 @@ class Game {
     }
   }
 
-  tableContainsCards(cards: Card[]) {
+  tableContainsCards(cards: Card[]): boolean {
     for (const card of cards) {
       if (this.cards.find(c => c.equals(card)) === undefined) {
         return false;
@@ -282,13 +301,19 @@ class Game {
     return true;
   }
 
-  playerAction(player: Player, type: ActionType, playerCard: Card, tableCards: Card[], forceMove: boolean = false) {
+  playerAction(
+    player: Player,
+    type: ActionType,
+    playerCard: Card,
+    tableCards: Card[],
+    forceMove = false,
+  ): void {
     if (!forceMove) {
       this.validateAction(player, type, playerCard, tableCards);
     }
     if (type === ActionType.TAKE_CARDS) {
       if (forceMove) {
-        console.dir("last move!");
+        console.dir('last move!');
         console.dir(tableCards);
       }
       this.removeCardsFromTable(tableCards);
@@ -304,7 +329,7 @@ class Game {
       player.removeCardFromHand(playerCard);
     }
     if (forceMove) {
-      console.dir("last moved!");
+      console.dir('last moved!');
       console.dir(this.cards);
     }
     this.players.forEach(pl => {
@@ -312,23 +337,25 @@ class Game {
       let movePlayerPositionIndex = positions[player.position] - positionShift;
       movePlayerPositionIndex = movePlayerPositionIndex >= 0 ? movePlayerPositionIndex : 4 + movePlayerPositionIndex;
       server.socketManager
-        .sendMessage(pl, "game:take-cards",
-          {position: positionsArray[movePlayerPositionIndex], playerCard, tableCards})
+        .sendMessage(pl, 'game:take-cards',
+          {position: positionsArray[movePlayerPositionIndex], playerCard, tableCards});
     });
     this.changePlayer();
   }
 
-  validateAction(player: Player, type: ActionType, playerCard: Card, tableCards: Card[]) {
+  validateAction(player: Player, type: ActionType, playerCard: Card, tableCards: Card[]): void {
     if (!player.equals(this.activePlayer))
-      throw Error("incorrect player");
+      throw Error('incorrect player');
     if (type === ActionType.TAKE_CARDS && (!tableCards.length || !this.tableContainsCards(tableCards)))
-      throw Error("incorrect cards");
+      throw Error('incorrect cards');
     if (type === ActionType.TAKE_CARDS && !playerCard.canTakeCards(tableCards))
-      throw Error("incorrect move");
+      throw Error('incorrect move');
   }
 
-  public statistics() {
-    return {message: "Game finished!"};
+  public statistics(): {
+    message: string
+  } {
+    return {message: 'Game finished!'};
   }
 
   private occupiedPositions() {
@@ -336,5 +363,3 @@ class Game {
   }
 
 }
-
-export default Game;

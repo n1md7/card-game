@@ -8,6 +8,7 @@ import Game from '../../game/Game';
 import socketIOClient, {Socket} from 'socket.io-client';
 import {SOCKET_ENDPOINT} from '../../constants/urls';
 import {Alert, AlertType} from '../../helpers/toaster';
+import Player from './Player';
 
 
 export default () => {
@@ -20,17 +21,20 @@ export default () => {
   const [tableWidth, setTableWidth] = useState(defaults.tableWidth);
   const [tableHeight, setTableHeight] = useState(defaults.tableHeight);
   const [windowWidth, setWindowWidth] = useState(defaults.windowWidth);
+  const [gameData, setGameData] = useState({
+    playerData: {},
+    remainedCards: null,
+  });
+  const posMap = {
+    left: 'x-one',
+    up: 'x-two',
+    right: 'x-three',
+    down: 'x-four',
+  };
 
   useEffect(() => {
     setCardDiagonal(Pythagoras(cardHeight, cardWidth));
   }, [cardWidth, cardHeight]);
-
-  // useEffect(() => {
-  //   setOuterEllipse(new Ellipse(
-  //     tableWidth - cardDiagonal / 2,
-  //     tableHeight - cardDiagonal / 2,
-  //   ));
-  // }, []);
 
   useLayoutEffect(() => {
     function updateSize(){
@@ -51,6 +55,7 @@ export default () => {
 
   useLayoutEffect(() => {
     if ( !defaults) return;
+    const nav = document.querySelector('div.x-actions');
     const root = document.querySelector('div.x-2d-area');
     const room = root.querySelector('div.x-2d-room');
     const table = room.querySelector('div.x-table');
@@ -66,13 +71,15 @@ export default () => {
       secure: true,
     });
     socketIO.on('connect', () => {
-      const selectors = {root, actions, table, room};
+      const selectors = {root, actions, table, room, nav};
       // Run the game
       const outerEllipse = new Ellipse(
         tableWidth - cardDiagonal / 2,
         tableHeight - cardDiagonal / 2,
       );
-      new Game(selectors, socketIO, outerEllipse, defaults).run();
+      const game = new Game(selectors, socketIO, outerEllipse, defaults);
+      game.run();
+      game.onProcessGameData(data => setGameData(data));
     });
     socketIO.on('error', message => {
       Alert(AlertType.ERROR, message, 10);
@@ -89,6 +96,20 @@ export default () => {
         </button>
       </div>
       <div className="x-2d-room">
+        {
+          Object.keys(gameData.playerData)
+            .map((pos, key) => {
+              return (
+                <Player
+                  key={key}
+                  name={gameData.playerData[pos].name}
+                  cards={gameData.playerData[pos].cards}
+                  progress={gameData.playerData[pos].progress}
+                  score={gameData.playerData[pos].score}
+                  className={'x-seat ' + posMap[pos]}/>
+              );
+            })
+        }
         <div className="x-table" style={{
           width: tableWidth,
           height: tableHeight,

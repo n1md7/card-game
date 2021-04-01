@@ -1,6 +1,11 @@
 import {Rank, Suit} from './types';
 import cover from '../img/card-cover.svg';
 
+export enum ActionType {
+  create = 1,
+  update
+}
+
 export class Card {
   public readonly rank: Rank;
   public readonly suit: Suit;
@@ -13,6 +18,7 @@ export class Card {
   public left: number = 32;
   public top: number = 32;
   public rotate: number = 0;
+  private event: {[eventType: string]: (event: any) => void} = {};
 
   public constructor(rank: Rank, suit: Suit) {
     this.rank = rank;
@@ -38,15 +44,13 @@ export class Card {
   }
 
   public appendDOM(parent: Element): Card {
-    parent.appendChild(this.action('create'));
+    parent.appendChild(this.action(ActionType.create));
 
     return this;
   }
 
   public remove(): void {
-    if (this.htmlElement) {
-      this.htmlElement.parentNode?.removeChild(this.htmlElement);
-    }
+    this.htmlElement?.parentNode?.removeChild(this.htmlElement);
   }
 
   public alreadyInDOM(): boolean {
@@ -58,9 +62,11 @@ export class Card {
     return false;
   }
 
-  public action(type: 'create'|'update'): HTMLImageElement {
-    const card = type === 'create' ? new Image() : this.htmlElement;
+  public action(type: ActionType): HTMLImageElement {
+    const card = type === ActionType.create ? new Image() : this.htmlElement;
+    card.setAttribute('data-id', this.id);
     card.className = `x-card js_${this.id}`;
+    card.style.position = 'absolute';
     card.style.left = this.left + 'px';
     card.style.top = this.top + 'px';
     card.style.width = this.width + 'px';
@@ -76,4 +82,20 @@ export class Card {
 
     return card;
   }
+
+  public attachEvent(event: string, callback: (event: any) => void): void {
+    this.event[event] = callback;
+    this.htmlElement.addEventListener(event, callback, false);
+  }
+
+  public removeEvent(event: string): void {
+    if (this.event.hasOwnProperty(event)) {
+      this.htmlElement.removeEventListener(event, this.event[event]);
+    }
+  }
+
+  public set zIndex(index: number){
+    this.htmlElement.style.zIndex = String(index);
+  }
+
 }

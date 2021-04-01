@@ -5,6 +5,7 @@ export type GameSelectorType = {
   table: Element;
   actions: Element;
   room: Element;
+  nav: Element;
 }
 export type SocketType = typeof Socket;
 
