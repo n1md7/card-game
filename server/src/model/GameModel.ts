@@ -55,7 +55,7 @@ class GameModel extends BaseModel<GameProps> {
     }
 
     game.removePlayerFromTheGame( userId );
-    // remove gameId from User
+    // remove gameId from UserStore
     userStore.setGameId(userId, null);
   }
 

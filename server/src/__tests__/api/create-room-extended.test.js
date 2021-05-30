@@ -59,7 +59,7 @@ describe( "Create room with extended requests", () => {
     );
     // get first available room object from the list
     const [ roomToJoin ] = firefoxShowRoomsRequest.body.rooms;
-    const firefoxUser = "Firefox User";
+    const firefoxUser = "Firefox UserStore";
     // join room with the id
     const firefoxRoomJoinRequest = await firefox.post( `/api/join-room` )
       .send( {

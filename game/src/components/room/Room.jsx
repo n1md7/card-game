@@ -7,7 +7,7 @@ import Header from '../Header';
 export default function Room(){
   // roomId is URL route param
   const {roomId} = useParams();
-  // When user will be redirected to Auth endpoint
+  // When user will be redirected to UserStore endpoint
   // This will be used to return back to the game room
   // when accessed directly from the URL
   // we dont know that roomId definitely exists
