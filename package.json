@@ -14,7 +14,9 @@
     "game:start:test": "npm run test --prefix game",
     "game:install": "npm install --prefix game",
     "dev": "npm-run-all --parallel server:start:dev game:start:dev",
-    "install": "npm-run-all --parallel server:install game:install"
+    "install": "npm-run-all --parallel server:install game:install",
+    "format:code": "npx prettier --write .",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -34,5 +36,13 @@
     "node": "14.16.0",
     "npm": "7.14.0"
   },
-  "engineStrict": true
+  "engineStrict": true,
+  "devDependencies": {
+    "husky": "^7.0.4",
+    "lint-staged": "^11.2.6",
+    "prettier": "2.4.1"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  }
 }

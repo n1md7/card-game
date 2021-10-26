@@ -1,5 +1,5 @@
-import {Alert, AlertType} from './toaster';
-import {AxiosError} from 'axios';
+import { Alert, AlertType } from './toaster';
+import { AxiosError } from 'axios';
 
 export default (error: AxiosError): string => {
   let message = '';

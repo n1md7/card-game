@@ -1,8 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import cover from '../../img/card-cover.svg';
-import {ReactSVG} from 'react-svg';
+import { ReactSVG } from 'react-svg';
 
-export default React.forwardRef(({rank, suit, svg, x, y, w, h, rotate, selected, ...props}, ref) => {
+export default React.forwardRef(({ rank, suit, svg, x, y, w, h, rotate, selected, ...props }, ref) => {
   const [src, setSrc] = useState(cover);
   const cardName = `${rank}_of_${suit}`;
   const style = {};
@@ -11,9 +11,15 @@ export default React.forwardRef(({rank, suit, svg, x, y, w, h, rotate, selected,
   suit = suit && String(suit).toLowerCase();
   style.left = x ? x : 96 + 'px';
   style.top = y ? y : 128 + 'px';
-  if (w) { style.width = w + 'px'}
-  if (h) { style.height = h + 'px';}
-  if (rotate) { style.transform = `rotate(${rotate}deg)`;}
+  if (w) {
+    style.width = w + 'px';
+  }
+  if (h) {
+    style.height = h + 'px';
+  }
+  if (rotate) {
+    style.transform = `rotate(${rotate}deg)`;
+  }
 
   useEffect(() => {
     if (suit && rank) {
@@ -35,30 +41,34 @@ export default React.forwardRef(({rank, suit, svg, x, y, w, h, rotate, selected,
     svg.classList.add('x-card');
   };
 
-  if ( !svg) {
-    return <img
-      ref={ref}
-      style={style}
-      className={'x-card'}
-      {...props}
-      src={src}
-      alt={rank && suit && cardName || 'cover'}
-    />;
+  if (!svg) {
+    return (
+      <img
+        ref={ref}
+        style={style}
+        className={'x-card'}
+        {...props}
+        src={src}
+        alt={(rank && suit && cardName) || 'cover'}
+      />
+    );
   }
 
-  return <ReactSVG
-    style={style}
-    src={src}
-    afterInjection={afterInjectionHandler}
-    beforeInjection={beforeInjectionHandler}
-    // evalScripts="always"
-    fallback={() => <span>Error!</span>}
-    loading={() => <span>loading...</span>}
-    renumerateIRIElements={false}
-    wrapper="span"
-    onClick={() => {
-      console.log(`svg ${cardName} clicked`)
-    }}
-    {...props}
-  />;
+  return (
+    <ReactSVG
+      style={style}
+      src={src}
+      afterInjection={afterInjectionHandler}
+      beforeInjection={beforeInjectionHandler}
+      // evalScripts="always"
+      fallback={() => <span>Error!</span>}
+      loading={() => <span>loading...</span>}
+      renumerateIRIElements={false}
+      wrapper="span"
+      onClick={() => {
+        console.log(`svg ${cardName} clicked`);
+      }}
+      {...props}
+    />
+  );
 });

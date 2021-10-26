@@ -6,7 +6,7 @@ export enum HttpText {
   notFound = 'Not Found',
   noContent = 'No Content',
   accepted = 'Accepted',
-  created = 'Created'
+  created = 'Created',
 }
 
 export enum HttpCode {
@@ -17,7 +17,7 @@ export enum HttpCode {
   notFound = 404,
   noContent = 204,
   accepted = 202,
-  created = 201
+  created = 201,
 }
 
 export enum ErrorType {
@@ -27,7 +27,7 @@ export enum ErrorType {
   mongoError = 'MongoError',
   validationError = 'ValidationError',
   jsonWebTokenError = 'JsonWebTokenError',
-  tokenExpiredError = 'TokenExpiredError'
+  tokenExpiredError = 'TokenExpiredError',
 }
 
 export enum ExceptionType {
@@ -35,13 +35,13 @@ export enum ExceptionType {
 }
 
 export enum MongoErrorCode {
-  duplicateKey = 11000
+  duplicateKey = 11000,
 }
 
 export type MongoErrorType = {
-  message: string,
-  code: number,
+  message: string;
+  code: number;
   keyValue: {
-    [key: string]: string
-  }
+    [key: string]: string;
+  };
 };

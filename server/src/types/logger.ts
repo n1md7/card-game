@@ -1,9 +1,9 @@
 export enum Level {
-    Debug = 'debug',
-    Info = 'info'
+  Debug = 'debug',
+  Info = 'info',
 }
 
 export enum TransportType {
-    File = 'file',
-    Console = 'console'
+  File = 'file',
+  Console = 'console',
 }

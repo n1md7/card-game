@@ -39,7 +39,7 @@ export const gameDataDefault = {
       cards: 0,
     },
   },
-  remainedCards: 0
+  remainedCards: 0,
 };
 
 export const draggingValue = {
@@ -48,4 +48,3 @@ export const draggingValue = {
   top: 0,
   target: null,
 };
-

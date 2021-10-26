@@ -1,4 +1,4 @@
-import Router from "@koa/router";
+import Router from '@koa/router';
 import AuthController from '../../../../controller/v1//AuthController';
 import authVerify from '../../../../middleware/handleAuthVerification';
 

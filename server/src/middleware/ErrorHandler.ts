@@ -1,17 +1,10 @@
-import {Context, Next} from "koa";
-import {
-  ErrorType,
-  HttpText,
-  HttpCode,
-  MongoErrorType,
-  MongoErrorCode, ExceptionType,
-} from "../types/errorHandler";
-import {ValidationErrorItem} from 'joi';
-
+import { Context, Next } from 'koa';
+import { ErrorType, HttpText, HttpCode, MongoErrorType, MongoErrorCode, ExceptionType } from '../types/errorHandler';
+import { ValidationErrorItem } from 'joi';
 
 class ErrorHandler {
   static async handle(ctx: Context, next: Next): Promise<void> {
-    await next().catch(error => {
+    await next().catch((error) => {
       if (error.name === ErrorType.mongoError) {
         return ErrorHandler.handleMongoExceptions(error, ctx);
       }
@@ -19,7 +12,7 @@ class ErrorHandler {
     });
   }
 
-  private static buildErrorMessage(error: Error&{details?: ValidationErrorItem}, ctx: Context) {
+  private static buildErrorMessage(error: Error & { details?: ValidationErrorItem }, ctx: Context) {
     const status: number = ctx.status || HttpCode.internalServerError;
     const errorMessage: string = error.message || error.details?.toString() || HttpText.internalServerError;
 
@@ -27,7 +20,7 @@ class ErrorHandler {
   }
 
   private static handleMongoExceptions(error: MongoErrorType, ctx: Context) {
-    const {message, code, keyValue} = error;
+    const { message, code, keyValue } = error;
     switch (code) {
       case MongoErrorCode.duplicateKey:
         // eslint-disable-next-line no-case-declarations
@@ -43,8 +36,7 @@ class ErrorHandler {
     ctx.app.emit('error:server', `[${ErrorType.mongoError}]:[${HttpCode.badRequest} - ${message}]`);
   }
 
-  private static handleEverythingElse(error: Error&{details?: ValidationErrorItem}, ctx: Context) {
-
+  private static handleEverythingElse(error: Error & { details?: ValidationErrorItem }, ctx: Context) {
     switch (error.name) {
       case ExceptionType.validationErrorException:
         ctx.status = HttpCode.badRequest;

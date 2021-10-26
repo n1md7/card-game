@@ -1,20 +1,18 @@
 import Deck from './Deck';
 import Player from './Player';
-import {ActionType} from '../constant/cardConstants';
-import {Card} from './Card';
-import {PLAYER_MOVER_INTERVAL} from '../constant/gameConfig';
+import { ActionType } from '../constant/cardConstants';
+import { Card } from './Card';
+import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
 import server from '../index';
 
-
-const positions: { [key: string]: number; } = {
-  'down': 0,
-  'left': 1,
-  'up': 2,
-  'right': 3,
+const positions: { [key: string]: number } = {
+  down: 0,
+  left: 1,
+  up: 2,
+  right: 3,
 };
 
 const positionsArray = ['down', 'left', 'up', 'right'];
-
 
 export default class Game {
   public isStarted: boolean;
@@ -34,7 +32,14 @@ export default class Game {
   private lastTaker: Player;
   private maxScores: number;
 
-  constructor(numberOfPlayers: number, gameId: string, isPublic: boolean, userId: string, name: string, maxScores = 11) {
+  constructor(
+    numberOfPlayers: number,
+    gameId: string,
+    isPublic: boolean,
+    userId: string,
+    name: string,
+    maxScores = 11,
+  ) {
     this.numberOfPlayers = numberOfPlayers;
     this.deck = new Deck();
     this.gameId = gameId;
@@ -51,7 +56,7 @@ export default class Game {
 
   findEmptyPositions(): any {
     const occupiedPositions = this.occupiedPositions();
-    return positionsArray.filter(item => !occupiedPositions.includes(item));
+    return positionsArray.filter((item) => !occupiedPositions.includes(item));
   }
 
   startGame(): void {
@@ -62,18 +67,20 @@ export default class Game {
   }
 
   getCardsList(): any {
-    return this.cards
-      .reduce((cards, card: Card) => ([
-          ...cards,
-          {
-            rank: card.name,
-            suit: card.suit,
-            key: card.suit + card.name,
-          }]
-      ), []);
+    return this.cards.reduce(
+      (cards, card: Card) => [
+        ...cards,
+        {
+          rank: card.name,
+          suit: card.suit,
+          key: card.suit + card.name,
+        },
+      ],
+      [],
+    );
   }
 
-  dealCards(firstDeal = false): void|null {
+  dealCards(firstDeal = false): void | null {
     if (this.deck.isEmpty()) {
       return;
     }
@@ -97,17 +104,20 @@ export default class Game {
         progress: number;
         cards: number;
         score?: number;
-      }
+      };
     };
     remainedCards: number;
   } {
     type ReducePlayers = {
-      [x: string]: string
-    }
-    const playerData = this.players.reduce((players: ReducePlayers, player: Player) => ({
-      ...players,
-      [player.position]: player.getPlayerData(),
-    }), {});
+      [x: string]: string;
+    };
+    const playerData = this.players.reduce(
+      (players: ReducePlayers, player: Player) => ({
+        ...players,
+        [player.position]: player.getPlayerData(),
+      }),
+      {},
+    );
 
     for (const position of this.findEmptyPositions()) {
       playerData[position] = {
@@ -120,7 +130,7 @@ export default class Game {
     }
 
     const positionShift = positions[requestPlayer.position];
-    const result: { [key: string]: any; } = {};
+    const result: { [key: string]: any } = {};
     for (const key of Object.keys(playerData)) {
       let newIndex = positions[key] - positionShift;
       newIndex = newIndex >= 0 ? newIndex : 4 + newIndex;
@@ -134,7 +144,7 @@ export default class Game {
   }
 
   playersHaveCard(): boolean {
-    return this.players.some(p => p.cards.length > 0);
+    return this.players.some((p) => p.cards.length > 0);
   }
 
   changePlayer(): void {
@@ -157,7 +167,7 @@ export default class Game {
     this.playerAction(this.lastTaker, ActionType.TAKE_CARDS, null, this.cards, true);
     let maxCards = 0;
     let maxClubs = 0;
-    this.players.forEach(player => {
+    this.players.forEach((player) => {
       player.calculateResult();
       if (player.result.numberOfCards > maxCards) {
         maxCards = player.result.numberOfCards;
@@ -166,28 +176,27 @@ export default class Game {
         maxClubs = player.result.numberOfClubs;
       }
     });
-    const clubWinners = this.players.filter(pl => pl.result.numberOfClubs === maxClubs);
-    const cardWinners = this.players.filter(pl => pl.result.numberOfCards === maxCards);
-    this.players.forEach(player => {
-      if (clubWinners.find(pl => pl.equals(player)) != null) {
+    const clubWinners = this.players.filter((pl) => pl.result.numberOfClubs === maxClubs);
+    const cardWinners = this.players.filter((pl) => pl.result.numberOfCards === maxCards);
+    this.players.forEach((player) => {
+      if (clubWinners.find((pl) => pl.equals(player)) != null) {
         player.score += 1;
       }
-      if (cardWinners.find(pl => pl.equals(player)) != null) {
+      if (cardWinners.find((pl) => pl.equals(player)) != null) {
         player.score += cardWinners.length > 1 ? 1 : 2;
       }
-      if (player.result.hasTenOfDiamonds)
-        player.score++;
-      if (player.result.hasTwoOfClubs)
-        player.score++;
+      if (player.result.hasTenOfDiamonds) player.score++;
+      if (player.result.hasTwoOfClubs) player.score++;
       player.result.score = player.score;
     });
-    this.players.forEach(player => server.socketManager.sendMessage(player, 'game:finish-deck', player.result));
+    this.players.forEach((player) => server.socketManager.sendMessage(player, 'game:finish-deck', player.result));
     const winnerScores = this.players
-      .filter(pl => pl.score >= this.maxScores)
-      .reduce((scores, pl: Player) => [...scores, pl.score], []).sort();
+      .filter((pl) => pl.score >= this.maxScores)
+      .reduce((scores, pl: Player) => [...scores, pl.score], [])
+      .sort();
     if (winnerScores.length > 0) {
       const winnerScore = winnerScores[winnerScores.length - 1];
-      const winnerPlayers = this.players.filter(pl => pl.score === winnerScore);
+      const winnerPlayers = this.players.filter((pl) => pl.score === winnerScore);
       if (winnerPlayers.length === 1) {
         this.finishGame(winnerPlayers[0]);
         return;
@@ -204,7 +213,7 @@ export default class Game {
   finishGame(winnerPlayer: Player): void {
     clearInterval(this.timer);
     this.isFinished = true;
-    this.players.forEach(player => server.socketManager.sendMessage(player, 'game:finish', player.result));
+    this.players.forEach((player) => server.socketManager.sendMessage(player, 'game:finish', player.result));
   }
 
   startTimer(): void {
@@ -249,8 +258,8 @@ export default class Game {
     size: number;
     creator: {
       name: string;
-    },
-    isPublic: boolean
+    };
+    isPublic: boolean;
   } {
     return {
       id: this.getGameId(),
@@ -264,7 +273,7 @@ export default class Game {
   }
 
   playerAlreadyInGameRoom(playerId: string): boolean {
-    return this.players.findIndex(player => player.getPlayerId() === playerId) !== -1;
+    return this.players.findIndex((player) => player.getPlayerId() === playerId) !== -1;
   }
 
   getGameId(): string {
@@ -276,7 +285,7 @@ export default class Game {
   }
 
   removePlayerFromTheGame(playerId: string): void {
-    const index = this.players.findIndex(player => player.playerId === playerId);
+    const index = this.players.findIndex((player) => player.playerId === playerId);
     if (index) {
       // remove from the array
       this.players.splice(index, 1);
@@ -285,7 +294,7 @@ export default class Game {
 
   removeCardsFromTable(cards: Card[]): void {
     for (const card of cards) {
-      const tableCardIndex = this.cards.findIndex(c => c.equals(card));
+      const tableCardIndex = this.cards.findIndex((c) => c.equals(card));
       if (tableCardIndex >= 0) {
         this.cards.splice(tableCardIndex, 1);
       }
@@ -294,20 +303,14 @@ export default class Game {
 
   tableContainsCards(cards: Card[]): boolean {
     for (const card of cards) {
-      if (this.cards.find(c => c.equals(card)) === undefined) {
+      if (this.cards.find((c) => c.equals(card)) === undefined) {
         return false;
       }
     }
     return true;
   }
 
-  playerAction(
-    player: Player,
-    type: ActionType,
-    playerCard: Card,
-    tableCards: Card[],
-    forceMove = false,
-  ): void {
+  playerAction(player: Player, type: ActionType, playerCard: Card, tableCards: Card[], forceMove = false): void {
     if (!forceMove) {
       this.validateAction(player, type, playerCard, tableCards);
     }
@@ -332,34 +335,33 @@ export default class Game {
       console.dir('last moved!');
       console.dir(this.cards);
     }
-    this.players.forEach(pl => {
+    this.players.forEach((pl) => {
       const positionShift = positions[pl.position];
       let movePlayerPositionIndex = positions[player.position] - positionShift;
       movePlayerPositionIndex = movePlayerPositionIndex >= 0 ? movePlayerPositionIndex : 4 + movePlayerPositionIndex;
-      server.socketManager
-        .sendMessage(pl, 'game:take-cards',
-          {position: positionsArray[movePlayerPositionIndex], playerCard, tableCards});
+      server.socketManager.sendMessage(pl, 'game:take-cards', {
+        position: positionsArray[movePlayerPositionIndex],
+        playerCard,
+        tableCards,
+      });
     });
     this.changePlayer();
   }
 
   validateAction(player: Player, type: ActionType, playerCard: Card, tableCards: Card[]): void {
-    if (!player.equals(this.activePlayer))
-      throw Error('incorrect player');
+    if (!player.equals(this.activePlayer)) throw Error('incorrect player');
     if (type === ActionType.TAKE_CARDS && (!tableCards.length || !this.tableContainsCards(tableCards)))
       throw Error('incorrect cards');
-    if (type === ActionType.TAKE_CARDS && !playerCard.canTakeCards(tableCards))
-      throw Error('incorrect move');
+    if (type === ActionType.TAKE_CARDS && !playerCard.canTakeCards(tableCards)) throw Error('incorrect move');
   }
 
   public statistics(): {
-    message: string
+    message: string;
   } {
-    return {message: 'Game finished!'};
+    return { message: 'Game finished!' };
   }
 
   private occupiedPositions() {
-    return this.players.reduce((op, {position}: Player) => [...op, position], []);
+    return this.players.reduce((op, { position }: Player) => [...op, position], []);
   }
-
 }

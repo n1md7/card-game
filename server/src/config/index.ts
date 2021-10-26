@@ -1,13 +1,13 @@
 export enum token {
   self = 'token',
   userId = 'userId',
-  name = 'name'
+  name = 'name',
 }
 
 export enum room {
   two = 2,
   three,
-  four
+  four,
 }
 
 export default {
@@ -28,4 +28,4 @@ export default {
     timeStampFormat: 'YYYY-MM-DD HH:mm:ss:ms',
     excludeUrlsFromLogger: ['/health-check'],
   },
-}
+};

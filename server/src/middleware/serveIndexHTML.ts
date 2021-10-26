@@ -1,4 +1,4 @@
-import Koa, {Context} from 'koa';
+import Koa, { Context } from 'koa';
 import fs from 'fs';
 
 export default (index: string, koa: Koa) => {
@@ -12,7 +12,7 @@ export default (index: string, koa: Koa) => {
             <p>Make sure you run <code>npm run build</code> command</p>
         `;
       ctx.status = 404;
-      koa.emit("error:server", error?.toString());
+      koa.emit('error:server', error?.toString());
     }
   };
 };

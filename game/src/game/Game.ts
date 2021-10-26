@@ -9,21 +9,21 @@ import {
   TableCardType,
 } from './types';
 import BaseGame from './BaseGame';
-import {ActionType, Card} from './Card';
-import Ellipse, {isInRange, random} from '../libs/Formulas';
+import { ActionType, Card } from './Card';
+import Ellipse, { isInRange, random } from '../libs/Formulas';
 
 export default class Game extends BaseGame {
   private borderWidth = 4;
   private readonly defaults: Defaults;
   private ellipse: EllipseType = new Ellipse(0, 0);
-  private tableCards: {[x: string]: Card} = {};
-  private playerTurn: PlayerPlaceOptions|null = PlayerPlaceOptions.down;
-  private processGameDataCallback: ((data: GameData) => void)|null = null;
+  private tableCards: { [x: string]: Card } = {};
+  private playerTurn: PlayerPlaceOptions | null = PlayerPlaceOptions.down;
+  private processGameDataCallback: ((data: GameData) => void) | null = null;
   private mouseX: number = 0;
   private mouseY: number = 0;
   private cardIsDragging = false;
-  private cardIsDraggingRef: any|null = null;
-  private cardIsDraggingObj: Card|null = null;
+  private cardIsDraggingRef: any | null = null;
+  private cardIsDraggingObj: Card | null = null;
   private mouseInCard = {
     x: 0,
     y: 0,
@@ -44,17 +44,18 @@ export default class Game extends BaseGame {
 
   public run(): void {
     //const card01 = new Card(Rank.TWO, Suit.CLUBS).appendDOM(this.selector.table);
-    const initGameCards = [{rank: "9", suit: "hearts", key: "hearts9"},
-      {rank: "queen", suit: "clubs", key: "clubsqueen"},
-      {rank: "ace", suit: "diamonds", key: "diamondsace"},
-      {rank: "5", suit: "hearts", key: "hearts5"}] as Array<TableCardType>;
+    const initGameCards = [
+      { rank: '9', suit: 'hearts', key: 'hearts9' },
+      { rank: 'queen', suit: 'clubs', key: 'clubsqueen' },
+      { rank: 'ace', suit: 'diamonds', key: 'diamondsace' },
+      { rank: '5', suit: 'hearts', key: 'hearts5' },
+    ] as Array<TableCardType>;
     this.processTableCardsAdd(initGameCards);
 
     this.attachEvents();
   }
 
   private attachEvents(): void {
-
     this.socketIO.on(Event.playerTurn, this.processPlayerTurn.bind(this));
     this.socketIO.on(Event.gameData, this.processGameData.bind(this));
     this.socketIO.on(Event.gameTakeCards, this.processGameTakeCards.bind(this));
@@ -96,50 +97,49 @@ export default class Game extends BaseGame {
       width: (this.selector.table as HTMLDivElement).offsetWidth,
       height: (this.selector.table as HTMLDivElement).offsetHeight,
     };
-    cards
-      .map(card => {
-        const {rank, suit} = card;
-        const tableRange = {
-          x: {
-            min: table.left + 128,
-            max: table.left + table.width - 128,
-          },
-        };
-        const left = random(tableRange.x.min, tableRange.x.max);
-        const ellipse = new Ellipse(table.width - 256, table.height - 256);
-        const [yMin, yMax] = ellipse.y(left - table.left - table.width / 2);
-        const yAxisMin = yMin + table.height / 2 + table.top + this.borderWidth;
-        const yAxisMax = yMax + table.height / 2 + table.top;
-        const top = random(yAxisMin, yAxisMax) - 64;
-        const rotate = random(0, 180);
-        const $card = new Card(rank, suit);
-        if (!this.tableCards.hasOwnProperty($card.id)) {
-          this.tableCards[$card.id] = $card;
-          const [$left, $top, $rotate] = Game.calculatedAnimationPoint(left, top).for(this.playerTurn);
-          $card.setPosition($left, $top);
-          $card.setRotation($rotate);
-          $card.appendDOM(this.selector.room);
-          $card.attachEvent('click', (event) => {
-            event.preventDefault();
-          });
-          $card.attachEvent('mousedown', (event) => {
-            event.preventDefault();
-            this.cardIsDragging = true;
-            this.cardIsDraggingRef = event;
-            this.cardIsDraggingObj = $card;
-            this.mouseInCard = {
-              x: event.clientX - event.target.offsetLeft,
-              y: event.clientY - event.target.offsetTop,
-            };
-            $card.zIndex = this.zIndex++;
-          });
-          setTimeout(() => {
-            $card.setPosition(left, top);
-            $card.setRotation(rotate);
-            $card.action(ActionType.update);
-          }, 100);
-        }
-      });
+    cards.map((card) => {
+      const { rank, suit } = card;
+      const tableRange = {
+        x: {
+          min: table.left + 128,
+          max: table.left + table.width - 128,
+        },
+      };
+      const left = random(tableRange.x.min, tableRange.x.max);
+      const ellipse = new Ellipse(table.width - 256, table.height - 256);
+      const [yMin, yMax] = ellipse.y(left - table.left - table.width / 2);
+      const yAxisMin = yMin + table.height / 2 + table.top + this.borderWidth;
+      const yAxisMax = yMax + table.height / 2 + table.top;
+      const top = random(yAxisMin, yAxisMax) - 64;
+      const rotate = random(0, 180);
+      const $card = new Card(rank, suit);
+      if (!this.tableCards.hasOwnProperty($card.id)) {
+        this.tableCards[$card.id] = $card;
+        const [$left, $top, $rotate] = Game.calculatedAnimationPoint(left, top).for(this.playerTurn);
+        $card.setPosition($left, $top);
+        $card.setRotation($rotate);
+        $card.appendDOM(this.selector.room);
+        $card.attachEvent('click', (event) => {
+          event.preventDefault();
+        });
+        $card.attachEvent('mousedown', (event) => {
+          event.preventDefault();
+          this.cardIsDragging = true;
+          this.cardIsDraggingRef = event;
+          this.cardIsDraggingObj = $card;
+          this.mouseInCard = {
+            x: event.clientX - event.target.offsetLeft,
+            y: event.clientY - event.target.offsetTop,
+          };
+          $card.zIndex = this.zIndex++;
+        });
+        setTimeout(() => {
+          $card.setPosition(left, top);
+          $card.setRotation(rotate);
+          $card.action(ActionType.update);
+        }, 100);
+      }
+    });
   }
 
   private tableDims() {
@@ -157,9 +157,12 @@ export default class Game extends BaseGame {
     };
   }
 
-  private static calculatedAnimationPoint(left: number, top: number): {for: (playerTurn: PlayerPlaceOptions|null) => [number, number, number]} {
+  private static calculatedAnimationPoint(
+    left: number,
+    top: number,
+  ): { for: (playerTurn: PlayerPlaceOptions | null) => [number, number, number] } {
     return {
-      for: (playerTurn: PlayerPlaceOptions|null) => {
+      for: (playerTurn: PlayerPlaceOptions | null) => {
         const ANIMATION_COEFFICIENT = 100;
         switch (playerTurn) {
           case PlayerPlaceOptions.down:
@@ -178,7 +181,7 @@ export default class Game extends BaseGame {
 
         return [left, top, random(0, 180)];
       },
-    }
+    };
   }
 
   private mouseMoveEvents(): void {

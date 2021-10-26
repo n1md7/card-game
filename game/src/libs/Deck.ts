@@ -41,7 +41,7 @@ export enum Suit {
   spades,
   diamonds,
   clubs,
-  hearts
+  hearts,
 }
 
 export const fullDeck: Array<{
@@ -53,7 +53,8 @@ ranks.forEach((rank) => {
   suits.forEach((suit) => {
     fullDeck.push({
       id: `${rank}_of_${suit}`,
-      rank, suit,
+      rank,
+      suit,
     });
   });
 });

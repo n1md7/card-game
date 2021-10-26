@@ -1,9 +1,9 @@
-import {token} from "../config";
-import {Context, Next} from "koa";
-import JsonWebToken from "jsonwebtoken";
-import User from "../game/User";
-import UserModel from "../model/UserModel";
-import {JWTProps} from '../types';
+import { token } from '../config';
+import { Context, Next } from 'koa';
+import JsonWebToken from 'jsonwebtoken';
+import User from '../game/User';
+import UserModel from '../model/UserModel';
+import { JWTProps } from '../types';
 
 export default async (ctx: Context, next: Next): Promise<void> => {
   const jwToken = ctx.header[token.self] as string;

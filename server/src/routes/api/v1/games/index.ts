@@ -1,4 +1,4 @@
-import Router from "@koa/router";
+import Router from '@koa/router';
 import handleAuthentication from '../../../../middleware/handleAuthVerification';
 import GameController from '../../../../controller/v1/GameController';
 

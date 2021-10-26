@@ -1,4 +1,4 @@
-export const updateUser = data => ({
-    type: 'UPDATE',
-    ...data
+export const updateUser = (data) => ({
+  type: 'UPDATE',
+  ...data,
 });

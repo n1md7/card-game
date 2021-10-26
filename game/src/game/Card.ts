@@ -1,9 +1,9 @@
-import {Rank, Suit} from './types';
+import { Rank, Suit } from './types';
 import cover from '../img/card-cover.svg';
 
 export enum ActionType {
   create = 1,
-  update
+  update,
 }
 
 export class Card {
@@ -12,13 +12,13 @@ export class Card {
   public readonly key: string;
   public readonly id: string;
   public htmlElement: HTMLImageElement;
-  public parent: HTMLElement|null;
+  public parent: HTMLElement | null;
   public height: number = 90;
   public width: number = 60;
   public left: number = 32;
   public top: number = 32;
   public rotate: number = 0;
-  private event: {[eventType: string]: (event: any) => void} = {};
+  private event: { [eventType: string]: (event: any) => void } = {};
 
   public constructor(rank: Rank, suit: Suit) {
     this.rank = rank;
@@ -74,7 +74,7 @@ export class Card {
     card.style.transform = `rotate(${this.rotate}deg)`;
     try {
       card.src = require(`../img/cards/${this.id}.svg`);
-    } catch ({message}) {
+    } catch ({ message }) {
       card.src = cover;
     } finally {
       this.htmlElement = card;
@@ -94,8 +94,7 @@ export class Card {
     }
   }
 
-  public set zIndex(index: number){
+  public set zIndex(index: number) {
     this.htmlElement.style.zIndex = String(index);
   }
-
 }

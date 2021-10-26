@@ -1,9 +1,9 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 
 dotenv.config();
 
-import config from "./config";
-import Server from "./server";
+import config from './config';
+import Server from './server';
 
 // Start Koa server
 const koa = new Server(config);
@@ -12,5 +12,3 @@ koa.startServer();
 koa.startSocket();
 
 export default koa;
-
-

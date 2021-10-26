@@ -1,20 +1,20 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Provider} from 'react-redux';
+import { Provider } from 'react-redux';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import store from './redux/store';
 import 'react-toastify/dist/ReactToastify.css';
 import './css/app.scss';
-import {ToastContainer} from 'react-toastify';
-import {BrowserRouter} from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <App/>
-        <ToastContainer/>
+        <App />
+        <ToastContainer />
       </BrowserRouter>
     </Provider>
   </React.StrictMode>,

@@ -1,16 +1,16 @@
-import {ToastPosition, toast } from 'react-toastify';
+import { ToastPosition, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 enum AlertType {
-  ERROR = "error",
-  SUCCESS = "success",
-  INFO = "info",
-  WARNING = "warning",
+  ERROR = 'error',
+  SUCCESS = 'success',
+  INFO = 'info',
+  WARNING = 'warning',
 }
 
-function Alert( type : AlertType, message : string, time : number = 5) {
+function Alert(type: AlertType, message: string, time: number = 5) {
   const options = {
-    position: "top-right" as ToastPosition,
+    position: 'top-right' as ToastPosition,
     autoClose: time * 1000,
     hideProgressBar: false,
     closeOnClick: true,
@@ -18,8 +18,7 @@ function Alert( type : AlertType, message : string, time : number = 5) {
     draggable: true,
     progress: undefined,
   };
-  toast[type](`${type.toUpperCase()}: ${message}` , options);
+  toast[type](`${type.toUpperCase()}: ${message}`, options);
 }
 
-
-export {Alert, AlertType};
+export { Alert, AlertType };

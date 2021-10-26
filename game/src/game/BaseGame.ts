@@ -1,4 +1,4 @@
-import {GameSelectorType, SocketType} from './types';
+import { GameSelectorType, SocketType } from './types';
 
 export default class BaseGame {
   protected readonly selector: GameSelectorType;

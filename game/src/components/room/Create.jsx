@@ -1,43 +1,45 @@
-import React, {useEffect, useState} from 'react';
-import {httpClient} from '../../services/httpClient';
-import {baseURL} from '../../constants/urls';
-import {useSelector} from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { httpClient } from '../../services/httpClient';
+import { baseURL } from '../../constants/urls';
+import { useSelector } from 'react-redux';
 import Header from '../Header';
 import handleError from '../../helpers/handleError';
-import {useHistory} from 'react-router';
+import { useHistory } from 'react-router';
 
-export default function Create(){
+export default function Create() {
   const [gameId, setGameId] = useState(null);
   const [size, setSize] = useState(2);
   const [isPublic, setIsPublic] = useState(true);
   // Get name value from the redux store
-  const {name} = useSelector(({user}) => user);
+  const { name } = useSelector(({ user }) => user);
   // define event change handlers
-  const sizeChangeHandler = ({target: {value}}) => setSize(+ value);
-  const isPublicChangeHandler = ({target: {value}}) => setIsPublic( !!+ value);
+  const sizeChangeHandler = ({ target: { value } }) => setSize(+value);
+  const isPublicChangeHandler = ({ target: { value } }) => setIsPublic(!!+value);
   const history = useHistory();
 
-  const formSubmitHandler = function (event){
+  const formSubmitHandler = function (event) {
     event.preventDefault();
-    httpClient.post(`v1/game/create`, {
+    httpClient
+      .post(`v1/game/create`, {
         size: this.size,
         isPublic: this.isPublic,
         name: this.name,
       })
-      .then(response => {
+      .then((response) => {
         if (response.status === 200) {
           return setGameId(response.data);
         }
         throw new Error(response.data);
-      }).catch(handleError);
-  }.bind({size, isPublic, name});
+      })
+      .catch(handleError);
+  }.bind({ size, isPublic, name });
 
   // Redirect to Game when ID is available
   useEffect(() => {
     if (gameId) {
       history.push(`/room/${gameId}`);
     }
-  }, [gameId])
+  }, [gameId]);
 
   return (
     <Header>
@@ -61,10 +63,12 @@ export default function Create(){
           </div>
           <div className="col-12">{''}</div>
           <div className="form-group col-md-6 text-center">
-            <button type="submit" id="create" className="btn btn-secondary w-100">Create</button>
+            <button type="submit" id="create" className="btn btn-secondary w-100">
+              Create
+            </button>
           </div>
         </div>
       </form>
     </Header>
   );
-};
+}

@@ -1,13 +1,13 @@
 import React from 'react';
-import {useParams} from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import GameRoom from '../game/Room';
 import PlayGround from '../game/PlayGround';
 import useJoinRoom from '../../hooks/useJoinRoom';
 import Header from '../Header';
 
-export default function Room(){
+export default function Room() {
   // roomId is URL route param
-  const {roomId} = useParams();
+  const { roomId } = useParams();
   // When user will be redirected to Auth endpoint
   // This will be used to return back to the game room
   // when accessed directly from the URL
@@ -20,21 +20,21 @@ export default function Room(){
   }
 
   return gameId ? (
-    <PlayGround/>
+    <PlayGround />
   ) : (
     <Header>
       <div className={'row justify-content-center'}>
         <div className="col col-md-6 mx-3">
           <div className={'alert alert-danger'}>
-            {
-              errorMessage ? errorMessage : `
+            {errorMessage
+              ? errorMessage
+              : `
                 Requested roomID[${roomId}] does not exist or
                 you are not allowed to join here!
-              `
-            }
+              `}
           </div>
         </div>
       </div>
     </Header>
-  )
+  );
 }

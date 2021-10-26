@@ -1,9 +1,9 @@
-import SocketIO, {Socket} from 'socket.io';
+import SocketIO, { Socket } from 'socket.io';
 import UserModel from '../model/UserModel';
-import {isset} from '../helpers/extras';
-import {JWTProps} from '../types';
-import {token} from '../config';
-import {playerMove} from './events';
+import { isset } from '../helpers/extras';
+import { JWTProps } from '../types';
+import { token } from '../config';
+import { playerMove } from './events';
 import jwt from 'jsonwebtoken';
 import PlayerModel from '../model/PlayerModel';
 import GameModel from '../model/GameModel';
@@ -30,11 +30,9 @@ export default class SocketModule {
         }
         user.socketId = socket.id;
         socket.on('player:move', playerMove(user, this.koa));
-
-      } catch ({message}) {
+      } catch ({ message }) {
         this.io.to(socket.id).emit('error', message);
       }
-
     });
 
     this.io.on('error', (message: string) => {
@@ -69,6 +67,4 @@ export default class SocketModule {
       }, time);
     };
   }
-
-
 }

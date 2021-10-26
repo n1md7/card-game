@@ -1,5 +1,5 @@
-import {Context} from '../../types';
+import { Context } from '../../types';
 
 export default interface User {
-  getUserInfo: (ctx: Context) => Promise<void>
+  getUserInfo: (ctx: Context) => Promise<void>;
 }

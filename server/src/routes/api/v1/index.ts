@@ -3,14 +3,10 @@ import userRouter from './users';
 import authRouter from './auth';
 import roomRouter from './games';
 import GameController from '../../../controller/v1/GameController';
-import {Env} from '../../../types';
+import { Env } from '../../../types';
 
 const apiRoute = new Router();
-const combineApiRoutes = [
-  userRouter.routes(),
-  roomRouter.routes(),
-  authRouter.routes(),
-];
+const combineApiRoutes = [userRouter.routes(), roomRouter.routes(), authRouter.routes()];
 if (process.env.NODE_ENV !== Env.Prod) {
   const developmentRoutes = new Router();
   developmentRoutes.get('/storage', GameController.showStoreData);

@@ -1,4 +1,4 @@
-import {Socket} from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 
 export type GameSelectorType = {
   root: Element;
@@ -6,29 +6,29 @@ export type GameSelectorType = {
   actions: Element;
   room: Element;
   nav: Element;
-}
+};
 export type SocketType = typeof Socket;
 
 export enum PlayerPlaceOptions {
   left = 'left',
   right = 'right',
   up = 'up',
-  down = 'down'
+  down = 'down',
 }
 
 export type PlayerData = {
   [places in PlayerPlaceOptions]: {
-    taken: boolean,
-    name: string,
-    progress: number,
-    cards: number,
-  }
-}
+    taken: boolean;
+    name: string;
+    progress: number;
+    cards: number;
+  };
+};
 
 export type GameData = {
-  playerData: PlayerData,
-  remainedCards: number
-}
+  playerData: PlayerData;
+  remainedCards: number;
+};
 
 export enum Event {
   playerTurn = 'player:turn',
@@ -38,7 +38,7 @@ export enum Event {
   gameTakeCards = 'game:take-cards',
   playerCards = 'player-cards',
   tableCardsAdd = 'table-cards:add',
-  tableCardsRemove = 'table-cards:remove'
+  tableCardsRemove = 'table-cards:remove',
 }
 
 export enum Rank {
@@ -54,7 +54,7 @@ export enum Rank {
   TEN = '10',
   JACK = 'jack',
   QUEEN = 'queen',
-  KING = 'king'
+  KING = 'king',
 }
 
 export enum Suit {
@@ -65,13 +65,13 @@ export enum Suit {
 }
 
 export type TableCardType = {
-  rank: Rank,
-  suit: Suit,
-  key: string, //Suit&Rank
-  top?: number,
-  left?: number,
-  rotate?: number,
-}
+  rank: Rank;
+  suit: Suit;
+  key: string; //Suit&Rank
+  top?: number;
+  left?: number;
+  rotate?: number;
+};
 
 export type Defaults = {
   windowWidth: number;
@@ -88,5 +88,5 @@ export type Defaults = {
 };
 
 export type EllipseType = {
-  y: (x: number) => [number, number]
-}
+  y: (x: number) => [number, number];
+};

@@ -1,17 +1,17 @@
-import Koa from "koa";
-import serve from "koa-static";
-import bodyParser from "koa-bodyparser";
-import cors from "@koa/cors";
-import logWrite from "../logger";
-import routes from "../routes";
-import handleErrors from "../middleware/ErrorHandler";
-import {Env} from "../types";
-import {ConfigOptions} from "../types/config";
-import path from "path";
-import http, {Server as HttpServer} from "http";
-import SocketIO, {Server as SocketIoServer} from "socket.io"
-import SocketModule from "../socket";
-import SocketManager from "../socket/manager";
+import Koa from 'koa';
+import serve from 'koa-static';
+import bodyParser from 'koa-bodyparser';
+import cors from '@koa/cors';
+import logWrite from '../logger';
+import routes from '../routes';
+import handleErrors from '../middleware/ErrorHandler';
+import { Env } from '../types';
+import { ConfigOptions } from '../types/config';
+import path from 'path';
+import http, { Server as HttpServer } from 'http';
+import SocketIO, { Server as SocketIoServer } from 'socket.io';
+import SocketModule from '../socket';
+import SocketManager from '../socket/manager';
 import serveIndexHTML from '../middleware/serveIndexHTML';
 import handleApiNotFound from '../middleware/handleApiNotFound';
 
@@ -46,15 +46,14 @@ export default class Server {
       cookie: false,
     });
     const router = routes(this.config);
-    const indexHTMLPath = path.join(
-      this.staticFolderPath,
-      this.config.server.indexFile,
-    );
+    const indexHTMLPath = path.join(this.staticFolderPath, this.config.server.indexFile);
     this.koa.use(handleErrors);
-    this.koa.use(cors({
-      origin: this.config.origin,
-      credentials: true,
-    }));
+    this.koa.use(
+      cors({
+        origin: this.config.origin,
+        credentials: true,
+      }),
+    );
     this.koa.use(bodyParser());
     this.koa.use(router.allowedMethods());
     this.koa.use(router.routes());
@@ -64,13 +63,13 @@ export default class Server {
     this.koa.use(handleApiNotFound(this.config.server.apiContextPath, this.koa));
     // Redirect everything else to index.html - for React-router
     this.koa.use(serveIndexHTML(indexHTMLPath, this.koa));
-    this.koa.on('error:server', errorMessage => {
+    this.koa.on('error:server', (errorMessage) => {
       logWrite.error(`[server] ${errorMessage}`);
     });
-    this.koa.on('error:socket', errorMessage => {
+    this.koa.on('error:socket', (errorMessage) => {
       logWrite.error(`[socket] ${errorMessage}`);
     });
-    this.koa.on('debug', debugMessage => {
+    this.koa.on('debug', (debugMessage) => {
       logWrite.error(`${debugMessage}`);
     });
 
@@ -81,13 +80,13 @@ export default class Server {
     this.socketModule = new SocketModule(this.io, this.koa);
     this.socketManager = new SocketManager(this.io);
     this.socketModule.connectionHandler();
-    this.socketModule.sendUpdatesEvery(100)("milliseconds");
+    this.socketModule.sendUpdatesEvery(100)('milliseconds');
 
     return this.socketModule;
   }
 
   startServer(): HttpServer {
-    const {port, hostname, apiContextPath} = this.config.server;
+    const { port, hostname, apiContextPath } = this.config.server;
 
     return this.httpServer.listen(port, hostname, () => {
       logWrite.debug(`Health-check - http://${hostname}:${port}/health-check`);

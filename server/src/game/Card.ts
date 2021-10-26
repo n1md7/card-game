@@ -1,4 +1,4 @@
-import {CARD_SUM_VALUE, CardSuit, CardRank} from "../constant/cardConstants";
+import { CARD_SUM_VALUE, CardSuit, CardRank } from '../constant/cardConstants';
 
 class Card {
   public readonly suit: CardSuit;
@@ -26,17 +26,18 @@ class Card {
     }
 
     if (this.value === CardRank.JACK) {
-      const paintedCards = cards.filter(card => card.value > CardRank.JACK);
-      const paintedCardsSum = paintedCards.reduce((accumulator, card) =>
-        [CardSuit.SPADES, CardSuit.CLUBS].includes(card.suit) ?
-          accumulator - card.value : accumulator + card.value, 0);
+      const paintedCards = cards.filter((card) => card.value > CardRank.JACK);
+      const paintedCardsSum = paintedCards.reduce(
+        (accumulator, card) =>
+          [CardSuit.SPADES, CardSuit.CLUBS].includes(card.suit) ? accumulator - card.value : accumulator + card.value,
+        0,
+      );
 
       return paintedCardsSum === 0;
     }
 
     return false;
   }
-
 }
 
-export {Card};
+export { Card };

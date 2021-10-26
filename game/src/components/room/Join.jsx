@@ -8,34 +8,28 @@ export default () => {
 
   return (
     <Header>
-      <h3 className="text-center mt-5 mb-4 text-muted">
-        {
-          !rooms.length ? 'No active rooms' : 'Rooms'
-        }
-      </h3>
+      <h3 className="text-center mt-5 mb-4 text-muted">{!rooms.length ? 'No active rooms' : 'Rooms'}</h3>
       <div className="row justify-content-center">
         <div className="col-12 text-center">
-          {
-            !rooms.length || (
-              <table className="table table-sm table-hover">
-                <thead>
+          {!rooms.length || (
+            <table className="table table-sm table-hover">
+              <thead>
                 <tr>
                   <td>ID</td>
                   <td>Creator</td>
                   <td>Players</td>
                   <td>Action</td>
                 </tr>
-                </thead>
-                <tbody>
-                {
-                  rooms.map((values, key) => <Row key={key} {...values}/>)
-                }
-                </tbody>
-              </table>
-            )
-          }
+              </thead>
+              <tbody>
+                {rooms.map((values, key) => (
+                  <Row key={key} {...values} />
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </Header>
-  )
+  );
 };
