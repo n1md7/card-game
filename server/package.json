@@ -114,5 +114,9 @@
       "/node_modules/",
       "src/logger/"
     ]
+  },
+  "engines": {
+    "node": "14.16.0",
+    "npm": "7.14.0"
   }
 }

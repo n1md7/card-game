@@ -1,17 +1,17 @@
-import { Card } from "./Card";
-import { ActionType } from "../constant/cardConstants";
+import {Card} from "./Card";
+import {ActionType} from "../constant/cardConstants";
 import Game from "./Game";
-import { gameStore } from "../store";
-import { PLAYER_MOVER_INTERVAL } from "../constant/gameConfig";
-import { PlayerResult } from "./PlayerResult";
+import {gameStore} from "../store";
+import {PLAYER_MOVER_INTERVAL} from "../constant/gameConfig";
+import {PlayerResult} from "./PlayerResult";
 
-function getRandomInt( max: number ) {
-  return Math.floor( Math.random() * Math.floor( max ) );
+function getRandomInt(max: number) {
+  return Math.floor(Math.random() * Math.floor(max));
 }
 
 class Player {
   player(): Player {
-    throw new Error( "Method not implemented." );
+    throw new Error("Method not implemented.");
   }
 
   private readonly name: string;
@@ -23,7 +23,7 @@ class Player {
   public result: PlayerResult;
   public score: number;
 
-  constructor( playerId: string, name = '' ) {
+  constructor(playerId: string, name = '') {
     this.name = name;
     this.playerId = playerId;
     this.cards = [];
@@ -34,7 +34,7 @@ class Player {
     const progress = (
       this.getGame() &&
       this.getGame().activePlayer &&
-      this.getGame().activePlayer.equals( this )
+      this.getGame().activePlayer.equals(this)
     ) ? 100 * this.getGame().timeToMove / PLAYER_MOVER_INTERVAL : 0;
 
     return {
@@ -42,25 +42,25 @@ class Player {
       name: this.name,
       progress,
       cards: this.cards.length,
-      score: this.score
+      score: this.score,
     }
   }
 
   getHandCards() {
     return this.cards
-      .reduce( ( acc: any, card: Card ) => [
+      .reduce((acc: any, card: Card) => [
         ...acc, {
           rank: card.name,
-          suit: card.suit
-        }
-      ], [] );
+          suit: card.suit,
+        },
+      ], []);
   }
 
-  giveCards( cards: Card[] ) {
-    this.cards = [ ...this.cards, ...cards ];
+  giveCards(cards: Card[]) {
+    this.cards = [...this.cards, ...cards];
   }
 
-  setGame( game: Game ) {
+  setGame(game: Game) {
     this.gameId = game.getGameId();
   }
 
@@ -76,40 +76,40 @@ class Player {
     return this.gameId;
   }
 
-  equals( player: Player ) {
+  equals(player: Player) {
     // TODO change equality check
     return this.name === player.name;
   }
 
-  takeCards( cards: Card[] ) {
-    this.takenCards = [ ...this.takenCards, ...cards ];
+  takeCards(cards: Card[]) {
+    this.takenCards = [...this.takenCards, ...cards];
   }
 
-  removeCardFromHand( card: Card ) {
-    const handCard = this.cards.find( c => c.equals( card ) );
-    if (handCard  !== undefined )
-      this.cards.remove( handCard );
+  removeCardFromHand(card: Card) {
+    const handCard = this.cards.find(c => c.equals(card));
+    if (handCard !== undefined)
+      this.cards.remove(handCard);
   }
 
 
   placeRandomCard() {
-    this.placeCard( this.cards[ getRandomInt( this.cards.length - 1 ) ] );
+    this.placeCard(this.cards[getRandomInt(this.cards.length - 1)]);
   }
 
-  placeCard( card: Card ) {
-    if ( this.cards.find( c => c.equals( card ) ) === undefined )
-      throw Error( "incorrect card" );
-    this.getGame().playerAction( this, ActionType.PLACE_CARD, card, [] );
+  placeCard(card: Card) {
+    if (this.cards.find(c => c.equals(card)) === undefined)
+      throw Error("incorrect card");
+    this.getGame().playerAction(this, ActionType.PLACE_CARD, card, []);
   }
 
-  takeCardsFromTable( card: Card, tableCards: Card[] ) {
-    if ( this.cards.find( c => c.equals( card ) ) === undefined )
-      throw Error( "incorrect card" );
-    if ( tableCards.length === 0 )
-      throw Error( "Ups error WTF?" );
+  takeCardsFromTable(card: Card, tableCards: Card[]) {
+    if (this.cards.find(c => c.equals(card)) === undefined)
+      throw Error("incorrect card");
+    if (tableCards.length === 0)
+      throw Error("Ups error WTF?");
     console.dir(card);
     console.dir(tableCards);
-    this.getGame().playerAction( this, ActionType.TAKE_CARDS, card, tableCards );
+    this.getGame().playerAction(this, ActionType.TAKE_CARDS, card, tableCards);
   }
 
   calculateResult() {
