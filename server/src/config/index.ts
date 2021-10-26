@@ -22,7 +22,7 @@ export default {
   loggerOptions: {
     fileOptions: {
       maxsize: 100000000,
-      maxFiles: 7,
+      maxFiles: 8,
       filename: process.env.LOGFILE || 'logs/app.log',
     },
     timeStampFormat: 'YYYY-MM-DD HH:mm:ss:ms',
