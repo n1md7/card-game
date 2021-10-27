@@ -10,5 +10,3 @@ const koa = new Server(config);
 koa.init();
 koa.startServer();
 koa.startSocket();
-
-export default koa;

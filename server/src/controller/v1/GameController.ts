@@ -8,9 +8,10 @@ import { createGameSchema, enterGameSchema } from './validators/GameRequestValid
 import ValidationErrorException from '../../exceptions/ValidationErrorException';
 import { HttpCode } from '../../types/errorHandler';
 import { gameStore, playerStore, userStore } from '../../store';
+import SocketManager from '../../socket/manager';
 
 class GameController extends BaseController implements Game {
-  public createGame = async (ctx: Context): Promise<void> => {
+  public createGame = async (ctx: Context & { socketManager: SocketManager }): Promise<void> => {
     const validation = createGameSchema.validate(ctx.request.body);
     if (validation.error) {
       throw new ValidationErrorException(validation.error.details);
@@ -19,7 +20,7 @@ class GameController extends BaseController implements Game {
     const roomId = Id.game();
     const userId = ctx.state.user?.id;
     const { isPublic, size, name } = validation.value;
-    const player = GameModel.create(userId, roomId, Number(size), Boolean(isPublic), name);
+    const player = GameModel.create(userId, roomId, Number(size), Boolean(isPublic), name, ctx.socketManager);
     PlayerModel.addPlayer(player, userId);
 
     ctx.body = roomId;

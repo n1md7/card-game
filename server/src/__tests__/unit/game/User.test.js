@@ -8,6 +8,8 @@ describe('User test', function () {
     expect(user).toEqual({
       id: userId,
       name: 'Badass',
+      signUpTime: expect.any(Date),
+      updateTime: expect.any(Date),
     });
   });
 
@@ -23,6 +25,8 @@ describe('User test', function () {
       name: 'Badass',
       gameId: gameId,
       socketId: '123',
+      signUpTime: expect.any(Date),
+      updateTime: expect.any(Date),
     });
   });
 });

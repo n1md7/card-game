@@ -2,9 +2,10 @@ import '../helpers/index';
 import Player from '../game/Player';
 import Game from '../game/Game';
 import BaseModel from './BaseModel';
-import { gameStore, userStore, playerStore, Game as GameProps } from '../store/index';
+import { gameStore, userStore, playerStore } from '../store';
+import SocketManager from '../socket/manager';
 
-class GameModel extends BaseModel<GameProps> {
+class GameModel extends BaseModel<Game> {
   public getGamesList() {
     return Object.values(gameStore.getStorage())
       .map((game) => game.getGameDetails())
@@ -53,9 +54,16 @@ class GameModel extends BaseModel<GameProps> {
     userStore.setGameId(userId, null);
   }
 
-  public create(userId: string, roomId: string, size: number, isPublic: boolean, name: string): Player {
+  public create(
+    userId: string,
+    roomId: string,
+    size: number,
+    isPublic: boolean,
+    name: string,
+    socketManager: SocketManager,
+  ): Player {
     const player = new Player(userId, name);
-    const game = new Game(size, roomId, isPublic, userId, name);
+    const game = new Game(size, roomId, isPublic, userId, name, socketManager);
     game.joinPlayer(player);
     playerStore.setById(player.id, player);
     gameStore.setById(game.getGameId(), game);

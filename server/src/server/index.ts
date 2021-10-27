@@ -1,4 +1,4 @@
-import Koa from 'koa';
+import Koa, { Context, Next } from 'koa';
 import serve from 'koa-static';
 import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
@@ -16,13 +16,13 @@ import serveIndexHTML from '../middleware/serveIndexHTML';
 import handleApiNotFound from '../middleware/handleApiNotFound';
 
 export default class Server {
-  koa: Koa;
-  io: SocketIoServer;
-  config: ConfigOptions;
-  httpServer: HttpServer;
-  staticFolderPath: string;
-  socketModule: SocketModule;
-  socketManager: SocketManager;
+  public koa: Koa;
+  public httpServer: HttpServer;
+  private io: SocketIoServer;
+  private readonly config: ConfigOptions;
+  private readonly staticFolderPath: string;
+  private socketModule: SocketModule;
+  private socketManager: SocketManager;
 
   constructor(config: ConfigOptions) {
     this.config = config;
@@ -56,6 +56,10 @@ export default class Server {
     );
     this.koa.use(bodyParser());
     this.koa.use(router.allowedMethods());
+    this.koa.use(async (ctx: Context, next: Next) => {
+      ctx.socketManager = this.socketManager || {};
+      await next();
+    });
     this.koa.use(router.routes());
     // Serve files from public static folder
     this.koa.use(serve(this.staticFolderPath));

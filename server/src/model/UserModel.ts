@@ -1,5 +1,6 @@
-import { userStore, User } from '../store/index';
+import { userStore } from '../store';
 import BaseModel from './BaseModel';
+import User from '../game/User';
 
 class UserModel extends BaseModel<User> {
   public getUserInfoById(userId: string) {

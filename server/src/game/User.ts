@@ -6,9 +6,13 @@ class User {
   public gameId: string;
   public player: Player;
   public socketId: string;
+  public signUpTime: Date;
+  public updateTime: Date;
   constructor(id: string, name: string) {
     this.id = id;
     this.name = name;
+    this.signUpTime = new Date();
+    this.updateTime = new Date();
   }
 }
 

@@ -3,7 +3,8 @@ import Player from './Player';
 import { ActionType } from '../constant/cardConstants';
 import { Card } from './Card';
 import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
-import server from '../index';
+import Server from '../server';
+import SocketManager from '../socket/manager';
 
 const positions: { [key: string]: number } = {
   down: 0,
@@ -31,6 +32,7 @@ export default class Game {
   private readonly numberOfPlayers: number;
   private readonly creatorName: string;
   private readonly isPublic: boolean;
+  private readonly socketManager: SocketManager;
 
   constructor(
     numberOfPlayers: number,
@@ -38,6 +40,7 @@ export default class Game {
     isPublic: boolean,
     userId: string,
     name: string,
+    socketManager: SocketManager,
     maxScores = 11,
   ) {
     this.numberOfPlayers = numberOfPlayers;
@@ -52,6 +55,7 @@ export default class Game {
     this.creatorName = name;
     this.isPublic = isPublic;
     this.maxScores = maxScores;
+    this.socketManager = socketManager;
   }
 
   findEmptyPositions(): any {
@@ -189,7 +193,7 @@ export default class Game {
       if (player.result.hasTwoOfClubs) player.score++;
       player.result.score = player.score;
     });
-    this.players.forEach((player) => server.socketManager.sendMessage(player, 'game:finish-deck', player.result));
+    this.players.forEach((player) => this.socketManager.sendMessage(player, 'game:finish-deck', player.result));
     const winnerScores = this.players
       .filter((pl) => pl.score >= this.maxScores)
       .reduce((scores, pl: Player) => [...scores, pl.score], [])
@@ -213,7 +217,7 @@ export default class Game {
   finishGame(winnerPlayer: Player): void {
     clearInterval(this.timer);
     this.isFinished = true;
-    this.players.forEach((player) => server.socketManager.sendMessage(player, 'game:finish', player.result));
+    this.players.forEach((player) => this.socketManager.sendMessage(player, 'game:finish', player.result));
   }
 
   startTimer(): void {
@@ -339,7 +343,7 @@ export default class Game {
       const positionShift = positions[pl.position];
       let movePlayerPositionIndex = positions[player.position] - positionShift;
       movePlayerPositionIndex = movePlayerPositionIndex >= 0 ? movePlayerPositionIndex : 4 + movePlayerPositionIndex;
-      server.socketManager.sendMessage(pl, 'game:take-cards', {
+      this.socketManager.sendMessage(pl, 'game:take-cards', {
         position: positionsArray[movePlayerPositionIndex],
         playerCard,
         tableCards,

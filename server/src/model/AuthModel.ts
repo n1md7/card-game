@@ -1,12 +1,10 @@
-import { userStore, playerStore } from '../store';
-import '../helpers/index';
-import Player from '../game/Player';
+import { userStore } from '../store';
 import User from '../game/User';
 
 class AuthModel {
-  public signIn(id: string, name?: string | null): null | Player {
-    const user = playerStore.getById(id);
-    if (user && !name) {
+  public signIn(id: string, name?: string | null): null | User {
+    const user = userStore.getById(id);
+    if (user) {
       return user;
     }
 
