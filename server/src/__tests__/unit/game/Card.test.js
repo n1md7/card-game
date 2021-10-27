@@ -38,11 +38,6 @@ describe.each([
   [new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE), [], false],
   [
     new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
-    [new Card(CardSuit.CLUBS, CardRankName.TEN, CardRank.TEN)],
-    true,
-  ],
-  [
-    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
     [
       new Card(CardSuit.CLUBS, CardRankName.TEN, CardRank.TEN),
       new Card(CardSuit.DIAMONDS, CardRankName.TEN, CardRank.TEN),
@@ -91,6 +86,211 @@ describe.each([
     ],
     true,
   ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [new Card(CardSuit.CLUBS, CardRankName.TEN, CardRank.TEN)],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.TWO, CardRank.TWO),
+    [new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE)],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.THREE, CardRank.THREE),
+    [new Card(CardSuit.DIAMONDS, CardRankName.EIGHT, CardRank.EIGHT)],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.FOUR, CardRank.FOUR),
+    [new Card(CardSuit.DIAMONDS, CardRankName.SEVEN, CardRank.SEVEN)],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.FIVE, CardRank.FIVE),
+    [new Card(CardSuit.DIAMONDS, CardRankName.SIX, CardRank.SIX)],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [
+      new Card(CardSuit.CLUBS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [
+      new Card(CardSuit.CLUBS, CardRankName.TWO, CardRank.TWO),
+      new Card(CardSuit.DIAMONDS, CardRankName.EIGHT, CardRank.EIGHT),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [
+      new Card(CardSuit.CLUBS, CardRankName.THREE, CardRank.THREE),
+      new Card(CardSuit.DIAMONDS, CardRankName.SEVEN, CardRank.SEVEN),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [
+      new Card(CardSuit.CLUBS, CardRankName.FOUR, CardRank.FOUR),
+      new Card(CardSuit.DIAMONDS, CardRankName.SIX, CardRank.SIX),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [
+      new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),
+      new Card(CardSuit.DIAMONDS, CardRankName.FIVE, CardRank.FIVE),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.DIAMONDS, CardRankName.EIGHT, CardRank.EIGHT),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.TWO, CardRank.TWO),
+      new Card(CardSuit.DIAMONDS, CardRankName.SEVEN, CardRank.SEVEN),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.THREE, CardRank.THREE),
+      new Card(CardSuit.DIAMONDS, CardRankName.SIX, CardRank.SIX),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.FOUR, CardRank.FOUR),
+      new Card(CardSuit.DIAMONDS, CardRankName.FIVE, CardRank.FIVE),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.SPADES, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.DIAMONDS, CardRankName.SEVEN, CardRank.SEVEN),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.SPADES, CardRankName.TWO, CardRank.TWO),
+      new Card(CardSuit.DIAMONDS, CardRankName.SIX, CardRank.SIX),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.SPADES, CardRankName.THREE, CardRank.THREE),
+      new Card(CardSuit.DIAMONDS, CardRankName.FIVE, CardRank.FIVE),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.JACK, CardRank.JACK),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.SPADES, CardRankName.TWO, CardRank.TWO),
+      new Card(CardSuit.DIAMONDS, CardRankName.SIX, CardRank.SIX),
+    ],
+    true,
+  ],
+  [new Card(CardSuit.DIAMONDS, CardRankName.JACK, CardRank.JACK), [], false],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.JACK, CardRank.JACK),
+    [new Card(CardSuit.DIAMONDS, CardRankName.JACK, CardRank.JACK)],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.JACK, CardRank.JACK),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.JACK, CardRank.JACK),
+      new Card(CardSuit.DIAMONDS, CardRankName.QUEEN, CardRank.QUEEN),
+    ],
+    false,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.JACK, CardRank.JACK),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.QUEEN, CardRank.QUEEN),
+      new Card(CardSuit.DIAMONDS, CardRankName.QUEEN, CardRank.QUEEN),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.JACK, CardRank.JACK),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.QUEEN, CardRank.QUEEN),
+      new Card(CardSuit.DIAMONDS, CardRankName.QUEEN, CardRank.QUEEN),
+      new Card(CardSuit.SPADES, CardRankName.QUEEN, CardRank.QUEEN),
+    ],
+    false,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.JACK, CardRank.JACK),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.QUEEN, CardRank.QUEEN),
+      new Card(CardSuit.DIAMONDS, CardRankName.QUEEN, CardRank.QUEEN),
+      new Card(CardSuit.SPADES, CardRankName.SEVEN, CardRank.SEVEN),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.JACK, CardRank.JACK),
+    [
+      new Card(CardSuit.HEARTS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.DIAMONDS, CardRankName.TWO, CardRank.TWO),
+      new Card(CardSuit.SPADES, CardRankName.SEVEN, CardRank.SEVEN),
+    ],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.QUEEN, CardRank.QUEEN),
+    [new Card(CardSuit.HEARTS, CardRankName.QUEEN, CardRank.QUEEN)],
+    true,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.QUEEN, CardRank.QUEEN),
+    [new Card(CardSuit.HEARTS, CardRankName.KING, CardRank.KING)],
+    false,
+  ],
+  [
+    new Card(CardSuit.DIAMONDS, CardRankName.KING, CardRank.KING),
+    [new Card(CardSuit.HEARTS, CardRankName.KING, CardRank.KING)],
+    true,
+  ],
 ])(
   'Testing canTakeCards',
   /**
@@ -100,7 +300,7 @@ describe.each([
    * */
   (card, cards, canTake) => {
     test(`Testing whether or not [${card.name}] can take any from [${cards.map(
-      (c) => c.name,
+      ({ name }) => name,
     )}]. Should be [${canTake}]`, () => {
       expect(card.canTakeCards(cards)).toBe(canTake);
     });

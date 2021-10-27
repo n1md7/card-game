@@ -1,4 +1,5 @@
 import { CARD_SUM_VALUE, CardRank, CardRankName, CardSuit } from '../constant/cardConstants';
+import { isEven } from '../helpers/extras';
 
 export class Card {
   public readonly suit: CardSuit;
@@ -24,6 +25,8 @@ export class Card {
    * @returns {boolean}
    */
   canTakeCards(cards: Card[]): boolean {
+    if (!cards.length) return false;
+
     if (cards.length === 1 && cards[0].value >= 12 && cards[0].name === this.name) {
       return true;
     }
@@ -34,14 +37,18 @@ export class Card {
     }
 
     if (this.value === CardRank.JACK) {
-      const paintedCards = cards.filter((card) => card.value > CardRank.JACK);
-      const paintedCardsSum = paintedCards.reduce(
-        (accumulator, card) =>
-          [CardSuit.SPADES, CardSuit.CLUBS].includes(card.suit) ? accumulator - card.value : accumulator + card.value,
-        0,
-      );
+      const counter = {
+        [CardRank.QUEEN]: 0,
+        [CardRank.KING]: 0,
+      };
+      for (const card of cards) {
+        if (card.value > CardRank.JACK) {
+          // @ts-ignore
+          counter[card.value]++;
+        }
+      }
 
-      return paintedCardsSum === 0;
+      return isEven(counter[CardRank.QUEEN]) && isEven(counter[CardRank.KING]);
     }
 
     return false;
