@@ -1,12 +1,12 @@
 import { Card } from '../game/Card';
-import { cardRanksByName, cardSuitsByName } from '../constant/cardConstants';
+import { CardRankName, cardRanksByName, CardSuit, cardSuitsByName } from '../constant/cardConstants';
 import User from '../game/User';
 import PlayerModel from '../model/PlayerModel';
 import Koa from 'koa';
 
 type CardObject = {
-  suit: string;
-  rank: string;
+  suit: CardSuit;
+  rank: CardRankName;
 };
 
 type PlayerMoveObject = {

@@ -4,10 +4,7 @@ import Game from './Game';
 import { gameStore } from '../store';
 import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
 import { PlayerResult } from './PlayerResult';
-
-function getRandomInt(max: number) {
-  return Math.floor(Math.random() * Math.floor(max));
-}
+import { getRandomInt } from '../helpers/extras';
 
 class Player {
   player(): Player {
