@@ -3,7 +3,7 @@ import { Context } from '../../types';
 import BaseController from './BaseController';
 import PlayerModel from '../../model/PlayerModel';
 import GameModel from '../../model/GameModel';
-import Game from './Game';
+import Game from './interfaces/Game';
 import { createGameSchema, enterGameSchema } from './validators/GameRequestValidator';
 import ValidationErrorException from '../../exceptions/ValidationErrorException';
 import { HttpCode } from '../../types/errorHandler';

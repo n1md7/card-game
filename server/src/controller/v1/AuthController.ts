@@ -2,7 +2,7 @@ import { token } from '../../config';
 import { id } from '../../helpers/ids';
 import { Context } from '../../types';
 import AuthModel from '../../model/AuthModel';
-import Auth from './Auth';
+import Auth from './interfaces/Auth';
 import BaseController from './BaseController';
 
 class AuthController extends BaseController implements Auth {

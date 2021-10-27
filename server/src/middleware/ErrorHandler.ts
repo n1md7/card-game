@@ -1,6 +1,7 @@
 import { Context, Next } from 'koa';
 import { ErrorType, HttpText, HttpCode, MongoErrorType, MongoErrorCode, ExceptionType } from '../types/errorHandler';
 import { ValidationErrorItem } from 'joi';
+import { KoaEvent } from '../types';
 
 class ErrorHandler {
   static async handle(ctx: Context, next: Next): Promise<void> {
@@ -33,7 +34,7 @@ class ErrorHandler {
         ctx.body = message;
     }
 
-    ctx.app.emit('error:server', `[${ErrorType.mongoError}]:[${HttpCode.badRequest} - ${message}]`);
+    ctx.app.emit(KoaEvent.serverError, `[${ErrorType.mongoError}]:[${HttpCode.badRequest} - ${message}]`);
   }
 
   private static handleEverythingElse(error: Error & { details?: ValidationErrorItem }, ctx: Context) {
@@ -62,7 +63,7 @@ class ErrorHandler {
         ctx.body = HttpText.internalServerError;
     }
 
-    ctx.app.emit('error:server', ErrorHandler.buildErrorMessage(error, ctx));
+    ctx.app.emit(KoaEvent.serverError, ErrorHandler.buildErrorMessage(error, ctx));
   }
 }
 

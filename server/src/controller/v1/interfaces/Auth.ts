@@ -1,4 +1,4 @@
-import { Context } from '../../types';
+import { Context } from '../../../types';
 
 export default interface Auth {
   status: (ctx: Context) => Promise<void>;

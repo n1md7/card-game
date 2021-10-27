@@ -31,7 +31,7 @@ class GameModel extends BaseModel<GameProps> {
 
     const player = new Player(user.id, name || user.name);
     game.joinPlayer(player);
-    playerStore.setById(player.getPlayerId(), player);
+    playerStore.setById(player.id, player);
     playerStore.addPlayerById(player, userId);
     userStore.setGameId(userId, game.getGameId());
 
@@ -43,7 +43,7 @@ class GameModel extends BaseModel<GameProps> {
     if (!user) {
       throw new Error(`could not find a user with the id:${userId}`);
     }
-    const game = user.getGame();
+    const game = user.game;
     if (!game) {
       throw new Error(`could not find a room to remove`);
     }
@@ -57,7 +57,7 @@ class GameModel extends BaseModel<GameProps> {
     const player = new Player(userId, name);
     const game = new Game(size, roomId, isPublic, userId, name);
     game.joinPlayer(player);
-    playerStore.setById(player.getPlayerId(), player);
+    playerStore.setById(player.id, player);
     gameStore.setById(game.getGameId(), game);
     userStore.setGameId(userId, game.getGameId());
 

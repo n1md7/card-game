@@ -20,17 +20,17 @@ export default class Game {
   public activePlayer: Player;
   public timeToMove: number;
   private deck: Deck;
-  private players: Player[];
-  private readonly gameId: string;
-  private readonly numberOfPlayers: number;
   private timer: any;
   private currentPlayerIndex: number;
   private cards: Card[];
-  private isPublic: boolean;
   private creatorId: string;
-  private creatorName: string;
   private lastTaker: Player;
   private maxScores: number;
+  private readonly players: Player[];
+  private readonly gameId: string;
+  private readonly numberOfPlayers: number;
+  private readonly creatorName: string;
+  private readonly isPublic: boolean;
 
   constructor(
     numberOfPlayers: number,
@@ -114,7 +114,7 @@ export default class Game {
     const playerData = this.players.reduce(
       (players: ReducePlayers, player: Player) => ({
         ...players,
-        [player.position]: player.getPlayerData(),
+        [player.position]: player.data,
       }),
       {},
     );
@@ -245,7 +245,7 @@ export default class Game {
     }
 
     player.position = position;
-    player.setGame(this);
+    player.gameId = this.getGameId();
     this.players.push(player);
     if (this.players.length === this.numberOfPlayers) {
       this.startGame();
@@ -273,7 +273,7 @@ export default class Game {
   }
 
   playerAlreadyInGameRoom(playerId: string): boolean {
-    return this.players.findIndex((player) => player.getPlayerId() === playerId) !== -1;
+    return this.players.findIndex((player) => player.id === playerId) !== -1;
   }
 
   getGameId(): string {
@@ -285,7 +285,7 @@ export default class Game {
   }
 
   removePlayerFromTheGame(playerId: string): void {
-    const index = this.players.findIndex((player) => player.playerId === playerId);
+    const index = this.players.findIndex((player) => player.id === playerId);
     if (index) {
       // remove from the array
       this.players.splice(index, 1);

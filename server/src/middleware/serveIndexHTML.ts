@@ -1,5 +1,6 @@
 import Koa, { Context } from 'koa';
 import fs from 'fs';
+import { KoaEvent } from '../types';
 
 export default (index: string, koa: Koa) => {
   return async (ctx: Context) => {
@@ -12,7 +13,7 @@ export default (index: string, koa: Koa) => {
             <p>Make sure you run <code>npm run build</code> command</p>
         `;
       ctx.status = 404;
-      koa.emit('error:server', error?.toString());
+      koa.emit(KoaEvent.serverError, error?.toString());
     }
   };
 };

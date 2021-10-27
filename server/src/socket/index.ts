@@ -1,9 +1,9 @@
 import SocketIO, { Socket } from 'socket.io';
 import UserModel from '../model/UserModel';
 import { isset } from '../helpers/extras';
-import { JWTProps } from '../types';
+import { JWTProps, KoaEvent } from '../types';
 import { token } from '../config';
-import { playerMove } from './events';
+import Events from './events';
 import jwt from 'jsonwebtoken';
 import PlayerModel from '../model/PlayerModel';
 import GameModel from '../model/GameModel';
@@ -12,10 +12,12 @@ import Koa from 'koa';
 export default class SocketModule {
   private io: SocketIO.Server;
   private readonly koa: Koa;
+  private readonly events: Events;
 
   constructor(io: SocketIO.Server, koa: Koa) {
     this.io = io;
     this.koa = koa;
+    this.events = new Events(koa);
   }
 
   public connectionHandler(): void {
@@ -29,7 +31,7 @@ export default class SocketModule {
           throw new Error(`We couldn't find a user with the id:${userId}`);
         }
         user.socketId = socket.id;
-        socket.on('player:move', playerMove(user, this.koa));
+        socket.on('player:move', this.events.playerMove(user));
       } catch ({ message }) {
         this.io.to(socket.id).emit('error', message);
       }
@@ -37,12 +39,12 @@ export default class SocketModule {
 
     this.io.on('error', (message: string) => {
       this.io.emit('error', message);
-      this.koa.emit('error:socket', message);
+      this.koa.emit(KoaEvent.socketError, message);
     });
   }
 
   public sendUpdatesEvery(time = 1000) {
-    return (timeInterval: string) => {
+    return (timeInterval: 'milliseconds') => {
       return setInterval(() => {
         const users = UserModel.getUsers();
         for (const userId in users) {
@@ -57,7 +59,7 @@ export default class SocketModule {
                   this.io.to(user.socketId).emit('game:finished', game.statistics());
                 } else {
                   this.io.to(user.socketId).emit('game:data', game.getGameData(player));
-                  this.io.to(user.socketId).emit('player-cards', player.getHandCards());
+                  this.io.to(user.socketId).emit('player-cards', player.handCards);
                   this.io.to(user.socketId).emit('table-cards:add', game.getCardsList());
                 }
               }

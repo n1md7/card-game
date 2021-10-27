@@ -5,7 +5,7 @@ import cors from '@koa/cors';
 import logWrite from '../logger';
 import routes from '../routes';
 import handleErrors from '../middleware/ErrorHandler';
-import { Env } from '../types';
+import { Env, KoaEvent } from '../types';
 import { ConfigOptions } from '../types/config';
 import path from 'path';
 import http, { Server as HttpServer } from 'http';
@@ -63,10 +63,10 @@ export default class Server {
     this.koa.use(handleApiNotFound(this.config.server.apiContextPath, this.koa));
     // Redirect everything else to index.html - for React-router
     this.koa.use(serveIndexHTML(indexHTMLPath, this.koa));
-    this.koa.on('error:server', (errorMessage) => {
+    this.koa.on(KoaEvent.serverError, (errorMessage) => {
       logWrite.error(`[server] ${errorMessage}`);
     });
-    this.koa.on('error:socket', (errorMessage) => {
+    this.koa.on(KoaEvent.socketError, (errorMessage) => {
       logWrite.error(`[socket] ${errorMessage}`);
     });
     this.koa.on('debug', (debugMessage) => {

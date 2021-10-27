@@ -6,9 +6,9 @@ interface SocketCallback {
 
 type RoomSizeProps = 2 | 3 | 4;
 
-/*
- * extends Koa context with custom state props
- * */
+/**
+ * @description extends {Koa} context with custom state props
+ */
 interface MyContext extends Context {
   state: {
     user: {
@@ -28,6 +28,12 @@ export enum Env {
   Dev = 'development',
   Test = 'test',
   Prod = 'production',
+}
+
+export enum KoaEvent {
+  socketError = 'error:socket',
+  serverError = 'error:server',
+  debug = 'debug',
 }
 
 export { RoomSizeProps, SocketCallback, MyContext as Context, JWTProps };

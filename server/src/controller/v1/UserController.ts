@@ -1,7 +1,7 @@
 import { Context } from '../../types';
 import UserModel from '../../model/UserModel';
 import BaseController from './BaseController';
-import User from './User';
+import User from './interfaces/User';
 
 class UserController extends BaseController implements User {
   public getUserInfo = async (ctx: Context): Promise<void> => {
