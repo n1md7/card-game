@@ -1,11 +1,11 @@
-import { CARD_SUM_VALUE, CardSuit, CardRank } from '../constant/cardConstants';
+import { CARD_SUM_VALUE, CardRank, CardRankName, CardSuit } from '../constant/cardConstants';
 
-class Card {
+export class Card {
   public readonly suit: CardSuit;
-  public readonly name: string;
-  public readonly value: number;
+  public readonly name: CardRankName;
+  public readonly value: CardRank;
 
-  constructor(suit: CardSuit, name: string, value: number) {
+  constructor(suit: CardSuit, name: CardRankName, value: CardRank) {
     this.suit = suit;
     this.name = name;
     this.value = value;
@@ -15,12 +15,20 @@ class Card {
     return this.suit === card?.suit && this.name === card?.name;
   }
 
+  /**
+   * @Description Only takes argument of cards which suppose to match counting rules.
+   * When the card value is 2 and passed cards are 9 and 3 it will be false because 2+9+3 is not 11.
+   * Thus, it only expects 9 in this case. This is not calculating possible combinations from the passed cards only
+   * validates sum of the values.
+   * @param {Card[]} cards
+   * @returns {boolean}
+   */
   canTakeCards(cards: Card[]): boolean {
     if (cards.length === 1 && cards[0].value >= 12 && cards[0].name === this.name) {
       return true;
     }
 
-    const sumValue = cards.reduce((acc, cv) => acc + cv.value, 0);
+    const sumValue = cards.reduce((sum, card) => sum + card.value, 0);
     if (sumValue + this.value === CARD_SUM_VALUE) {
       return true;
     }
@@ -39,5 +47,3 @@ class Card {
     return false;
   }
 }
-
-export { Card };
