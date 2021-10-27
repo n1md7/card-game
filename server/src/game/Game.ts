@@ -88,11 +88,11 @@ export default class Game {
     for (const player of this.players) {
       const numberOfCards = 4 - player.cards.length;
       if (numberOfCards > 0) {
-        player.giveCards(this.deck.getCards(numberOfCards));
+        player.giveCards(this.deck.takeCards(numberOfCards));
       }
     }
     if (firstDeal) {
-      this.cards = this.deck.getCards(4);
+      this.cards = this.deck.takeCards(4);
     }
   }
 
@@ -139,7 +139,7 @@ export default class Game {
 
     return {
       playerData: result,
-      remainedCards: this.deck.size(),
+      remainedCards: this.deck.size,
     };
   }
 
