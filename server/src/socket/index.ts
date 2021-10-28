@@ -10,15 +10,7 @@ import GameModel from '../model/GameModel';
 import Koa from 'koa';
 
 export default class SocketModule {
-  private io: SocketIO.Server;
-  private readonly koa: Koa;
-  private readonly events: Events;
-
-  constructor(io: SocketIO.Server, koa: Koa) {
-    this.io = io;
-    this.koa = koa;
-    this.events = new Events(koa);
-  }
+  constructor(private readonly io: SocketIO.Server, private readonly koa: Koa, private readonly events: Events) {}
 
   public connectionHandler(): void {
     this.io.on('connection', (socket: Socket) => {

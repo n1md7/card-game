@@ -14,6 +14,7 @@ import SocketModule from '../socket';
 import SocketManager from '../socket/manager';
 import serveIndexHTML from '../middleware/serveIndexHTML';
 import handleApiNotFound from '../middleware/handleApiNotFound';
+import Events from '../socket/events';
 
 export default class Server {
   public koa: Koa;
@@ -81,7 +82,7 @@ export default class Server {
   }
 
   startSocket(): SocketModule {
-    this.socketModule = new SocketModule(this.io, this.koa);
+    this.socketModule = new SocketModule(this.io, this.koa, new Events(this.koa));
     this.socketManager = new SocketManager(this.io);
     this.socketModule.connectionHandler();
     this.socketModule.sendUpdatesEvery(100)('milliseconds');
