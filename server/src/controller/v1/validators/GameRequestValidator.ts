@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { room as Room } from '../../../config';
+import { Room } from '../../../types';
 
 export const createGameSchema = Joi.object({
   size: Joi.number().valid(Room.two, Room.three, Room.four).required(),

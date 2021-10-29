@@ -15,9 +15,7 @@
     "mongo:status": "npx migrate-mongo status",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "test": "jest --coverage --forceExit",
-    "test:os-linux": "NODE_ENV=test jest --coverage",
-    "test:os-windows": "set NODE_ENV=test && jest --coverage"
+    "test": "jest --coverage --forceExit"
   },
   "repository": {
     "type": "git",

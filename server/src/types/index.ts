@@ -6,6 +6,18 @@ interface SocketCallback {
 
 type RoomSizeProps = 2 | 3 | 4;
 
+export enum Token {
+  self = 'token',
+  userId = 'userId',
+  name = 'name',
+}
+
+export enum Room {
+  two = 2,
+  three,
+  four,
+}
+
 /**
  * @description extends {Koa} context with custom state props
  */

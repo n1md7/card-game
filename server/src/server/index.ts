@@ -83,8 +83,10 @@ export default class Server {
 
     return new Promise((resolve) => {
       this.httpServer.listen(port, hostname, function () {
-        logWrite.debug(`Example API endpoint - http://${hostname}:${port}${apiContextPath}/v1/storage`);
-        logWrite.debug('Server (re)started! Ready to serve the master');
+        if (process.env.NODE_ENV !== 'test') {
+          logWrite.debug(`Example API endpoint - http://${hostname}:${port}${apiContextPath}/v1/storage`);
+          logWrite.debug('Server (re)started! Ready to serve the master');
+        }
         resolve(this);
       });
     });
