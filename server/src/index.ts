@@ -8,5 +8,4 @@ import Server from './server';
 // Start Koa server
 const koa = new Server(config);
 koa.init();
-koa.startServer();
-koa.startSocket();
+koa.startServer().then(() => koa.attachSocket());

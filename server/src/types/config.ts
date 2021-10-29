@@ -1,6 +1,6 @@
 export type ConfigOptions = {
   server: ServerConfig;
-  origin: string;
+  origins: string[];
   loggerOptions: LoggerOptions;
 };
 

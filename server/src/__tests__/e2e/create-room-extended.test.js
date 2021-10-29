@@ -11,7 +11,7 @@ describe('Create room with extended requests', () => {
     config.origin = 'http://127.0.0.1:34567';
     const server = new Server(config);
     server.init();
-    server.startSocket();
+    server.attachSocket();
     httpServer = server.startServer();
   });
 

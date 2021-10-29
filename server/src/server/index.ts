@@ -5,7 +5,7 @@ import cors from '@koa/cors';
 import logWrite from '../logger';
 import routes from '../routes';
 import handleErrors from '../middleware/ErrorHandler';
-import { Env, KoaEvent } from '../types';
+import { KoaEvent } from '../types';
 import { ConfigOptions } from '../types/config';
 import path from 'path';
 import http, { Server as HttpServer } from 'http';
@@ -30,28 +30,31 @@ export default class Server {
     // Makes publicly accessible React build folder
     this.staticFolderPath = path.join(__dirname, config.server.staticFolderPath);
     // Allow any cross-domain requests when not Production environment
-    if (process.env.NODE_ENV === Env.Prod) {
-      this.config.origin = process.env.ORIGIN;
-    }
+    // if (process.env.NODE_ENV === Env.Prod) {
+    //   this.config.origin = process.env.ORIGIN;
+    // }
   }
 
   init(): Server {
     this.koa = new Koa();
     this.httpServer = http.createServer(this.koa.callback());
-    this.io = SocketIO(this.httpServer, {
-      path: '/socket.io',
-      serveClient: false,
-      // below are engine.IO options
-      pingInterval: 10000,
-      pingTimeout: 5000,
-      cookie: false,
-    });
     const router = routes(this.config);
     const indexHTMLPath = path.join(this.staticFolderPath, this.config.server.indexFile);
     this.koa.use(handleErrors);
     this.koa.use(
       cors({
-        origin: this.config.origin,
+        origin: (ctx: Koa.Context) => {
+          if (this.config.origins.includes(ctx.headers.origin)) {
+            return ctx.headers.origin;
+          }
+          throw new Error(
+            `Request referer=>origin=[${ctx.request.headers.referer}]=>[${ctx.headers.origin}] rejected by CORs.` +
+              ` Requests are allowed only from: ${this.config.origins.join(', ')}`,
+          );
+        },
+        allowMethods: ['GET', 'POST', 'OPTIONS', 'PUT'],
+        allowHeaders: ['Content-Type', 'token'],
+        exposeHeaders: ['token'],
         credentials: true,
       }),
     );
@@ -68,35 +71,40 @@ export default class Server {
     this.koa.use(handleApiNotFound(this.config.server.apiContextPath, this.koa));
     // Redirect everything else to index.html - for React-router
     this.koa.use(serveIndexHTML(indexHTMLPath, this.koa));
-    this.koa.on(KoaEvent.serverError, (errorMessage) => {
-      logWrite.error(`[server] ${errorMessage}`);
-    });
-    this.koa.on(KoaEvent.socketError, (errorMessage) => {
-      logWrite.error(`[socket] ${errorMessage}`);
-    });
-    this.koa.on('debug', (debugMessage) => {
-      logWrite.error(`${debugMessage}`);
-    });
+    this.koa.on(KoaEvent.serverError, (errorMessage) => logWrite.error(`[server] ${errorMessage}`));
+    this.koa.on(KoaEvent.socketError, (errorMessage) => logWrite.error(`[socket] ${errorMessage}`));
+    this.koa.on(KoaEvent.debug, (debugMessage) => logWrite.error(`${debugMessage}`));
 
     return this;
   }
 
-  startSocket(): SocketModule {
+  startServer(): Promise<HttpServer> {
+    const { port, hostname, apiContextPath } = this.config.server;
+
+    return new Promise((resolve) => {
+      this.httpServer.listen(port, hostname, function () {
+        logWrite.debug(`Example API endpoint - http://${hostname}:${port}${apiContextPath}/v1/storage`);
+        logWrite.debug('Server (re)started! Ready to serve the master');
+        resolve(this);
+      });
+    });
+  }
+
+  attachSocket(): SocketModule {
+    this.io = SocketIO(this.httpServer, {
+      path: '/socket.io',
+      serveClient: false,
+      // below are engine.IO options
+      pingInterval: 10000,
+      pingTimeout: 5000,
+      cookie: false,
+    });
+
     this.socketModule = new SocketModule(this.io, this.koa, new Events(this.koa));
     this.socketManager = new SocketManager(this.io);
     this.socketModule.connectionHandler();
     this.socketModule.sendUpdatesEvery(100)('milliseconds');
 
     return this.socketModule;
-  }
-
-  startServer(): HttpServer {
-    const { port, hostname, apiContextPath } = this.config.server;
-
-    return this.httpServer.listen(port, hostname, () => {
-      logWrite.debug(`Health-check - http://${hostname}:${port}/health-check`);
-      logWrite.debug(`Example API endpoint - http://${hostname}:${port}${apiContextPath}/v1/users`);
-      logWrite.debug('Server (re)started!');
-    });
   }
 }

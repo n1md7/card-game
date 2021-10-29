@@ -18,6 +18,7 @@ export enum HttpCode {
   noContent = 204,
   accepted = 202,
   created = 201,
+  ok = 200,
 }
 
 export enum ErrorType {
