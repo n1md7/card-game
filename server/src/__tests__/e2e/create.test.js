@@ -135,3 +135,53 @@ describe('Create user/verify', () => {
     );
   });
 });
+
+describe.each([
+  [0, 'fail'],
+  [1, 'fail'],
+  [5, 'fail'],
+  [6, 'fail'],
+  [17, 'fail'],
+])('Create room with size %i. It should %s with error message', (sz, ms) => {
+  const ref = { httpServer: null, myConfig: null, request: null };
+
+  beforeAll(async function () {
+    ref.myConfig = copy(config);
+    ref.myConfig.server.port = 3457;
+    ref.myConfig.server.hostname = 'localhost';
+    ref.myConfig.origins = [`http://${ref.myConfig.server.hostname}`];
+    const koa = new Server(ref.myConfig);
+    const server = koa.init();
+    ref.httpServer = await koa.startServer();
+    koa.attachSocket();
+    ref.request = axios.create({
+      baseURL: `http://${ref.myConfig.server.hostname}:${ref.myConfig.server.port}/api/v1`,
+      responseType: 'json',
+      timeout: 5000,
+      validateStatus: (status) => status >= 200 && status < 500,
+    });
+  });
+
+  afterAll(function () {
+    ref.httpServer.close();
+  });
+
+  it(`it ${ms}s for [${sz}]`, async () => {
+    const {
+      data: { token = null, userId = null },
+    } = await ref.request.get('/auth/init');
+    const { status: createStatus, data: errorResponse = null } = await ref.request.post(
+      '/game/create',
+      {
+        isPublic: true,
+        name: 'Nacho',
+        size: sz,
+      },
+      {
+        headers: { [Token.self]: token },
+      },
+    );
+    expect(createStatus).toBe(HttpCode.badRequest);
+    expect(errorResponse).toEqual(expect.any(String));
+  });
+});
