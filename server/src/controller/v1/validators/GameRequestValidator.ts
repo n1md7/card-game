@@ -1,29 +1,16 @@
 import Joi from 'joi';
-import {room as Room} from '../../../config';
+import { Room } from '../../../types';
 
 export const createGameSchema = Joi.object({
-  size: Joi.number()
-    .valid(Room.two, Room.three, Room.four)
-    .required(),
+  size: Joi.number().valid(Room.two, Room.three, Room.four).required(),
 
-  name: Joi.string()
-    .alphanum()
-    .min(2)
-    .max(16)
-    .required(),
+  name: Joi.string().alphanum().min(2).max(16).required(),
 
   isPublic: Joi.boolean().required(),
 });
 
 export const enterGameSchema = Joi.object({
-  id: Joi.string()
-    .min(2)
-    .max(32)
-    .required(),
+  id: Joi.string().min(2).max(32).required(),
 
-  name: Joi.string()
-    .alphanum()
-    .min(2)
-    .max(16)
-    .required(),
+  name: Joi.string().alphanum().min(2).max(16).required(),
 });

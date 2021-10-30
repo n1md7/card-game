@@ -1,5 +1,5 @@
-import BaseStore, {Storage} from "./BaseStore";
-import User from "../game/User";
+import BaseStore, { Storage } from './BaseStore';
+import User from '../game/User';
 
 export default class UserStore extends BaseStore<User> {
   constructor(defaultData: Storage<User> = {}) {
@@ -10,6 +10,6 @@ export default class UserStore extends BaseStore<User> {
     this.storage[id] = {
       ...this.storage[id],
       gameId,
-    }
+    };
   }
 }

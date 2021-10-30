@@ -1,26 +1,27 @@
-import React, {useState, useEffect} from 'react';
-import {useDispatch} from 'react-redux';
-import {updateUser} from '../redux/actions';
-import {httpClient} from '../services/httpClient';
-import {tokenStore} from '../services/token';
-import {token as tokenKey} from '../constants/urls';
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '../redux/actions';
+import { httpClient } from '../services/httpClient';
+import { tokenStore } from '../services/token';
+import { token as tokenKey } from '../constants/urls';
 import handleError from '../helpers/handleError';
 import useAuth from '../hooks/useAuth';
-import {getRandomInt} from '../libs/Formulas';
-import {useParams} from 'react-router-dom';
+import { getRandomInt } from '../libs/Formulas';
+import { useParams } from 'react-router-dom';
 import Nav from './Nav';
 
-export default ({history}) => {
+export default ({ history }) => {
   const [isAuth, isLoading] = useAuth();
   const dispatch = useDispatch();
   const [name, setName] = useState('');
-  const nameChangeHandler = ({target: {value}}) => setName(value);
-  const {roomId} = useParams();
+  const nameChangeHandler = ({ target: { value } }) => setName(value);
+  const { roomId } = useParams();
 
-  const submitHandler = event => {
+  const submitHandler = (event) => {
     event.preventDefault();
-    httpClient.get(`v1/auth/init`)
-      .then(response => {
+    httpClient
+      .get(`v1/auth/init`)
+      .then((response) => {
         if (response.status === 200) {
           // custom store for the token
           tokenStore.setToken(response.data.token);
@@ -28,11 +29,12 @@ export default ({history}) => {
           localStorage.setItem(tokenKey, response.data.token);
           // save name into storage
           localStorage.setItem('name', name);
-          dispatch(updateUser({name}));
+          dispatch(updateUser({ name }));
           return null;
         }
         throw new Error(response.data);
-      }).catch(handleError);
+      })
+      .catch(handleError);
   };
 
   useEffect(() => {
@@ -55,9 +57,7 @@ export default ({history}) => {
   }, [isAuth, roomId]);
 
   if (isLoading) {
-    return (
-      <div>Loading...</div>
-    );
+    return <div>Loading...</div>;
   }
 
   return (
@@ -74,16 +74,13 @@ export default ({history}) => {
                 onChange={nameChangeHandler}
                 placeholder="Nickname"
                 maxLength={16}
-                className="form-control"/>
-              <small className="form-text text-muted">
-                This name will be used during the game
-              </small>
+                className="form-control"
+              />
+              <small className="form-text text-muted">This name will be used during the game</small>
             </div>
             <div className="row">
               <div className="col-12">
-                <button
-                  type="submit"
-                  className="w-100 btn btn-outline-primary">
+                <button type="submit" className="w-100 btn btn-outline-primary">
                   START
                 </button>
               </div>

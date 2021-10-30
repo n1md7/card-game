@@ -1,15 +1,15 @@
-import {useEffect, useState} from 'react';
-import {baseURL} from '../constants/urls';
-import {httpClient} from '../services/httpClient';
+import { useEffect, useState } from 'react';
+import { baseURL } from '../constants/urls';
+import { httpClient } from '../services/httpClient';
 import handleError from '../helpers/handleError';
 import useToken from './useToken';
 import useUser from './useUser';
 
-const useJoinRoom = (roomId: string): [string|undefined, boolean, string|undefined] => {
+const useJoinRoom = (roomId: string): [string | undefined, boolean, string | undefined] => {
   useToken();
   const [isLoading, setIsLoading] = useState(true);
-  const [gameId, setGameId] = useState<string|undefined>();
-  const [error, setError] = useState<string|undefined>();
+  const [gameId, setGameId] = useState<string | undefined>();
+  const [error, setError] = useState<string | undefined>();
   const name = useUser();
 
   useEffect(() => {
@@ -24,18 +24,21 @@ const useJoinRoom = (roomId: string): [string|undefined, boolean, string|undefin
           id: roomId,
           name,
         },
-      }).then(response => {
-        if (response.status === 200) {
-          return setGameId(response.data?.id);
-        }
-        setError(response.data);
-        throw new Error(response.data);
-      }).catch(ex => {
-        setError(handleError(ex));
-      }).then(() => {
-        // Set loading to false when all is done
-        setIsLoading(false);
-      });
+      })
+        .then((response) => {
+          if (response.status === 200) {
+            return setGameId(response.data?.id);
+          }
+          setError(response.data);
+          throw new Error(response.data);
+        })
+        .catch((ex) => {
+          setError(handleError(ex));
+        })
+        .then(() => {
+          // Set loading to false when all is done
+          setIsLoading(false);
+        });
     }
   }, [name]);
 

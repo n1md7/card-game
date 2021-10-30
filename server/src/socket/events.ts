@@ -1,40 +1,45 @@
-import { Card } from "../game/Card";
-import { cardRanksByName, cardSuitsByName } from "../constant/cardConstants";
-import User from "../game/User";
-import PlayerModel from "../model/PlayerModel";
+import { Card } from '../game/Card';
+import { CardRankName, cardRanksByName, CardSuit, cardSuitsByName } from '../constant/cardConstants';
+import User from '../game/User';
+import PlayerModel from '../model/PlayerModel';
 import Koa from 'koa';
+import { KoaEvent } from '../types';
 
 type CardObject = {
-  suit: string;
-  rank: string;
-}
+  suit: CardSuit;
+  rank: CardRankName;
+};
 
 type PlayerMoveObject = {
-  playerCard: CardObject,
-  tableCards: CardObject[]
-}
+  playerCard: CardObject;
+  tableCards: CardObject[];
+};
 
+export default class Events {
+  constructor(private readonly koa: Koa) {}
 
-const getCardFromCardObject = ( cardObject: CardObject ): Card => {
-  const cardSuit = cardSuitsByName.get( cardObject.suit );
-  const cardRank = cardObject.rank;
-  const cardValue = cardRanksByName.get( cardRank );
-
-  return new Card( cardSuit, cardRank, cardValue );
-}
-
-export const playerMove = ( user: User, koa: Koa ) => ( playerMoveObject: PlayerMoveObject ) => {
-  try {
-    const player = PlayerModel.getById( user.id );
-    const playerCard = getCardFromCardObject( playerMoveObject.playerCard );
-    const tableCards = playerMoveObject.tableCards.map( getCardFromCardObject );
-    if ( tableCards.length === 0 ) {
-      player.placeCard( playerCard );
-    } else {
-      player.takeCardsFromTable( playerCard, tableCards );
-    }
-  } catch ( error ) {
-    koa.emit("error:socket", error.toString());
+  playerMove(user: User) {
+    return (playerMoveObject: PlayerMoveObject) => {
+      try {
+        const player = PlayerModel.getById(user.id);
+        const playerCard = Events.getCardFromCardObject(playerMoveObject.playerCard);
+        const tableCards = playerMoveObject.tableCards.map(Events.getCardFromCardObject);
+        if (tableCards.length === 0) {
+          player.placeCard(playerCard);
+        } else {
+          player.takeCardsFromTable(playerCard, tableCards);
+        }
+      } catch (error) {
+        this.koa.emit(KoaEvent.socketError, error.message || JSON.stringify(error));
+      }
+    };
   }
 
-};
+  private static getCardFromCardObject = (cardObject: CardObject): Card => {
+    const cardSuit = cardSuitsByName.get(cardObject.suit);
+    const cardRank = cardObject.rank;
+    const cardValue = cardRanksByName.get(cardRank);
+
+    return new Card(cardSuit, cardRank, cardValue);
+  };
+}

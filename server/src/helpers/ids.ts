@@ -1,5 +1,5 @@
-import {v4 as uuidv4} from "uuid";
-import jsonwebtoken from "jsonwebtoken";
+import { v4 as uuidv4 } from 'uuid';
+import jsonwebtoken from 'jsonwebtoken';
 
 export const id = {
   user: (len = 5): string => `U-${uuidv4().substring(0, len)}`,
@@ -8,10 +8,8 @@ export const id = {
   player: (len = 5): string => `P-${uuidv4().substring(0, len)}`,
   token: (): string => `${uuidv4()}`,
   jwt: (data = {}): string => {
-    return jsonwebtoken.sign(
-      data,
-      process.env.JWT_SECRET, {
-        expiresIn: '1h',
-      });
+    return jsonwebtoken.sign(data, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    });
   },
 };

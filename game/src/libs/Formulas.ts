@@ -24,15 +24,18 @@ export const ellipseRanges = (width: number, skips = 4) => {
 
 export const random = (min: number, max: number) => {
   return Math.random() * (max - min) + min;
-}
+};
 
 export const Pythagoras = (a: number, b: number) => {
   return Math.sqrt(a ** 2 + b ** 2);
-}
+};
 
 export const getRandomInt = (min: number, max: number) => {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1) + min);
-}
+};
 
+export const isInRange = ([min, max]: [number, number], target: number): boolean => {
+  return target >= min && target <= max;
+};

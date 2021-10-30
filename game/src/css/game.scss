@@ -8,7 +8,8 @@ $avatar-w: 84px;
 $table-w: 740px;
 $table-h: 360px;
 
-body, #root {
+body,
+#root {
   //background: rgba(14, 14, 14, 0.9);
   .no-select {
     -webkit-touch-callout: none; /* iOS Safari */
@@ -49,7 +50,6 @@ body, #root {
     width: 100%;
     border: solid 4px rgba(49, 44, 44, 0.58);
     background: rgba(0, 0, 0, 0.78);
-
 
     .x-table {
       overflow: hidden;

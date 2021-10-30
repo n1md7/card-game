@@ -1,5 +1,5 @@
 export default {
-  windowWidth: 640,
+  windowWidth: 1024,
   tableWidth: 740,
   tableHeight: 360,
   cardWidth: 60,
@@ -39,7 +39,7 @@ export const gameDataDefault = {
       cards: 0,
     },
   },
-  remainedCards: 0
+  remainedCards: 0,
 };
 
 export const draggingValue = {
@@ -48,4 +48,3 @@ export const draggingValue = {
   top: 0,
   target: null,
 };
-

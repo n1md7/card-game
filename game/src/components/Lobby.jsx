@@ -1,8 +1,8 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import useUserInfo from '../hooks/useUserInfo';
 import Header from './Header';
 
-export default function Lobby({history}){
+export default function Lobby({ history }) {
   const [userInfo, isLoading] = useUserInfo();
 
   useEffect(() => {
@@ -12,5 +12,5 @@ export default function Lobby({history}){
     }
   }, [userInfo]);
 
-  return isLoading ? <div>Loading...</div> : <Header/>;
+  return isLoading ? <div>Loading...</div> : <Header />;
 }

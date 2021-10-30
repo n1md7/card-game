@@ -1,0 +1,7 @@
+dist
+build
+logs
+.idea
+.github
+deploy
+node_module

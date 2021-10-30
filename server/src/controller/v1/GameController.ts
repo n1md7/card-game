@@ -1,17 +1,17 @@
-import {id as Id} from "../../helpers/ids";
-import {Context} from "../../types";
-import BaseController from "./BaseController";
-import PlayerModel from "../../model/PlayerModel";
-import GameModel from "../../model/GameModel";
-import Game from './Game';
-import {createGameSchema, enterGameSchema} from './validators/GameRequestValidator';
+import { id as Id } from '../../helpers/ids';
+import { Context } from '../../types';
+import BaseController from './BaseController';
+import PlayerModel from '../../model/PlayerModel';
+import GameModel from '../../model/GameModel';
+import Game from './interfaces/Game';
+import { createGameSchema, enterGameSchema } from './validators/GameRequestValidator';
 import ValidationErrorException from '../../exceptions/ValidationErrorException';
-import {HttpCode} from '../../types/errorHandler';
-import {gameStore, playerStore, userStore} from '../../store';
+import { HttpCode } from '../../types/errorHandler';
+import { gameStore, playerStore, userStore } from '../../store';
+import SocketManager from '../../socket/manager';
 
 class GameController extends BaseController implements Game {
-
-  public createGame = async (ctx: Context): Promise<void> => {
+  public createGame = async (ctx: Context & { socketManager: SocketManager }): Promise<void> => {
     const validation = createGameSchema.validate(ctx.request.body);
     if (validation.error) {
       throw new ValidationErrorException(validation.error.details);
@@ -19,22 +19,16 @@ class GameController extends BaseController implements Game {
 
     const roomId = Id.game();
     const userId = ctx.state.user?.id;
-    const {isPublic, size, name} = validation.value;
-    const player = GameModel.create(
-      userId,
-      roomId,
-      Number(size),
-      Boolean(isPublic),
-      name,
-    );
+    const { isPublic, size, name } = validation.value;
+    const player = GameModel.create(userId, roomId, Number(size), Boolean(isPublic), name, ctx.socketManager);
     PlayerModel.addPlayer(player, userId);
 
     ctx.body = roomId;
-  }
+  };
 
   public getAllPublicGames = async (ctx: Context): Promise<void> => {
     ctx.body = GameModel.getGamesList();
-  }
+  };
 
   public enterGame = async (ctx: Context): Promise<void> => {
     // id is roomId/gameId, name is playerName
@@ -43,18 +37,18 @@ class GameController extends BaseController implements Game {
       throw new ValidationErrorException(validation.error.details);
     }
 
-    const {id, name} = validation.value;
+    const { id, name } = validation.value;
     const userId = ctx.state.user?.id;
     const room = GameModel.join(id, userId, name);
 
     ctx.body = room.getGameDetails();
-  }
+  };
 
   public exitGame = async (ctx: Context): Promise<void> => {
     GameModel.leave(ctx.state.user?.id);
 
     ctx.status = HttpCode.accepted;
-  }
+  };
 
   public showStoreData = async (ctx: Context): Promise<void> => {
     ctx.body = {
@@ -62,8 +56,7 @@ class GameController extends BaseController implements Game {
       PlayerStore: playerStore.getStorage(),
       UserStore: userStore.getStorage(),
     };
-  }
-
+  };
 }
 
 export default new GameController();

@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Redirect, Route} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Redirect, Route } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 
 const ProtectedRoute = (props) => {
@@ -12,8 +12,7 @@ const ProtectedRoute = (props) => {
     }
   }, []);
 
-  return !isAuth && !isLoading ?
-    <Redirect to={roomId ? `/auth/${roomId}` : '/auth'}/> : <Route {...props}/>;
+  return !isAuth && !isLoading ? <Redirect to={roomId ? `/auth/${roomId}` : '/auth'} /> : <Route {...props} />;
 };
 
 export default ProtectedRoute;

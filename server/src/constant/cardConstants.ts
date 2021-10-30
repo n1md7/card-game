@@ -1,4 +1,4 @@
-enum CardRank {
+export enum CardRank {
   ACE = 1,
   TWO,
   THREE,
@@ -11,46 +11,58 @@ enum CardRank {
   TEN,
   JACK = 12,
   QUEEN,
-  KING
+  KING,
 }
 
-enum CardSuit {
-  CLUBS = "clubs",
-  DIAMONDS = "diamonds",
-  HEARTS = "hearts",
-  SPADES = "spades"
+export enum CardRankName {
+  ACE = 'ace',
+  TWO = 2,
+  THREE,
+  FOUR,
+  FIVE,
+  SIX,
+  SEVEN,
+  EIGHT,
+  NINE,
+  TEN,
+  JACK = 'jack',
+  QUEEN = 'queen',
+  KING = 'king',
 }
 
+export enum CardSuit {
+  CLUBS = 'clubs',
+  DIAMONDS = 'diamonds',
+  HEARTS = 'hearts',
+  SPADES = 'spades',
+}
 
-enum ActionType {
+export enum ActionType {
   PLACE_CARD,
-  TAKE_CARDS
+  TAKE_CARDS,
 }
 
-const cardRanksByName: Map<string, CardRank> = new Map( [
-  [ "ace", CardRank.ACE ],
-  [ "2", CardRank.TWO ],
-  [ "3", CardRank.THREE ],
-  [ "4", CardRank.FOUR ],
-  [ "5", CardRank.FIVE ],
-  [ "6", CardRank.SIX ],
-  [ "7", CardRank.SEVEN ],
-  [ "8", CardRank.EIGHT ],
-  [ "9", CardRank.NINE ],
-  [ "10", CardRank.TEN ],
-  [ "jack", CardRank.JACK ],
-  [ "queen", CardRank.QUEEN ],
-  [ "king", CardRank.KING ]
-] );
+export const cardRanksByName: Map<CardRankName, CardRank> = new Map([
+  [CardRankName.ACE, CardRank.ACE],
+  [CardRankName.TWO, CardRank.TWO],
+  [CardRankName.THREE, CardRank.THREE],
+  [CardRankName.FOUR, CardRank.FOUR],
+  [CardRankName.FIVE, CardRank.FIVE],
+  [CardRankName.SIX, CardRank.SIX],
+  [CardRankName.SEVEN, CardRank.SEVEN],
+  [CardRankName.EIGHT, CardRank.EIGHT],
+  [CardRankName.NINE, CardRank.NINE],
+  [CardRankName.TEN, CardRank.TEN],
+  [CardRankName.JACK, CardRank.JACK],
+  [CardRankName.QUEEN, CardRank.QUEEN],
+  [CardRankName.KING, CardRank.KING],
+]);
 
-
-const cardSuitsByName: Map<string, CardSuit> = new Map( [
-  [ "clubs", CardSuit.CLUBS ],
-  [ "diamonds", CardSuit.DIAMONDS ],
-  [ "hearts", CardSuit.HEARTS ],
-  [ "spades", CardSuit.SPADES ],
-] );
+export const cardSuitsByName: Map<CardSuit, CardSuit> = new Map([
+  [CardSuit.CLUBS, CardSuit.CLUBS],
+  [CardSuit.DIAMONDS, CardSuit.DIAMONDS],
+  [CardSuit.HEARTS, CardSuit.HEARTS],
+  [CardSuit.SPADES, CardSuit.SPADES],
+]);
 
 export const CARD_SUM_VALUE = 11;
-
-export { CardRank, cardRanksByName, cardSuitsByName, ActionType, CardSuit }
