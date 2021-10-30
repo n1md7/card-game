@@ -1,0 +1,26 @@
+{
+  "name": "shared-types",
+  "version": "1.0.1",
+  "description": "Card related shared enums and types between clientApp and server",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/n1md7/card-game.git"
+  },
+  "keywords": [
+    "Types"
+  ],
+  "author": "Harry Kodua",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/n1md7/card-game/issues"
+  },
+  "homepage": "https://github.com/n1md7/card-game#readme",
+  "dependencies": {
+    "typescript": "^4.4.4"
+  }
+}

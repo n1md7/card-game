@@ -12,8 +12,10 @@
     "game:start:dev": "npm run start --prefix clientApp",
     "game:start:test": "npm run test --prefix clientApp",
     "game:install": "npm install --prefix clientApp",
-    "dev": "npm-run-all --parallel server:start:dev game:start:dev",
-    "install": "npm-run-all --parallel server:install game:install",
+    "shared:install": "npm install --prefix shared-types",
+    "shared:build": "npm run build --prefix shared-types",
+    "dev": "npm-run-all --parallel server:start:dev game:start:dev shared:build",
+    "install": "npm-run-all --parallel server:install game:install shared:install",
     "format:code": "npx prettier --write .",
     "prepare": "husky install"
   },

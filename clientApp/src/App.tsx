@@ -7,6 +7,9 @@ import EnterRoom from './components/room/Room';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 
+// import { CardRank} from 'shared-types';
+// console.log(CardRank);
+
 export default function App() {
   return (
     <Switch>

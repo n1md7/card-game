@@ -15,15 +15,15 @@ export default class Deck {
     this.shuffle();
   }
 
-  get size() {
+  get size(): number {
     return this.cards.length;
   }
 
-  isEmpty() {
+  isEmpty(): boolean {
     return this.cards.length === 0;
   }
 
-  takeCards(count: number) {
+  takeCards(count: number): Card[] {
     if (this.cards.length < count) {
       throw new Error('Not enough cards in deck!');
     }
@@ -31,7 +31,7 @@ export default class Deck {
     return this.cards.splice(0, count);
   }
 
-  private shuffle() {
+  private shuffle(): void {
     const N = this.cards.length;
     for (let i = 0; i < N; i++) {
       const r = i + getRandomInt(N - i);
