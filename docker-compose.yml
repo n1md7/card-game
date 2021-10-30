@@ -4,7 +4,7 @@ services:
     image: phurti_game:0.1
     container_name: phurti_game
     build:
-      context: ./game
+      context: clientApp
       dockerfile: Dockerfile
     volumes:
       - ./game:/home/node/src

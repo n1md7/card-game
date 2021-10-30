@@ -1,41 +1,25 @@
+![](https://img.shields.io/badge/Node.js-v14.16.0-green)
+
 # Card Game
+
+Read more about the game [here](https://github.com/n1md7/card-game/wiki)
 
 ## Project run
 
 ```bash
 # Install dependencies
-
-npm i
-# or
 npm install
+
+# Start development
+npm run dev
 ```
 
-Start front-emd builder and server runner
-
 ```bash
-# Start development (both)
-npm run dev
-
 # If you would like to run them separately use commands below
 
-# Game builder
+# ClientApp
 npm run game:start:dev
 
-# Server runner
+# Server
 npm run server:start:dev
-```
-
-### Using docker-compose
-
-```bash
-docker-compose up
-```
-
-This is not tested but should work 😀
-
-Install dependencies
-
-```bash
-docker exec phurti_game npm install
-docker exec phurti_server npm install
 ```
