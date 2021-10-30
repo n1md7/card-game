@@ -45,7 +45,7 @@ describe('Sockets', () => {
 
   beforeAll(async function () {
     ref.myConfig = copy(config);
-    ref.myConfig.server.port = 3457;
+    ref.myConfig.server.port = 3467;
     ref.myConfig.server.hostname = 'localhost';
     ref.myConfig.origins = [`http://${ref.myConfig.server.hostname}`];
     const koa = new Server(ref.myConfig);
@@ -62,8 +62,8 @@ describe('Sockets', () => {
   });
 
   afterEach(() => {
-    if (ref.socket.connected) {
-      ref.socket.disconnect();
+    if (ref.socket.io.connected) {
+      ref.socket.io.disconnect();
     }
   });
 
