@@ -11,7 +11,7 @@ export default class BaseStore<T> {
     this.storage = defaultStorageData;
   }
 
-  public getStorage() {
+  public getStorage(): Storage<T> {
     return this.storage;
   }
 

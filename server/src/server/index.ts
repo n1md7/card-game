@@ -19,7 +19,7 @@ import Events from '../socket/events';
 export default class Server {
   public koa: Koa;
   public httpServer: HttpServer;
-  private io: SocketIoServer;
+  public io: SocketIoServer;
   private readonly config: ConfigOptions;
   private readonly staticFolderPath: string;
   private socketModule: SocketModule;

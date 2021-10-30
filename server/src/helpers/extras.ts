@@ -1,4 +1,4 @@
-export const isset = (value: any): boolean => value !== undefined && value !== null;
+export const isset = (value: unknown): boolean => value !== undefined && value !== null;
 
 export const getRandomInt = (max = 10): number => {
   return Math.floor(Math.random() * Math.floor(max));
