@@ -20,6 +20,18 @@ describe('Card', function () {
     expect(card.equals(compareCard)).toBeTruthy();
   });
 
+  it('should test .not.equals method when the same cards', function () {
+    const card = new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE);
+    const compareCard = new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE);
+    expect(card.not.equals(compareCard)).toBeFalsy();
+  });
+
+  it('should test .not.equals method when different cards', function () {
+    const card = new Card(CardSuit.DIAMONDS, CardRankName.THREE, CardRank.THREE);
+    const compareCard = new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE);
+    expect(card.not.equals(compareCard)).toBeTruthy();
+  });
+
   it('should test .equals method when card is undefined', function () {
     const card = new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE);
     expect(card.equals(undefined)).toBeFalsy();

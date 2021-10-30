@@ -6,20 +6,26 @@ import { PlayerResult } from './PlayerResult';
 import { getRandomInt } from '../helpers/extras';
 
 export default class Player {
-  public cards: Card[];
-  public playerGameId: string = null;
   public position: string;
-  public result: PlayerResult;
   public score: number;
+  private playerResult: PlayerResult;
   private readonly name: string;
   private readonly playerId: string;
-  private takenCards: Card[];
+  private playerCardsInHand: Card[] = [];
+  private playerScoredCards: Card[] = [];
+  private playerGameId: string = null;
 
   constructor(playerId: string, name = '') {
     this.name = name;
     this.playerId = playerId;
-    this.cards = [];
-    this.takenCards = [];
+  }
+
+  set gameId(gameId: string) {
+    this.playerGameId = gameId;
+  }
+
+  get game() {
+    return gameStore.getById(this.playerGameId);
   }
 
   get data() {
@@ -32,13 +38,13 @@ export default class Player {
       taken: true,
       name: this.name,
       progress: progressValue,
-      cards: this.cards.length,
+      cards: this.playerCardsInHand.length,
       score: this.score,
     };
   }
 
   get handCards() {
-    return this.cards.reduce<
+    return this.playerCardsInHand.reduce<
       {
         rank: CardRankName;
         suit: CardSuit;
@@ -55,42 +61,47 @@ export default class Player {
     );
   }
 
-  get game() {
-    return gameStore.getById(this.playerGameId);
-  }
-
-  set gameId(gameId: string) {
-    this.playerGameId = gameId;
-  }
-
   get id() {
     return this.playerId;
   }
 
-  giveCards(cards: Card[]) {
-    this.cards = [...this.cards, ...cards];
+  get result() {
+    return this.playerResult;
+  }
+
+  get cards() {
+    return this.playerCardsInHand;
+  }
+
+  playerTakesCardsInHand(cards: Card[]) {
+    this.playerCardsInHand = [...this.playerCardsInHand, ...cards];
   }
 
   equals(player: Player) {
-    return this.name === player.name;
+    return this.playerId === player.id;
   }
 
-  takeCards(cards: Card[]) {
-    this.takenCards = [...this.takenCards, ...cards];
+  scoreCards(cards: Card[]) {
+    this.playerScoredCards = [...this.playerScoredCards, ...cards];
   }
 
-  removeCardFromHand(card: Card) {
-    const handCard = this.cards.find((c) => c.equals(card));
-    if (!handCard) this.cards.remove(handCard);
+  removeCardFromHand(cardFromHand: Card) {
+    if (!this.playerCardsInHand.find((card) => card.equals(cardFromHand))) {
+      throw new Error('You are not holding such card in hand. Thus, it cannot be removed.');
+    }
+    this.playerCardsInHand.remove(cardFromHand);
   }
 
-  placeRandomCard() {
-    this.placeCard(this.cards[getRandomInt(this.cards.length - 1)]);
+  placeRandomCardFromHand() {
+    this.placeCardFromHand(this.playerCardsInHand[getRandomInt(this.playerCardsInHand.length - 1)]);
   }
 
-  placeCard(card: Card) {
-    if (this.cards.find((c) => c.equals(card)) === undefined) throw Error('incorrect card');
-    this.game.playerAction(this, ActionType.PLACE_CARD, card, []);
+  placeCardFromHand(cardFromHand: Card) {
+    if (!this.playerCardsInHand.find((card) => card.equals(cardFromHand))) {
+      throw new Error('You are not holding such card in hand. Thus, it cannot be placed.');
+    }
+
+    this.game.playerAction(this, ActionType.PLACE_CARD, cardFromHand, []);
   }
 
   takeCardsFromTable(card: Card, tableCards: Card[]) {
@@ -102,6 +113,6 @@ export default class Player {
   }
 
   calculateResult() {
-    this.result = new PlayerResult(this.takenCards);
+    this.playerResult = new PlayerResult(this.playerScoredCards);
   }
 }

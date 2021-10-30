@@ -23,7 +23,7 @@ export default class Deck {
     return this.cards.length === 0;
   }
 
-  takeCards(count: number): Card[] {
+  distributeCards(count: number): Card[] {
     if (this.cards.length < count) {
       throw new Error('Not enough cards in deck!');
     }

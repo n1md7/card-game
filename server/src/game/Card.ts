@@ -12,8 +12,14 @@ export class Card {
     this.value = value;
   }
 
+  get not() {
+    return {
+      equals: (card: Card) => !this.equals(card),
+    };
+  }
+
   equals(card: Card): boolean {
-    return this.suit === card?.suit && this.name === card?.name;
+    return card && this.suit === card.suit && this.name === card.name;
   }
 
   /**

@@ -91,11 +91,11 @@ export default class Game {
     for (const player of this.players) {
       const numberOfCards = 4 - player.cards.length;
       if (numberOfCards > 0) {
-        player.giveCards(this.deck.takeCards(numberOfCards));
+        player.playerTakesCardsInHand(this.deck.distributeCards(numberOfCards));
       }
     }
     if (firstDeal) {
-      this.cards = this.deck.takeCards(4);
+      this.cards = this.deck.distributeCards(4);
     }
   }
 
@@ -202,7 +202,7 @@ export default class Game {
       const winnerPlayers = this.players.filter((pl) => pl.score === winnerScore);
       if (winnerPlayers.length === 1) {
         this.finishGame(winnerPlayers[0]);
-        return;
+        return void 0;
       }
     }
     this.restartGame();
@@ -223,7 +223,7 @@ export default class Game {
     this.timer = setInterval(() => {
       this.timeToMove--;
       if (this.timeToMove <= 0) {
-        this.activePlayer.placeRandomCard();
+        this.activePlayer.placeRandomCardFromHand();
       }
     }, 1000);
   }
@@ -324,10 +324,10 @@ export default class Game {
       }
       this.removeCardsFromTable(tableCards);
       if (playerCard != null) {
-        player.takeCards([...tableCards, playerCard]);
+        player.scoreCards([...tableCards, playerCard]);
         player.removeCardFromHand(playerCard);
       } else {
-        player.takeCards(tableCards);
+        player.scoreCards(tableCards);
       }
       this.lastTaker = player;
     } else if (type === ActionType.PLACE_CARD) {

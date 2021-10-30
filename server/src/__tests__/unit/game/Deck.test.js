@@ -6,7 +6,7 @@ describe('Deck', () => {
     const deck = new Deck();
     expect(deck.isEmpty).toBeDefined();
     expect(deck.size).toBeDefined();
-    expect(deck.takeCards).toBeDefined();
+    expect(deck.distributeCards).toBeDefined();
   });
 
   it('should test .isEmpty method', function () {
@@ -22,7 +22,7 @@ describe('Deck', () => {
   it('should test .takeCards method', function () {
     const deck = new Deck();
     const amountOfCardsToGet = 10;
-    const cards = deck.takeCards(amountOfCardsToGet);
+    const cards = deck.distributeCards(amountOfCardsToGet);
     expect(cards).toHaveLength(amountOfCardsToGet);
   });
 
@@ -30,7 +30,7 @@ describe('Deck', () => {
     const deck = new Deck();
     const amountOfCardsToGet = DECK_SIZE + 1;
     expect(() => {
-      deck.takeCards(amountOfCardsToGet);
+      deck.distributeCards(amountOfCardsToGet);
     }).toThrow('Not enough cards in deck!');
   });
 
@@ -38,7 +38,7 @@ describe('Deck', () => {
     const deck = new Deck();
     const amountOfCardsToGet = DECK_SIZE;
     expect(() => {
-      deck.takeCards(amountOfCardsToGet);
+      deck.distributeCards(amountOfCardsToGet);
     }).not.toThrow('Not enough cards in deck!');
   });
 });

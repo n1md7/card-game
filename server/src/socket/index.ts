@@ -15,7 +15,7 @@ export default class SocketModule {
   public connectionHandler(): void {
     this.io.on('connection', (socket: Socket) => {
       try {
-        const verified = jsonWebToken.verify(socket.handshake.query['token'], process.env.JWT_SECRET);
+        const verified = jsonWebToken.verify(socket.handshake.query[Token.auth], process.env.JWT_SECRET);
         const userId = (verified as JWTProps)[Token.userId];
         const user = UserModel.getById(userId);
         if (!isset(user)) {

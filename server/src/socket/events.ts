@@ -25,7 +25,7 @@ export default class Events {
         const playerCard = Events.getCardFromCardObject(playerMoveObject.playerCard);
         const tableCards = playerMoveObject.tableCards.map(Events.getCardFromCardObject);
         if (tableCards.length === 0) {
-          player.placeCard(playerCard);
+          player.placeCardFromHand(playerCard);
         } else {
           player.takeCardsFromTable(playerCard, tableCards);
         }
