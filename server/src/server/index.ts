@@ -15,6 +15,7 @@ import { SocketManager } from '../socket/manager';
 import serveIndexHTML from '../middleware/serveIndexHTML';
 import handleApiNotFound from '../middleware/handleApiNotFound';
 import Events from '../socket/events';
+import { Token } from 'shared-types';
 
 export default class Server {
   public koa: Koa;
@@ -52,9 +53,9 @@ export default class Server {
               ` Requests are allowed only from: ${this.config.origins.join(', ')}`,
           );
         },
-        allowMethods: ['GET', 'POST', 'OPTIONS', 'PUT'],
-        allowHeaders: ['Content-Type', 'token'],
-        exposeHeaders: ['token'],
+        allowMethods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE', 'PATCH', 'HEAD'],
+        allowHeaders: ['Content-Type', Token.auth],
+        exposeHeaders: [Token.auth],
         credentials: true,
       }),
     );

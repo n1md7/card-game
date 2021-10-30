@@ -3,7 +3,7 @@ import config from '../../config';
 import Server from '../../server';
 import axios from 'axios';
 import { copy } from '../../helpers/extras';
-import { Token } from '../../types';
+import { Token } from 'shared-types';
 import { HttpCode } from '../../types/errorHandler';
 
 describe('Create user/verify', () => {
@@ -50,9 +50,9 @@ describe('Create user/verify', () => {
     const {
       data: { token = null, userId = null },
     } = await ref.request.get('/auth/init');
-    const { data: user = null } = await ref.request.get('/user', { headers: { [Token.self]: token } });
+    const { data: user = null } = await ref.request.get('/user', { headers: { [Token.auth]: token } });
     const { status = null, data: response = null } = await ref.request.get('/auth/status', {
-      headers: { [Token.self]: token },
+      headers: { [Token.auth]: token },
     });
     expect(user).toEqual({
       id: userId,
@@ -76,7 +76,7 @@ describe('Create user/verify', () => {
         size: 2,
       },
       {
-        headers: { [Token.self]: token },
+        headers: { [Token.auth]: token },
       },
     );
     expect(status).toBe(HttpCode.ok);
@@ -94,7 +94,7 @@ describe('Create user/verify', () => {
       data: { token = null, userId = null },
     } = await ref.request.get('/auth/init');
     const { status: createStatus, data: createRoomId = null } = await ref.request.post('/game/create', payload, {
-      headers: { [Token.self]: token },
+      headers: { [Token.auth]: token },
     });
     const { status: enterStatus, data: gameInfo = null } = await ref.request.post(
       '/game/enter',
@@ -103,7 +103,7 @@ describe('Create user/verify', () => {
         name: payload.name,
       },
       {
-        headers: { [Token.self]: token },
+        headers: { [Token.auth]: token },
       },
     );
     const { status: gameListStatus, data: games = null } = await ref.request.get('/games');
@@ -178,7 +178,7 @@ describe.each([
         size: sz,
       },
       {
-        headers: { [Token.self]: token },
+        headers: { [Token.auth]: token },
       },
     );
     expect(createStatus).toBe(HttpCode.badRequest);

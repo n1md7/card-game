@@ -1,6 +1,7 @@
 import axios from 'axios';
-import { baseURL, token as tokenKey } from '../constants/urls';
+import { baseURL } from '../constants/urls';
 import { tokenStore } from './token';
+import { Token } from 'shared-types';
 
 const config = {
   baseURL,
@@ -15,6 +16,6 @@ export let httpClient = axios.create(config);
 
 // listener for the token update from App.jsx
 tokenStore.onUpdate((token) => {
-  config.headers[tokenKey] = token;
+  config.headers[Token.auth] = token;
   httpClient = axios.create(config);
 });

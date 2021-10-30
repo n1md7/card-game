@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { Room } from '../../../types';
+import { Room } from 'shared-types';
 
 export const createGameSchema = Joi.object({
   size: Joi.number().valid(Room.two, Room.three, Room.four).required(),

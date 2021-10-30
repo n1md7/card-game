@@ -9,6 +9,7 @@ import socketIOClient, { Socket } from 'socket.io-client';
 import { SOCKET_ENDPOINT } from '../../constants/urls';
 import { Alert, AlertType } from '../../helpers/toaster';
 import Player from './Player';
+import { Token } from 'shared-types';
 
 export default () => {
   const history = useHistory();
@@ -58,13 +59,13 @@ export default () => {
     const room = root.querySelector('div.x-2d-room');
     const table = room.querySelector('div.x-table');
     const actions = root.querySelector('div.x-playing-actions');
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(Token.auth);
     if (!token) {
       return Alert(AlertType.ERROR, 'Token not found in storage', 10);
     }
     // send token on init request
     const socketIO = socketIOClient(SOCKET_ENDPOINT, {
-      query: `token=${token}`,
+      query: `${Token.auth}=${token}`,
       autoConnect: true,
       secure: true,
     });

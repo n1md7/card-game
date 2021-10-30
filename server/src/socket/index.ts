@@ -1,7 +1,8 @@
 import SocketIO, { Socket } from 'socket.io';
 import UserModel from '../model/UserModel';
 import { isset } from '../helpers/extras';
-import { JWTProps, KoaEvent, Token } from '../types';
+import { JWTProps, KoaEvent } from '../types';
+import { Token } from 'shared-types';
 import Events from './events';
 import jsonWebToken from 'jsonwebtoken';
 import PlayerModel from '../model/PlayerModel';

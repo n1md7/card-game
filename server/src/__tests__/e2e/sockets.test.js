@@ -3,7 +3,7 @@ import config from '../../config';
 import Server from '../../server';
 import axios from 'axios';
 import { copy } from '../../helpers/extras';
-import { Token } from '../../types';
+import { Token } from 'shared-types';
 import io from 'socket.io-client';
 import { gameStore, playerStore, userStore } from '../../store';
 
@@ -29,7 +29,7 @@ describe('Sockets', () => {
         data: { token = null, userId = null },
       } = await ref.request.get('/auth/init');
       ref.socket = io.connect(`http://${ref.myConfig.server.hostname}:${ref.myConfig.server.port}`, {
-        query: `token=${token}`,
+        query: `${Token.auth}=${token}`,
         autoConnect: true,
         secure: true,
       });
@@ -85,7 +85,7 @@ describe('Sockets', () => {
         size: 2,
       },
       {
-        headers: { [Token.self]: Jason.token },
+        headers: { [Token.auth]: Jason.token },
       },
     );
     await ref.request.post(
@@ -95,7 +95,7 @@ describe('Sockets', () => {
         name: Jason.name,
       },
       {
-        headers: { [Token.self]: Jason.token },
+        headers: { [Token.auth]: Jason.token },
       },
     );
     // Jenny joins
@@ -106,7 +106,7 @@ describe('Sockets', () => {
         name: Jenny.name,
       },
       {
-        headers: { [Token.self]: Jenny.token },
+        headers: { [Token.auth]: Jenny.token },
       },
     );
 

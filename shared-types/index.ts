@@ -66,3 +66,16 @@ export const cardSuitsByName: Map<CardSuit, CardSuit> = new Map([
 ]);
 
 export const CARD_SUM_VALUE = 11;
+
+export enum Token {
+  self = 'token',
+  auth = 'authorization',
+  userId = 'userId',
+  name = 'name',
+}
+
+export enum Room {
+  two = 2,
+  three,
+  four,
+}

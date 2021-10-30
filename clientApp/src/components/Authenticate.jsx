@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { updateUser } from '../redux/actions';
 import { httpClient } from '../services/httpClient';
 import { tokenStore } from '../services/token';
-import { token as tokenKey } from '../constants/urls';
+import { Token } from 'shared-types';
 import handleError from '../helpers/handleError';
 import useAuth from '../hooks/useAuth';
 import { getRandomInt } from '../libs/Formulas';
@@ -24,11 +24,11 @@ export default ({ history }) => {
       .then((response) => {
         if (response.status === 200) {
           // custom store for the token
-          tokenStore.setToken(response.data.token);
+          tokenStore.setToken(response.data[Token.auth]);
           // save it into permanent storage
-          localStorage.setItem(tokenKey, response.data.token);
+          localStorage.setItem(Token.auth, response.data[Token.auth]);
           // save name into storage
-          localStorage.setItem('name', name);
+          localStorage.setItem(Token.name, name);
           dispatch(updateUser({ name }));
           return null;
         }
@@ -40,7 +40,7 @@ export default ({ history }) => {
   useEffect(() => {
     // get name from the storage when available
     // and set it as a default value
-    const storageName = localStorage.getItem('name');
+    const storageName = localStorage.getItem(Token.name);
     setName(storageName || `Noob${getRandomInt(100, 999)}`);
   }, []);
 

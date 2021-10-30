@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { baseURL, token as tokenKey } from '../constants/urls';
+import { baseURL } from '../constants/urls';
 import { tokenStore } from '../services/token';
 import { httpClient } from '../services/httpClient';
 import { updateUser } from '../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import handleError from '../helpers/handleError';
+import { Token } from 'shared-types';
 
 const useAuth = (showError = true): [boolean, boolean] => {
   const [isAuth, setIsAuth] = useState(false);
@@ -15,7 +16,7 @@ const useAuth = (showError = true): [boolean, boolean] => {
   useEffect(() => {
     if (user.name) {
       // get permanent token from the local storage
-      const tokenValue = localStorage.getItem(tokenKey);
+      const tokenValue = localStorage.getItem(Token.auth);
       // update token store which will trigger
       // httpClient config update and set the header
       tokenStore.setToken(tokenValue);
@@ -28,7 +29,7 @@ const useAuth = (showError = true): [boolean, boolean] => {
 
   useEffect(() => {
     // get permanent token from the local storage
-    const tokenValue = localStorage.getItem(tokenKey);
+    const tokenValue = localStorage.getItem(Token.auth);
     // update token store which will trigger
     // httpClient config update and set the header
     tokenStore.setToken(tokenValue);
@@ -43,7 +44,7 @@ const useAuth = (showError = true): [boolean, boolean] => {
       })
       .then((data) => {
         if (data) {
-          const name = localStorage.getItem('name');
+          const name = localStorage.getItem(Token.name);
           dispatch(updateUser({ name }));
           // its all good, prev token is valid
           // we can continue without init request

@@ -41,3 +41,14 @@ export declare enum ActionType {
 export declare const cardRanksByName: Map<CardRankName, CardRank>;
 export declare const cardSuitsByName: Map<CardSuit, CardSuit>;
 export declare const CARD_SUM_VALUE = 11;
+export declare enum Token {
+  self = 'token',
+  auth = 'authorization',
+  userId = 'userId',
+  name = 'name',
+}
+export declare enum Room {
+  two = 2,
+  three = 3,
+  four = 4,
+}

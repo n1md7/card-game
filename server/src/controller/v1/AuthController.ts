@@ -1,4 +1,4 @@
-import { Token } from '../../types';
+import { Token } from 'shared-types';
 import { id } from '../../helpers/ids';
 import { Context } from '../../types';
 import AuthModel from '../../model/AuthModel';
@@ -21,7 +21,7 @@ class AuthController extends BaseController implements AuthInterface {
     AuthModel.signUp(userId, null);
 
     ctx.body = {
-      [Token.self]: jsonWebToken,
+      [Token.auth]: jsonWebToken,
       userId,
     };
   };

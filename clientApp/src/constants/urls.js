@@ -9,5 +9,4 @@ export const urls = {
   leaveRoom: 'leave-room',
   userInfo: 'user-info',
 };
-export const token = 'token';
 export const SOCKET_ENDPOINT = `${REACT_APP_BASE_URL}:${port}`;

@@ -18,7 +18,7 @@ npm run dev
 # If you would like to run them separately use commands below
 
 # ClientApp
-npm run game:start:dev
+npm run client:start:dev
 
 # Server
 npm run server:start:dev

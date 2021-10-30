@@ -1,6 +1,8 @@
 'use strict';
 Object.defineProperty(exports, '__esModule', { value: true });
-exports.CARD_SUM_VALUE =
+exports.Room =
+  exports.Token =
+  exports.CARD_SUM_VALUE =
   exports.cardSuitsByName =
   exports.cardRanksByName =
   exports.ActionType =
@@ -74,3 +76,16 @@ exports.cardSuitsByName = new Map([
   [CardSuit.SPADES, CardSuit.SPADES],
 ]);
 exports.CARD_SUM_VALUE = 11;
+var Token;
+(function (Token) {
+  Token['self'] = 'token';
+  Token['auth'] = 'authorization';
+  Token['userId'] = 'userId';
+  Token['name'] = 'name';
+})((Token = exports.Token || (exports.Token = {})));
+var Room;
+(function (Room) {
+  Room[(Room['two'] = 2)] = 'two';
+  Room[(Room['three'] = 3)] = 'three';
+  Room[(Room['four'] = 4)] = 'four';
+})((Room = exports.Room || (exports.Room = {})));
