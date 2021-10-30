@@ -1,5 +1,5 @@
 import { Card } from '../../../game/Card';
-import { CardRank, CardRankName, CardSuit } from '../../../constant/cardConstants';
+import { CardRank, CardRankName, CardSuit } from 'shared-types';
 
 describe('Card', function () {
   it('should have card methods defined', function () {

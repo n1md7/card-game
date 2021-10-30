@@ -1,10 +1,9 @@
 import Deck from './Deck';
 import Player from './Player';
-import { ActionType } from '../constant/cardConstants';
+import { ActionType } from 'shared-types';
 import { Card } from './Card';
 import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
-import Server from '../server';
-import SocketManager from '../socket/manager';
+import { SocketManager } from '../socket/manager';
 
 const positions: { [key: string]: number } = {
   down: 0,

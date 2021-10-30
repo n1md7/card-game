@@ -1,5 +1,5 @@
 import { Card } from '../game/Card';
-import { CardRankName, cardRanksByName, CardSuit, cardSuitsByName } from '../constant/cardConstants';
+import { CardRankName, cardRanksByName, CardSuit, cardSuitsByName } from 'shared-types';
 import User from '../game/User';
 import PlayerModel from '../model/PlayerModel';
 import Koa from 'koa';

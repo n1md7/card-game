@@ -1,5 +1,5 @@
 import { Card } from './Card';
-import { CardRank, cardRanksByName, CardSuit } from '../constant/cardConstants';
+import { CardRank, cardRanksByName, CardSuit } from 'shared-types';
 
 export class PlayerResult {
   public readonly numberOfClubs: number;

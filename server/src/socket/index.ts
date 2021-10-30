@@ -1,10 +1,9 @@
 import SocketIO, { Socket } from 'socket.io';
 import UserModel from '../model/UserModel';
 import { isset } from '../helpers/extras';
-import { JWTProps, KoaEvent } from '../types';
-import { Token } from '../types';
+import { JWTProps, KoaEvent, Token } from '../types';
 import Events from './events';
-import jwt from 'jsonwebtoken';
+import jsonWebToken from 'jsonwebtoken';
 import PlayerModel from '../model/PlayerModel';
 import GameModel from '../model/GameModel';
 import Koa from 'koa';
@@ -15,7 +14,7 @@ export default class SocketModule {
   public connectionHandler(): void {
     this.io.on('connection', (socket: Socket) => {
       try {
-        const verified = jwt.verify(socket.handshake.query['token'], process.env.JWT_SECRET);
+        const verified = jsonWebToken.verify(socket.handshake.query['token'], process.env.JWT_SECRET);
         const userId = (verified as JWTProps)[Token.userId];
         const user = UserModel.getById(userId);
         if (!isset(user)) {

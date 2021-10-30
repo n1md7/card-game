@@ -1,4 +1,4 @@
-import { CARD_SUM_VALUE, CardRank, CardRankName, CardSuit } from '../constant/cardConstants';
+import { CARD_SUM_VALUE, CardRank, CardRankName, CardSuit } from 'shared-types';
 import { isEven } from '../helpers/extras';
 
 export class Card {

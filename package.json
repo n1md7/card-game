@@ -14,7 +14,8 @@
     "game:install": "npm install --prefix clientApp",
     "shared:install": "npm install --prefix shared-types",
     "shared:build": "npm run build --prefix shared-types",
-    "dev": "npm-run-all --parallel server:start:dev game:start:dev shared:build",
+    "shared:watch": "npm run watch --prefix shared-types",
+    "dev": "npm-run-all --parallel game:start:dev server:start:dev shared:watch",
     "install": "npm-run-all --parallel server:install game:install shared:install",
     "format:code": "npx prettier --write .",
     "prepare": "husky install"

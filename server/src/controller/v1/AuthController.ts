@@ -2,10 +2,10 @@ import { Token } from '../../types';
 import { id } from '../../helpers/ids';
 import { Context } from '../../types';
 import AuthModel from '../../model/AuthModel';
-import Auth from './interfaces/Auth';
+import AuthInterface from './interfaces/AuthInterface';
 import BaseController from './BaseController';
 
-class AuthController extends BaseController implements Auth {
+class AuthController extends BaseController implements AuthInterface {
   public userVerified = async (ctx: Context): Promise<void> => {
     ctx.status = 200;
   };

@@ -3,7 +3,7 @@ import { HttpCode, HttpText } from '../types/errorHandler';
 import { KoaEvent } from '../types';
 
 export default (apiContextPath: string, koa: Koa) => {
-  return async (ctx: Context, next: Next) => {
+  return async (ctx: Context, next: Next): Promise<void> => {
     if (ctx.path.indexOf(apiContextPath) !== -1) {
       // Request came to api endpoint
       ctx.status = HttpCode.notFound;

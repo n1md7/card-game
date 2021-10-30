@@ -1,6 +1,6 @@
 import { PlayerResult } from '../../../game/PlayerResult';
 import { Card } from '../../../game/Card';
-import { CardRank, CardRankName, CardSuit } from '../../../constant/cardConstants';
+import { CardRank, CardRankName, CardSuit } from 'shared-types';
 
 describe('PlayerResult', function () {
   it('should verify properties', function () {

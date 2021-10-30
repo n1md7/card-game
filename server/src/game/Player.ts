@@ -1,5 +1,5 @@
 import { Card } from './Card';
-import { ActionType, CardRankName, CardSuit } from '../constant/cardConstants';
+import { ActionType, CardRankName, CardSuit } from 'shared-types';
 import { gameStore } from '../store';
 import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
 import { PlayerResult } from './PlayerResult';

@@ -3,7 +3,7 @@ import fs from 'fs';
 import { KoaEvent } from '../types';
 
 export default (index: string, koa: Koa) => {
-  return async (ctx: Context) => {
+  return async (ctx: Context): Promise<void> => {
     try {
       ctx.body = fs.readFileSync(index, 'utf8');
     } catch (error) {

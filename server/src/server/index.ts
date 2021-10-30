@@ -11,7 +11,7 @@ import path from 'path';
 import http, { Server as HttpServer } from 'http';
 import SocketIO, { Server as SocketIoServer } from 'socket.io';
 import SocketModule from '../socket';
-import SocketManager from '../socket/manager';
+import { SocketManager } from '../socket/manager';
 import serveIndexHTML from '../middleware/serveIndexHTML';
 import handleApiNotFound from '../middleware/handleApiNotFound';
 import Events from '../socket/events';

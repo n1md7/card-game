@@ -1,5 +1,5 @@
 import { Card } from './Card';
-import { cardRanksByName, cardSuitsByName } from '../constant/cardConstants';
+import { cardRanksByName, cardSuitsByName } from 'shared-types';
 import { getRandomInt } from '../helpers/extras';
 
 export default class Deck {

@@ -3,14 +3,16 @@ import { Context } from '../../types';
 import BaseController from './BaseController';
 import PlayerModel from '../../model/PlayerModel';
 import GameModel from '../../model/GameModel';
-import Game from './interfaces/Game';
+import GameInterface from './interfaces/GameInterface';
 import { createGameSchema, enterGameSchema } from './validators/GameRequestValidator';
 import ValidationErrorException from '../../exceptions/ValidationErrorException';
 import { HttpCode } from '../../types/errorHandler';
 import { gameStore, playerStore, userStore } from '../../store';
-import SocketManager from '../../socket/manager';
+import { SocketManager } from '../../socket/manager';
+import Player from '../../game/Player';
+import Game from '../../game/Game';
 
-class GameController extends BaseController implements Game {
+class GameController extends BaseController implements GameInterface {
   public createGame = async (ctx: Context & { socketManager: SocketManager }): Promise<void> => {
     const validation = createGameSchema.validate(ctx.request.body);
     if (validation.error) {
@@ -20,7 +22,10 @@ class GameController extends BaseController implements Game {
     const roomId = Id.game();
     const userId = ctx.state.user?.id;
     const { isPublic, size, name } = validation.value;
-    const player = GameModel.create(userId, roomId, Number(size), Boolean(isPublic), name, ctx.socketManager);
+    const player = new Player(userId, name);
+    const game = new Game(size, roomId, isPublic, userId, name, ctx.socketManager);
+    game.joinPlayer(player);
+    GameModel.create(userId, player, game);
     PlayerModel.addPlayer(player, userId);
 
     ctx.body = roomId;

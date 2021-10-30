@@ -1,11 +1,5 @@
 import { Context } from 'koa';
 
-interface SocketCallback {
-  message: any;
-}
-
-type RoomSizeProps = 2 | 3 | 4;
-
 export enum Token {
   self = 'token',
   userId = 'userId',
@@ -48,4 +42,4 @@ export enum KoaEvent {
   debug = 'debug',
 }
 
-export { RoomSizeProps, SocketCallback, MyContext as Context, JWTProps };
+export { MyContext as Context, JWTProps };

@@ -2,8 +2,7 @@ import '../helpers/index';
 import Player from '../game/Player';
 import Game from '../game/Game';
 import BaseModel from './BaseModel';
-import { gameStore, userStore, playerStore } from '../store';
-import SocketManager from '../socket/manager';
+import { gameStore, playerStore, userStore } from '../store';
 
 class GameModel extends BaseModel<Game> {
   public getGamesList() {
@@ -54,22 +53,10 @@ class GameModel extends BaseModel<Game> {
     userStore.setGameId(userId, null);
   }
 
-  public create(
-    userId: string,
-    roomId: string,
-    size: number,
-    isPublic: boolean,
-    name: string,
-    socketManager: SocketManager,
-  ): Player {
-    const player = new Player(userId, name);
-    const game = new Game(size, roomId, isPublic, userId, name, socketManager);
-    game.joinPlayer(player);
+  public create(userId: string, player: Player, game: Game): void {
     playerStore.setById(player.id, player);
     gameStore.setById(game.getGameId(), game);
     userStore.setGameId(userId, game.getGameId());
-
-    return player;
   }
 }
 
