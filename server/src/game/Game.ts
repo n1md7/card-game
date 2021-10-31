@@ -74,18 +74,6 @@ export default class Game {
     return this.gamePlayers;
   }
 
-  findEmptyPositions() {
-    const occupiedPositions = this.occupiedPositions();
-    return this.positions.filter((item) => !occupiedPositions.includes(item));
-  }
-
-  startGame(): void {
-    this.isStarted = true;
-    this.dealCards(true);
-    this.activePlayer = this.gamePlayers[this.currentPlayerIndex];
-    this.startTimer();
-  }
-
   get cardsList() {
     return this.cards.reduce(
       (cards, card) => [
@@ -102,6 +90,18 @@ export default class Game {
         key: string;
       }[],
     );
+  }
+
+  findEmptyPositions() {
+    const occupiedPositions = this.occupiedPositions();
+    return this.positions.filter((item) => !occupiedPositions.includes(item));
+  }
+
+  startGame(): void {
+    this.isStarted = true;
+    this.dealCards(true);
+    this.activePlayer = this.gamePlayers[this.currentPlayerIndex];
+    this.startTimer();
   }
 
   dealCards(firstDeal = false): void | null {
@@ -345,10 +345,13 @@ export default class Game {
   }
 
   validateAction(player: Player, type: ActionType, playerCard: Card, tableCards: Card[]): void {
-    if (!player.equals(this.activePlayer)) throw Error('incorrect player');
-    if (type === ActionType.TAKE_CARDS && (!tableCards.length || !this.tableContainsCards(tableCards)))
-      throw Error('incorrect cards');
-    if (type === ActionType.TAKE_CARDS && !playerCard.canTakeCards(tableCards)) throw Error('incorrect move');
+    if (player.not.equals(this.activePlayer)) throw new GameException('Action validation problem. Incorrect player.');
+    if (type === ActionType.TAKE_CARDS && (!tableCards.length || !this.tableContainsCards(tableCards))) {
+      throw new GameException('Action validation problem. Incorrect cards.');
+    }
+    if (type === ActionType.TAKE_CARDS && !playerCard.canTakeCards(tableCards)) {
+      throw new GameException('Action validation problem. Incorrect move.');
+    }
   }
 
   public statistics() {

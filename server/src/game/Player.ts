@@ -83,6 +83,12 @@ export default class Player {
     return this.playerCardsInHand;
   }
 
+  get not() {
+    return {
+      equals: (player: Player) => !this.equals(player),
+    };
+  }
+
   takeCardsInHand(cards: Card[]) {
     this.playerCardsInHand = [...this.playerCardsInHand, ...cards];
   }
