@@ -6,8 +6,17 @@ import { PlayerResult } from './PlayerResult';
 import { getRandomInt } from '../helpers/extras';
 import GameException from '../exceptions/GameException';
 
+export type PlayerPositionType = 'down' | 'left' | 'up' | 'right';
+export type PlayerDataType = {
+  taken: boolean;
+  name: string;
+  progress: number;
+  cards: number;
+  score: number;
+};
+
 export default class Player {
-  public position: string;
+  public position: PlayerPositionType;
   public score: number;
   private playerResult: PlayerResult;
   private readonly name: string;
@@ -29,7 +38,7 @@ export default class Player {
     return gameStore.getById(this.playerGameId);
   }
 
-  get data() {
+  get data(): PlayerDataType {
     const progressValue =
       this.game && this.game.activePlayer && this.game.activePlayer.equals(this)
         ? (100 * this.game.timeToMove) / PLAYER_MOVER_INTERVAL

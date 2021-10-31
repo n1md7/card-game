@@ -1,18 +1,12 @@
 import Deck from './Deck';
-import Player from './Player';
-import { ActionType } from 'shared-types';
+import Player, { PlayerDataType, PlayerPositionType } from './Player';
+import { ActionType, CardRankName, CardSuit } from 'shared-types';
 import { Card } from './Card';
 import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
 import { SocketManager } from '../socket/manager';
+import GameException from '../exceptions/GameException';
 
-const positions: { [key: string]: number } = {
-  down: 0,
-  left: 1,
-  up: 2,
-  right: 3,
-};
-
-const positionsArray = ['down', 'left', 'up', 'right'];
+type TransformedPlayerData = { [position in PlayerPositionType]: PlayerDataType };
 
 export default class Game {
   public isStarted: boolean;
@@ -32,6 +26,7 @@ export default class Game {
   private readonly creatorName: string;
   private readonly isPublic: boolean;
   private readonly socketManager: SocketManager;
+  private readonly positions: PlayerPositionType[];
 
   constructor(
     numberOfPlayers: number,
@@ -55,11 +50,12 @@ export default class Game {
     this.isPublic = isPublic;
     this.maxScores = maxScores;
     this.socketManager = socketManager;
+    this.positions = ['down', 'left', 'up', 'right'];
   }
 
-  findEmptyPositions(): any {
+  findEmptyPositions() {
     const occupiedPositions = this.occupiedPositions();
-    return positionsArray.filter((item) => !occupiedPositions.includes(item));
+    return this.positions.filter((item) => !occupiedPositions.includes(item));
   }
 
   startGame(): void {
@@ -69,9 +65,9 @@ export default class Game {
     this.startTimer();
   }
 
-  getCardsList(): any {
+  getCardsList() {
     return this.cards.reduce(
-      (cards, card: Card) => [
+      (cards, card) => [
         ...cards,
         {
           rank: card.name,
@@ -79,13 +75,17 @@ export default class Game {
           key: card.suit + card.name,
         },
       ],
-      [],
+      [] as {
+        rank: CardRankName;
+        suit: CardSuit;
+        key: string;
+      }[],
     );
   }
 
   dealCards(firstDeal = false): void | null {
     if (this.deck.isEmpty()) {
-      return;
+      return null;
     }
 
     for (const player of this.players) {
@@ -99,31 +99,21 @@ export default class Game {
     }
   }
 
-  getGameData(requestPlayer: Player): {
-    playerData: {
-      [x: string]: {
-        taken: boolean;
-        name: string;
-        progress: number;
-        cards: number;
-        score?: number;
-      };
-    };
-    remainedCards: number;
-  } {
-    type ReducePlayers = {
-      [x: string]: string;
-    };
-    const playerData = this.players.reduce(
-      (players: ReducePlayers, player: Player) => ({
-        ...players,
+  getGameData(requestPlayer: Player) {
+    if (!requestPlayer.position) {
+      throw new GameException('Property [position] has to be defined for the object');
+    }
+
+    const transformedPlayerData: TransformedPlayerData = this.players.reduce(
+      (transformedPlayerDataAcc, player) => ({
+        ...transformedPlayerDataAcc,
         [player.position]: player.data,
       }),
-      {},
+      {} as TransformedPlayerData,
     );
 
     for (const position of this.findEmptyPositions()) {
-      playerData[position] = {
+      transformedPlayerData[position] = {
         taken: false,
         name: '',
         progress: 0,
@@ -132,12 +122,18 @@ export default class Game {
       };
     }
 
-    const positionShift = positions[requestPlayer.position];
-    const result: { [key: string]: any } = {};
-    for (const key of Object.keys(playerData)) {
-      let newIndex = positions[key] - positionShift;
-      newIndex = newIndex >= 0 ? newIndex : 4 + newIndex;
-      result[positionsArray[newIndex]] = playerData[key];
+    type Result = { [key in PlayerPositionType]: TransformedPlayerData };
+    const result: Result = {} as Result;
+    const positionShift = this.positions.indexOf(requestPlayer.position);
+    for (const key in transformedPlayerData) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (transformedPlayerData.hasOwnProperty(key)) {
+        const newIndex = { value: this.positions.indexOf(key as PlayerPositionType) - positionShift };
+        newIndex.value = newIndex.value >= 0 ? newIndex.value : 4 + newIndex.value;
+        const newPosition = this.positions[newIndex.value];
+        // @ts-ignore
+        result[newPosition] = transformedPlayerData[key as PlayerPositionType];
+      }
     }
 
     return {
@@ -146,8 +142,11 @@ export default class Game {
     };
   }
 
+  /**
+   * @description Whether or not at least one player is holding a card
+   */
   playersHaveCard(): boolean {
-    return this.players.some((p) => p.cards.length > 0);
+    return this.players.some((player) => player.cards.length);
   }
 
   changePlayer(): void {
@@ -219,6 +218,7 @@ export default class Game {
     this.players.forEach((player) => this.socketManager.sendMessage(player, 'game:finish', player.result));
   }
 
+  // FIXME this might be unnecessary as well. One time should be enough from global level
   startTimer(): void {
     this.timer = setInterval(() => {
       this.timeToMove--;
@@ -228,7 +228,7 @@ export default class Game {
     }, 1000);
   }
 
-  joinPlayer(player: Player, position: string = null): void {
+  joinPlayer(player: Player, position: PlayerPositionType = null): void {
     if (position === null) {
       const emptyPositions = this.findEmptyPositions();
       if (emptyPositions.length > 0) {
@@ -339,11 +339,14 @@ export default class Game {
       console.dir(this.cards);
     }
     this.players.forEach((pl) => {
-      const positionShift = positions[pl.position];
-      let movePlayerPositionIndex = positions[player.position] - positionShift;
-      movePlayerPositionIndex = movePlayerPositionIndex >= 0 ? movePlayerPositionIndex : 4 + movePlayerPositionIndex;
+      const positionShift = this.positions.indexOf(pl.position);
+      const movePlayerPositionIndex = {
+        value: this.positions.indexOf(player.position) - positionShift,
+      };
+      movePlayerPositionIndex.value =
+        movePlayerPositionIndex.value >= 0 ? movePlayerPositionIndex.value : 4 + movePlayerPositionIndex.value;
       this.socketManager.sendMessage(pl, 'game:take-cards', {
-        position: positionsArray[movePlayerPositionIndex],
+        position: this.positions[movePlayerPositionIndex.value],
         playerCard,
         tableCards,
       });
@@ -358,13 +361,11 @@ export default class Game {
     if (type === ActionType.TAKE_CARDS && !playerCard.canTakeCards(tableCards)) throw Error('incorrect move');
   }
 
-  public statistics(): {
-    message: string;
-  } {
+  public statistics() {
     return { message: 'Game finished!' };
   }
 
   private occupiedPositions() {
-    return this.players.reduce((op, { position }: Player) => [...op, position], []);
+    return this.players.reduce((opAcc, { position }: Player) => [...opAcc, position], [] as PlayerPositionType[]);
   }
 }

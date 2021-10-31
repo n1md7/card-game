@@ -51,6 +51,8 @@ export default class SocketModule {
 
   public sendUpdatesEvery(time = 1000) {
     return (timeInterval: 'milliseconds') => {
+      // FIXME this looping is redundant. Only games are important to iterate not users or players
+      //  only get players based on game object
       return setInterval(() => {
         const users = UserModel.getUsers();
         for (const userId in users) {
