@@ -7,7 +7,7 @@ import { gameStore, playerStore, userStore } from '../store';
 class GameModel extends BaseModel<Game> {
   public getGamesList() {
     return Object.values(gameStore.getStorage())
-      .map((game) => game.getGameDetails())
+      .map((game) => game.details)
       .filter((game) => game.isPublic === true);
   }
 
@@ -21,7 +21,7 @@ class GameModel extends BaseModel<Game> {
       throw new Error(`could not find a user with the id:${userId}`);
     }
 
-    if (game.playerAlreadyInGameRoom(user.id)) {
+    if (game.playerAlreadyInGameRoom(user)) {
       return game;
     }
 
@@ -32,8 +32,7 @@ class GameModel extends BaseModel<Game> {
     const player = new Player(user.id, name || user.name);
     game.joinPlayer(player);
     playerStore.setById(player.id, player);
-    playerStore.addPlayerById(player, userId);
-    userStore.setGameId(userId, game.getGameId());
+    userStore.setGameId(userId, game.id);
 
     return game;
   }
@@ -55,8 +54,8 @@ class GameModel extends BaseModel<Game> {
 
   public create(userId: string, player: Player, game: Game): void {
     playerStore.setById(player.id, player);
-    gameStore.setById(game.getGameId(), game);
-    userStore.setGameId(userId, game.getGameId());
+    gameStore.setById(game.id, game);
+    userStore.setGameId(userId, game.id);
   }
 }
 

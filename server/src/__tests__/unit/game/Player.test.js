@@ -43,7 +43,7 @@ describe('Player', function () {
       cards: 0,
       name: playerName,
       progress: 0,
-      score: undefined,
+      score: 0,
       taken: true,
     });
     expect(player.id).toBe(playerId);
@@ -180,7 +180,7 @@ describe('Player', function () {
     player.gameId = payload.roomId;
     const playerActionMock = jest.fn();
     jest.spyOn(game, 'playerAction').mockImplementation(playerActionMock);
-    gameStore.setById(game.getGameId(), game);
+    gameStore.setById(game.id, game);
     const cards = [
       new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),
       new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
@@ -216,7 +216,7 @@ describe('Player', function () {
     player.gameId = payload.roomId;
     const playerActionMock = jest.fn();
     jest.spyOn(game, 'playerAction').mockImplementation(playerActionMock);
-    gameStore.setById(game.getGameId(), game);
+    gameStore.setById(game.id, game);
     const cards = [new Card(CardSuit.CLUBS, CardRankName.FOUR, CardRank.FOUR)];
     const tableCards = [
       new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),

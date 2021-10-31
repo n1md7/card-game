@@ -68,7 +68,7 @@ export default class SocketModule {
                 } else {
                   this.io.to(user.socketId).emit('game:data', game.getGameData(player));
                   this.io.to(user.socketId).emit('player-cards', player.handCards);
-                  this.io.to(user.socketId).emit('table-cards:add', game.getCardsList());
+                  this.io.to(user.socketId).emit('table-cards:add', game.cardsList);
                 }
               }
             }

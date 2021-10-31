@@ -46,7 +46,7 @@ class GameController extends BaseController implements GameInterface {
     const userId = ctx.state.user?.id;
     const room = GameModel.join(id, userId, name);
 
-    ctx.body = room.getGameDetails();
+    ctx.body = room.details;
   };
 
   public exitGame = async (ctx: Context): Promise<void> => {

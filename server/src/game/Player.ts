@@ -28,6 +28,7 @@ export default class Player {
   constructor(playerId: string, name = '') {
     this.name = name;
     this.playerId = playerId;
+    this.score = 0;
   }
 
   set gameId(gameId: string) {

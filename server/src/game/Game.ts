@@ -5,6 +5,7 @@ import { Card } from './Card';
 import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
 import { SocketManager } from '../socket/manager';
 import GameException from '../exceptions/GameException';
+import User from './User';
 
 type TransformedPlayerData = { [position in PlayerPositionType]: PlayerDataType };
 
@@ -20,7 +21,7 @@ export default class Game {
   private creatorId: string;
   private lastTaker: Player;
   private maxScores: number;
-  private readonly players: Player[];
+  private readonly gamePlayers: Player[];
   private readonly gameId: string;
   private readonly numberOfPlayers: number;
   private readonly creatorName: string;
@@ -40,7 +41,7 @@ export default class Game {
     this.numberOfPlayers = numberOfPlayers;
     this.deck = new Deck();
     this.gameId = gameId;
-    this.players = [];
+    this.gamePlayers = [];
     this.isStarted = false;
     this.timeToMove = PLAYER_MOVER_INTERVAL;
     this.cards = [];
@@ -53,6 +54,26 @@ export default class Game {
     this.positions = ['down', 'left', 'up', 'right'];
   }
 
+  get details() {
+    return {
+      id: this.gameId,
+      inRoomSize: this.gamePlayers.length,
+      size: this.numberOfPlayers,
+      creator: {
+        name: this.creatorName,
+      },
+      isPublic: this.isPublic,
+    };
+  }
+
+  get id(): string {
+    return this.gameId;
+  }
+
+  get players(): Player[] {
+    return this.gamePlayers;
+  }
+
   findEmptyPositions() {
     const occupiedPositions = this.occupiedPositions();
     return this.positions.filter((item) => !occupiedPositions.includes(item));
@@ -61,11 +82,11 @@ export default class Game {
   startGame(): void {
     this.isStarted = true;
     this.dealCards(true);
-    this.activePlayer = this.players[this.currentPlayerIndex];
+    this.activePlayer = this.gamePlayers[this.currentPlayerIndex];
     this.startTimer();
   }
 
-  getCardsList() {
+  get cardsList() {
     return this.cards.reduce(
       (cards, card) => [
         ...cards,
@@ -88,7 +109,7 @@ export default class Game {
       return null;
     }
 
-    for (const player of this.players) {
+    for (const player of this.gamePlayers) {
       const numberOfCards = 4 - player.cards.length;
       if (numberOfCards > 0) {
         player.takeCardsInHand(this.deck.distributeCards(numberOfCards));
@@ -104,7 +125,7 @@ export default class Game {
       throw new GameException('Property [position] has to be defined for the object');
     }
 
-    const transformedPlayerData: TransformedPlayerData = this.players.reduce(
+    const transformedPlayerData: TransformedPlayerData = this.gamePlayers.reduce(
       (transformedPlayerDataAcc, player) => ({
         ...transformedPlayerDataAcc,
         [player.position]: player.data,
@@ -146,12 +167,12 @@ export default class Game {
    * @description Whether or not at least one player is holding a card
    */
   playersHaveCard(): boolean {
-    return this.players.some((player) => player.cards.length);
+    return this.gamePlayers.some((player) => player.cards.length);
   }
 
   changePlayer(): void {
     this.currentPlayerIndex++;
-    if (this.currentPlayerIndex >= this.players.length) {
+    if (this.currentPlayerIndex >= this.gamePlayers.length) {
       this.currentPlayerIndex = 0;
       if (!this.playersHaveCard()) {
         if (this.deck.isEmpty()) {
@@ -161,7 +182,7 @@ export default class Game {
         }
       }
     }
-    this.activePlayer = this.players[this.currentPlayerIndex];
+    this.activePlayer = this.gamePlayers[this.currentPlayerIndex];
     this.timeToMove = PLAYER_MOVER_INTERVAL;
   }
 
@@ -169,7 +190,7 @@ export default class Game {
     this.playerAction(this.lastTaker, ActionType.TAKE_CARDS, null, this.cards, true);
     let maxCards = 0;
     let maxClubs = 0;
-    this.players.forEach((player) => {
+    this.gamePlayers.forEach((player) => {
       player.calculateResult();
       if (player.result.numberOfCards > maxCards) {
         maxCards = player.result.numberOfCards;
@@ -178,9 +199,9 @@ export default class Game {
         maxClubs = player.result.numberOfClubs;
       }
     });
-    const clubWinners = this.players.filter((pl) => pl.result.numberOfClubs === maxClubs);
-    const cardWinners = this.players.filter((pl) => pl.result.numberOfCards === maxCards);
-    this.players.forEach((player) => {
+    const clubWinners = this.gamePlayers.filter((pl) => pl.result.numberOfClubs === maxClubs);
+    const cardWinners = this.gamePlayers.filter((pl) => pl.result.numberOfCards === maxCards);
+    this.gamePlayers.forEach((player) => {
       if (clubWinners.find((pl) => pl.equals(player)) != null) {
         player.score += 1;
       }
@@ -191,14 +212,14 @@ export default class Game {
       if (player.result.hasTwoOfClubs) player.score++;
       player.result.score = player.score;
     });
-    this.players.forEach((player) => this.socketManager.sendMessage(player, 'game:finish-deck', player.result));
-    const winnerScores = this.players
+    this.gamePlayers.forEach((player) => this.socketManager.sendMessage(player, 'game:finish-deck', player.result));
+    const winnerScores = this.gamePlayers
       .filter((pl) => pl.score >= this.maxScores)
       .reduce((scores, pl: Player) => [...scores, pl.score], [])
       .sort();
     if (winnerScores.length > 0) {
       const winnerScore = winnerScores[winnerScores.length - 1];
-      const winnerPlayers = this.players.filter((pl) => pl.score === winnerScore);
+      const winnerPlayers = this.gamePlayers.filter((pl) => pl.score === winnerScore);
       if (winnerPlayers.length === 1) {
         this.finishGame(winnerPlayers[0]);
         return void 0;
@@ -215,7 +236,7 @@ export default class Game {
   finishGame(winnerPlayer: Player): void {
     clearInterval(this.timer);
     this.isFinished = true;
-    this.players.forEach((player) => this.socketManager.sendMessage(player, 'game:finish', player.result));
+    this.gamePlayers.forEach((player) => this.socketManager.sendMessage(player, 'game:finish', player.result));
   }
 
   // FIXME this might be unnecessary as well. One time should be enough from global level
@@ -228,70 +249,39 @@ export default class Game {
     }, 1000);
   }
 
-  joinPlayer(player: Player, position: PlayerPositionType = null): void {
+  joinPlayer(player: Player, position: PlayerPositionType | null = null): void {
     if (position === null) {
-      const emptyPositions = this.findEmptyPositions();
-      if (emptyPositions.length > 0) {
-        position = emptyPositions[0];
-      }
+      const [emptyPosition = null] = this.findEmptyPositions();
+      position = emptyPosition;
     }
 
     const positionIsInvalid = !['left', 'right', 'up', 'down'].includes(position);
     const positionsAreOccupied = this.occupiedPositions().includes(position);
 
-    if (positionIsInvalid || positionsAreOccupied) {
-      throw new Error('incorrect position');
-    }
+    if (positionIsInvalid) throw new GameException(`Invalid position. Incorrect value [${position}]`);
+    if (positionsAreOccupied) throw new GameException(`Position [${position}] is occupied`);
 
-    if (this.players.length >= this.numberOfPlayers) {
-      throw new Error('Game is full');
+    if (this.gamePlayers.length >= this.numberOfPlayers) {
+      throw new GameException('Game is full');
     }
 
     player.position = position;
-    player.gameId = this.getGameId();
-    this.players.push(player);
-    if (this.players.length === this.numberOfPlayers) {
+    player.gameId = this.gameId;
+    this.gamePlayers.push(player);
+    if (this.gamePlayers.length === this.numberOfPlayers) {
       this.startGame();
     }
   }
 
-  getGameDetails(): {
-    id: string;
-    inRoomSize: number;
-    size: number;
-    creator: {
-      name: string;
-    };
-    isPublic: boolean;
-  } {
-    return {
-      id: this.getGameId(),
-      inRoomSize: this.players.length,
-      size: this.numberOfPlayers,
-      creator: {
-        name: this.creatorName,
-      },
-      isPublic: this.isPublic,
-    };
-  }
-
-  playerAlreadyInGameRoom(playerId: string): boolean {
-    return this.players.findIndex((player) => player.id === playerId) !== -1;
-  }
-
-  getGameId(): string {
-    return this.gameId;
-  }
-
-  getPlayers(): Player[] {
-    return this.players;
+  playerAlreadyInGameRoom(targetPlayer: Player | User): boolean {
+    return this.gamePlayers.some((player) => player.id === targetPlayer.id);
   }
 
   removePlayerFromTheGame(playerId: string): void {
-    const index = this.players.findIndex((player) => player.id === playerId);
+    const index = this.gamePlayers.findIndex((player) => player.id === playerId);
     if (index) {
       // remove from the array
-      this.players.splice(index, 1);
+      this.gamePlayers.splice(index, 1);
     }
   }
 
@@ -338,7 +328,7 @@ export default class Game {
       console.dir('last moved!');
       console.dir(this.cards);
     }
-    this.players.forEach((pl) => {
+    this.gamePlayers.forEach((pl) => {
       const positionShift = this.positions.indexOf(pl.position);
       const movePlayerPositionIndex = {
         value: this.positions.indexOf(player.position) - positionShift,
@@ -366,6 +356,6 @@ export default class Game {
   }
 
   private occupiedPositions() {
-    return this.players.reduce((opAcc, { position }: Player) => [...opAcc, position], [] as PlayerPositionType[]);
+    return this.gamePlayers.reduce((opAcc, { position }) => [...opAcc, position], [] as PlayerPositionType[]);
   }
 }

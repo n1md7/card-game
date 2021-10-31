@@ -4,5 +4,6 @@ logs
 .idea
 .github
 deploy
-node_module
+node_modules
 coverage
+/shared-types/index.js
