@@ -4,7 +4,7 @@ import config from '../../config';
 import Server from '../../server';
 import axios from 'axios';
 import { copy } from '../../helpers/extras';
-import { HttpCode } from '../../types/errorHandler';
+import { HttpCode } from '../../types/error';
 
 describe('/api/v1/storage', () => {
   const ref = { httpServer: null, myConfig: null, request: null };

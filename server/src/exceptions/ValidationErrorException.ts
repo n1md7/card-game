@@ -1,4 +1,4 @@
-import { ExceptionType } from '../types/errorHandler';
+import { ExceptionType } from '../types/error';
 import { ValidationErrorItem } from 'joi';
 
 export default class ValidationErrorException extends Error {

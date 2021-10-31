@@ -19,19 +19,17 @@ export default class Events {
   constructor(private readonly koa: Koa) {}
 
   playerMove(user: User) {
+    // {playerMoveObject} is client passed data
     return (playerMoveObject: PlayerMoveObject) => {
-      try {
-        const player = PlayerModel.getById(user.id);
-        const playerCard = Events.getCardFromCardObject(playerMoveObject.playerCard);
-        const tableCards = playerMoveObject.tableCards.map(Events.getCardFromCardObject);
-        if (tableCards.length === 0) {
-          player.placeCardFromHand(playerCard);
-        } else {
-          player.takeCardsFromTable(playerCard, tableCards);
-        }
-      } catch (error) {
-        this.koa.emit(KoaEvent.socketError, error.message || JSON.stringify(error));
-      }
+      // try {
+      const player = PlayerModel.getById(user.id);
+      const playerCard = Events.getCardFromCardObject(playerMoveObject.playerCard);
+      const tableCards = playerMoveObject.tableCards.map(Events.getCardFromCardObject);
+      // When table is not empty than process the request otherwise place target card from hand
+      tableCards.length ? player.takeCardsFromTable(playerCard, tableCards) : player.placeCardFromHand(playerCard);
+      // } catch (error) {
+      //   this.koa.emit(KoaEvent.socketError, error.message || JSON.stringify(error));
+      // }
     };
   }
 

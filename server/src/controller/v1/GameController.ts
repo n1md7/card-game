@@ -6,7 +6,7 @@ import GameModel from '../../model/GameModel';
 import GameInterface from './interfaces/GameInterface';
 import { createGameSchema, enterGameSchema } from './validators/GameRequestValidator';
 import ValidationErrorException from '../../exceptions/ValidationErrorException';
-import { HttpCode } from '../../types/errorHandler';
+import { HttpCode } from '../../types/error';
 import { gameStore, playerStore, userStore } from '../../store';
 import { SocketManager } from '../../socket/manager';
 import Player from '../../game/Player';

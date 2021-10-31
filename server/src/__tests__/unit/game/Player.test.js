@@ -14,6 +14,7 @@ describe('Player', function () {
     gameStore.clearStorage();
     playerStore.clearStorage();
     userStore.clearStorage();
+    jest.clearAllMocks();
   });
 
   it('should verify properties/methods', function () {
@@ -21,7 +22,7 @@ describe('Player', function () {
     expect(player.data).toBeDefined();
     expect(player.handCards).toBeDefined();
     expect(player.id).toBeDefined();
-    expect(player.playerTakesCardsInHand).toBeDefined();
+    expect(player.takeCardsInHand).toBeDefined();
     expect(player.equals).toBeDefined();
     expect(player.scoreCards).toBeDefined();
     expect(player.removeCardFromHand).toBeDefined();
@@ -75,31 +76,20 @@ describe('Player', function () {
     expect(playerStore.getById(payload.userId)).toBeDefined();
   });
 
+  it('should test takeCardsInHand()', function () {
+    const player = new Player('id', 'Hey');
+    player.takeCardsInHand([
+      new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),
+    ]);
+
+    expect(player.cards).toHaveLength(2);
+  });
+
   it('should test equals()', function () {
-    const payload = {
-      size: 2,
-      isPublic: true,
-      roomId: id.game(),
-      userId: id.player(),
-      name: 'Jenny',
-    };
-
-    const player = new Player(payload.userId, payload.name);
+    const player = new Player('id', 'Mom');
     // The same id but name different.
-    const anotherPlayer = new Player(payload.userId, 'Dude');
-    const game = new Game(
-      payload.size,
-      payload.roomId,
-      payload.isPublic,
-      payload.userId,
-      payload.name,
-      new SocketManager(SocketIO),
-    );
-    game.joinPlayer(player);
-    GameModel.create(payload.userId, player, game);
-    PlayerModel.addPlayer(player, payload.userId);
-    player.gameId = payload.roomId;
-
+    const anotherPlayer = new Player('id', 'Dude');
     expect(player.equals(anotherPlayer)).toBeTruthy();
   });
 
@@ -142,5 +132,102 @@ describe('Player', function () {
       hasTwoOfClubs: false,
       hasTenOfDiamonds: false,
     });
+  });
+
+  it('should test removeCardFromHand()', function () {
+    const player = new Player('P-123', 'Jenny');
+    const cards = [
+      new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+    ];
+    player.takeCardsInHand(cards);
+    expect(player.cards).toHaveLength(3);
+    player.removeCardFromHand(new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE));
+    expect(player.cards).toHaveLength(2);
+  });
+
+  it('should throw when wrong card in removeCardFromHand()', function () {
+    const player = new Player('P-123', 'Jenny');
+    const cards = [
+      new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+    ];
+    player.takeCardsInHand(cards);
+    expect(() => {
+      player.removeCardFromHand(new Card(CardSuit.DIAMONDS, CardRankName.TEN, CardRank.TEN));
+    }).toThrow('You are not holding such card in hand. Thus, it cannot be removed.');
+  });
+
+  it('should test placeCardFromHand()/placeRandomCardFromHand()', function () {
+    const payload = {
+      size: 2,
+      isPublic: true,
+      roomId: id.game(),
+      userId: id.player(),
+      name: 'Lucy',
+    };
+    const player = new Player(payload.userId, payload.name);
+    const game = new Game(
+      payload.size,
+      payload.roomId,
+      payload.isPublic,
+      payload.userId,
+      payload.name,
+      new SocketManager(SocketIO),
+    );
+    player.gameId = payload.roomId;
+    const playerActionMock = jest.fn();
+    jest.spyOn(game, 'playerAction').mockImplementation(playerActionMock);
+    gameStore.setById(game.getGameId(), game);
+    const cards = [
+      new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+    ];
+    player.takeCardsInHand(cards);
+    player.placeCardFromHand(new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE));
+    expect(playerActionMock).toHaveBeenCalled();
+    player.placeRandomCardFromHand();
+    expect(playerActionMock).toHaveBeenCalledTimes(2);
+    expect(() => {
+      // Trying to place wrong card
+      player.placeCardFromHand(new Card(CardSuit.SPADES, CardRankName.NINE, CardRank.NINE));
+    }).toThrow('You are not holding such card in hand. Thus, it cannot be placed.');
+  });
+
+  it('should test takeCardsFromTable()', function () {
+    const payload = {
+      size: 2,
+      isPublic: true,
+      roomId: id.game(),
+      userId: id.player(),
+      name: 'Lucy',
+    };
+    const player = new Player(payload.userId, payload.name);
+    const game = new Game(
+      payload.size,
+      payload.roomId,
+      payload.isPublic,
+      payload.userId,
+      payload.name,
+      new SocketManager(SocketIO),
+    );
+    player.gameId = payload.roomId;
+    const playerActionMock = jest.fn();
+    jest.spyOn(game, 'playerAction').mockImplementation(playerActionMock);
+    gameStore.setById(game.getGameId(), game);
+    const cards = [new Card(CardSuit.CLUBS, CardRankName.FOUR, CardRank.FOUR)];
+    const tableCards = [
+      new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+    ];
+    player.takeCardsInHand(cards);
+    player.takeCardsFromTable(new Card(CardSuit.CLUBS, CardRankName.FOUR, CardRank.FOUR), tableCards);
+    expect(playerActionMock).toHaveBeenCalled();
+    expect(() => {
+      // Trying to place wrong card
+      player.placeCardFromHand(new Card(CardSuit.SPADES, CardRankName.NINE, CardRank.NINE));
+    }).toThrow('You are not holding such card in hand. Thus, it cannot be placed.');
   });
 });

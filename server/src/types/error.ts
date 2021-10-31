@@ -29,6 +29,7 @@ export enum ErrorType {
   validationError = 'ValidationError',
   jsonWebTokenError = 'JsonWebTokenError',
   tokenExpiredError = 'TokenExpiredError',
+  gameError = 'GameError',
 }
 
 export enum ExceptionType {

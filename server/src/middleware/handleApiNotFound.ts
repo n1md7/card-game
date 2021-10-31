@@ -1,5 +1,5 @@
 import Koa, { Context, Next } from 'koa';
-import { HttpCode, HttpText } from '../types/errorHandler';
+import { HttpCode, HttpText } from '../types/error';
 import { KoaEvent } from '../types';
 
 export default (apiContextPath: string, koa: Koa) => {

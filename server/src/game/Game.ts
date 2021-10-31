@@ -91,7 +91,7 @@ export default class Game {
     for (const player of this.players) {
       const numberOfCards = 4 - player.cards.length;
       if (numberOfCards > 0) {
-        player.playerTakesCardsInHand(this.deck.distributeCards(numberOfCards));
+        player.takeCardsInHand(this.deck.distributeCards(numberOfCards));
       }
     }
     if (firstDeal) {

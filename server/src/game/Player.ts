@@ -4,6 +4,7 @@ import { gameStore } from '../store';
 import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
 import { PlayerResult } from './PlayerResult';
 import { getRandomInt } from '../helpers/extras';
+import GameException from '../exceptions/GameException';
 
 export default class Player {
   public position: string;
@@ -43,13 +44,12 @@ export default class Player {
     };
   }
 
-  get handCards() {
-    return this.playerCardsInHand.reduce<
-      {
-        rank: CardRankName;
-        suit: CardSuit;
-      }[]
-    >(
+  get handCards(): {
+    rank: CardRankName;
+    suit: CardSuit;
+  }[] {
+    // FiXme: transforming object should not be necessary
+    return this.playerCardsInHand.reduce(
       (acc, card: Card) => [
         ...acc,
         {
@@ -73,7 +73,7 @@ export default class Player {
     return this.playerCardsInHand;
   }
 
-  playerTakesCardsInHand(cards: Card[]) {
+  takeCardsInHand(cards: Card[]) {
     this.playerCardsInHand = [...this.playerCardsInHand, ...cards];
   }
 
@@ -86,10 +86,11 @@ export default class Player {
   }
 
   removeCardFromHand(cardFromHand: Card) {
-    if (!this.playerCardsInHand.find((card) => card.equals(cardFromHand))) {
-      throw new Error('You are not holding such card in hand. Thus, it cannot be removed.');
+    const index = this.playerCardsInHand.findIndex((card) => card.equals(cardFromHand));
+    if (-1 === index) {
+      throw new GameException('You are not holding such card in hand. Thus, it cannot be removed.');
     }
-    this.playerCardsInHand.remove(cardFromHand);
+    this.playerCardsInHand.splice(index, 1);
   }
 
   placeRandomCardFromHand() {
@@ -98,18 +99,23 @@ export default class Player {
 
   placeCardFromHand(cardFromHand: Card) {
     if (!this.playerCardsInHand.find((card) => card.equals(cardFromHand))) {
-      throw new Error('You are not holding such card in hand. Thus, it cannot be placed.');
+      throw new GameException('You are not holding such card in hand. Thus, it cannot be placed.');
     }
 
     this.game.playerAction(this, ActionType.PLACE_CARD, cardFromHand, []);
   }
 
-  takeCardsFromTable(card: Card, tableCards: Card[]) {
-    if (this.cards.find((c) => c.equals(card)) === undefined) throw Error('incorrect card');
-    if (tableCards.length === 0) throw Error('Ups error WTF?');
-    console.dir(card);
-    console.dir(tableCards);
-    this.game.playerAction(this, ActionType.TAKE_CARDS, card, tableCards);
+  /**
+   * @description - Executes the logic whether or not the player can make a specific move to take cards
+   * @param cardFromHand - A Card that player is holding and placing on the table to create a combination and score
+   * @param tableCards - Pretty obvious what it is
+   */
+  takeCardsFromTable(cardFromHand: Card, tableCards: Card[]) {
+    if (!this.playerCardsInHand.find((card) => card.equals(cardFromHand))) {
+      throw new GameException('You are not holding such card in hand. Thus, it cannot be placed.');
+    }
+    console.debug(`takeCardsFromTable`, cardFromHand, tableCards);
+    this.game.playerAction(this, ActionType.TAKE_CARDS, cardFromHand, tableCards);
   }
 
   calculateResult() {

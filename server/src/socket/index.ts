@@ -8,6 +8,7 @@ import jsonWebToken from 'jsonwebtoken';
 import PlayerModel from '../model/PlayerModel';
 import GameModel from '../model/GameModel';
 import Koa from 'koa';
+import { ErrorType } from '../types/error';
 
 export default class SocketModule {
   constructor(private readonly io: SocketIO.Server, private readonly koa: Koa, private readonly events: Events) {}
@@ -15,6 +16,7 @@ export default class SocketModule {
   public connectionHandler(): void {
     this.io.on('connection', (socket: Socket) => {
       try {
+        // Extracting userId from JWT auth token and fetching it for the store
         const verified = jsonWebToken.verify(socket.handshake.query[Token.auth], process.env.JWT_SECRET);
         const userId = (verified as JWTProps)[Token.userId];
         const user = UserModel.getById(userId);
@@ -22,10 +24,22 @@ export default class SocketModule {
           // noinspection ExceptionCaughtLocallyJS
           throw new Error(`We couldn't find a user with the id:${userId}`);
         }
+        // One every new connection update user socket ID
         user.socketId = socket.id;
+        // Listen and process client request on "player:move"
         socket.on('player:move', this.events.playerMove(user));
-      } catch ({ message }) {
-        this.io.to(socket.id).emit('error', message);
+      } catch (error) {
+        // Socket error handling
+        switch (error.name) {
+          case ErrorType.gameError:
+            this.io.to(socket.id).emit('game:error', error.message);
+            break;
+          case ErrorType.jsonWebTokenError:
+            this.io.to(socket.id).emit('jwt:error', error.message);
+            break;
+          default:
+            this.io.to(socket.id).emit('error', error.message);
+        }
       }
     });
 

@@ -4,7 +4,7 @@ import Server from '../../server';
 import axios from 'axios';
 import { copy } from '../../helpers/extras';
 import { Token } from 'shared-types';
-import { HttpCode } from '../../types/errorHandler';
+import { HttpCode } from '../../types/error';
 
 describe('Create user/verify', () => {
   const ref = { httpServer: null, myConfig: null, request: null };
@@ -33,7 +33,7 @@ describe('Create user/verify', () => {
   it('GET /api/v1/auth/init', async function () {
     const { data = null } = await ref.request.get('/auth/init');
     expect(data).toEqual({
-      token: expect.any(String),
+      [Token.auth]: expect.any(String),
       userId: expect.any(String),
     });
   });
@@ -41,21 +41,19 @@ describe('Create user/verify', () => {
   it('Create user', async function () {
     const { data = null } = await ref.request.get('/auth/init');
     expect(data).toEqual({
-      token: expect.any(String),
+      [Token.auth]: expect.any(String),
       userId: expect.any(String),
     });
   });
 
   it('Create user and check status', async function () {
-    const {
-      data: { token = null, userId = null },
-    } = await ref.request.get('/auth/init');
-    const { data: user = null } = await ref.request.get('/user', { headers: { [Token.auth]: token } });
+    const { data } = await ref.request.get('/auth/init');
+    const { data: user = null } = await ref.request.get('/user', { headers: { [Token.auth]: data[Token.auth] } });
     const { status = null, data: response = null } = await ref.request.get('/auth/status', {
-      headers: { [Token.auth]: token },
+      headers: { [Token.auth]: data[Token.auth] },
     });
     expect(user).toEqual({
-      id: userId,
+      id: data.userId,
       name: null,
       signUpTime: expect.any(String),
       updateTime: expect.any(String),
@@ -65,9 +63,7 @@ describe('Create user/verify', () => {
   });
 
   it('Create user/create table', async function () {
-    const {
-      data: { token = null, userId = null },
-    } = await ref.request.get('/auth/init');
+    const { data } = await ref.request.get('/auth/init');
     const { status = null, data: roomId = null } = await ref.request.post(
       '/game/create',
       {
@@ -76,7 +72,7 @@ describe('Create user/verify', () => {
         size: 2,
       },
       {
-        headers: { [Token.auth]: token },
+        headers: { [Token.auth]: data[Token.auth] },
       },
     );
     expect(status).toBe(HttpCode.ok);
@@ -89,12 +85,9 @@ describe('Create user/verify', () => {
       name: 'Nacho',
       size: 3,
     };
-    const {
-      status: initStatus,
-      data: { token = null, userId = null },
-    } = await ref.request.get('/auth/init');
+    const { status: initStatus, data } = await ref.request.get('/auth/init');
     const { status: createStatus, data: createRoomId = null } = await ref.request.post('/game/create', payload, {
-      headers: { [Token.auth]: token },
+      headers: { [Token.auth]: data[Token.auth] },
     });
     const { status: enterStatus, data: gameInfo = null } = await ref.request.post(
       '/game/enter',
@@ -103,7 +96,7 @@ describe('Create user/verify', () => {
         name: payload.name,
       },
       {
-        headers: { [Token.auth]: token },
+        headers: { [Token.auth]: data[Token.auth] },
       },
     );
     const { status: gameListStatus, data: games = null } = await ref.request.get('/games');
@@ -167,9 +160,7 @@ describe.each([
   });
 
   it(`it ${ms}s for [${sz}]`, async () => {
-    const {
-      data: { token = null, userId = null },
-    } = await ref.request.get('/auth/init');
+    const { data } = await ref.request.get('/auth/init');
     const { status: createStatus, data: errorResponse = null } = await ref.request.post(
       '/game/create',
       {
@@ -178,7 +169,7 @@ describe.each([
         size: sz,
       },
       {
-        headers: { [Token.auth]: token },
+        headers: { [Token.auth]: data[Token.auth] },
       },
     );
     expect(createStatus).toBe(HttpCode.badRequest);

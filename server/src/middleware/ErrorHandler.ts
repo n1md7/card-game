@@ -1,5 +1,5 @@
 import { Context, Next } from 'koa';
-import { ErrorType, HttpText, HttpCode, MongoErrorType, MongoErrorCode, ExceptionType } from '../types/errorHandler';
+import { ErrorType, HttpText, HttpCode, MongoErrorType, MongoErrorCode, ExceptionType } from '../types/error';
 import { ValidationErrorItem } from 'joi';
 import { KoaEvent } from '../types';
 

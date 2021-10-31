@@ -5,4 +5,5 @@ module.exports = {
     '^.+\\.jsx?$': 'babel-jest',
     '^.+\\.tsx?$': 'ts-jest',
   },
+  coveragePathIgnorePatterns: ['src/middleware'],
 };
