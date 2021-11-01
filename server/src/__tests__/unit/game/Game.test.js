@@ -110,4 +110,80 @@ describe('Game', function () {
 
     expect(game.playersHaveCard()).toBeTruthy();
   });
+
+  it('should verify .cardsList()', function () {
+    const payload = {
+      size: 2,
+      isPublic: true,
+      roomId: id.game(),
+      userId: id.player(),
+      name: 'Jenny',
+    };
+
+    const player = new Player(payload.userId, payload.name);
+    player.position = 'up';
+    const game = new Game(
+      payload.size,
+      payload.roomId,
+      payload.isPublic,
+      payload.userId,
+      payload.name,
+      new SocketManager(SocketIO),
+    );
+    game.joinPlayer(player);
+    GameModel.create(payload.userId, player, game);
+    PlayerModel.addPlayer(player, payload.userId);
+    player.gameId = payload.roomId;
+    game.dealCards(true);
+
+    expect(game.cardsList).toHaveLength(4);
+  });
+
+  it('should verify .playerAlreadyInGameRoom()/.removePlayerFromTheGame()', function () {
+    const payload = {
+      size: 2,
+      isPublic: true,
+      roomId: id.game(),
+      userId: id.player(),
+      name: 'Pem',
+    };
+
+    const player = new Player(payload.userId, payload.name);
+    player.position = 'up';
+    const game = new Game(
+      payload.size,
+      payload.roomId,
+      payload.isPublic,
+      payload.userId,
+      payload.name,
+      new SocketManager(SocketIO),
+    );
+    game.joinPlayer(player);
+    GameModel.create(payload.userId, player, game);
+    PlayerModel.addPlayer(player, payload.userId);
+    player.gameId = payload.roomId;
+    game.dealCards(true);
+
+    expect(game.playerAlreadyInGameRoom(player)).toBeTruthy();
+    game.removePlayerFromGameById(player.id);
+    expect(game.playerAlreadyInGameRoom(player)).toBeFalsy();
+  });
+
+  it('should verify .joinPlayer()', function () {
+    const Jim = new Player('Jim-id', 'Jim');
+    const Pam = new Player('Pam-id', 'Pam');
+    const Michael = new Player('Michael-id', 'Michael');
+    const Dwight = new Player('Dwight-id', 'Dwight');
+    const Andy = new Player('Andy-id', 'Andy');
+    const args = [4, id.game(), true, id.player(), 'Bold game', new SocketManager(SocketIO)];
+    const game = new Game(...args);
+    game.joinPlayer(Jim);
+    game.joinPlayer(Pam);
+    game.joinPlayer(Michael);
+    game.joinPlayer(Dwight);
+
+    expect(() => {
+      game.joinPlayer(Andy);
+    }).toThrow('Table is full');
+  });
 });

@@ -92,9 +92,12 @@ export default class Game {
     );
   }
 
+  private get occupiedPositions() {
+    return this.gamePlayers.reduce((opAcc, { position }) => [...opAcc, position], [] as PlayerPositionType[]);
+  }
+
   findEmptyPositions() {
-    const occupiedPositions = this.occupiedPositions();
-    return this.positions.filter((item) => !occupiedPositions.includes(item));
+    return this.positions.filter((item) => !this.occupiedPositions.includes(item));
   }
 
   startGame(): void {
@@ -252,11 +255,14 @@ export default class Game {
   joinPlayer(player: Player, position: PlayerPositionType | null = null): void {
     if (position === null) {
       const [emptyPosition = null] = this.findEmptyPositions();
+      if (emptyPosition === null) {
+        throw new GameException(`Table is full`);
+      }
       position = emptyPosition;
     }
 
     const positionIsInvalid = !['left', 'right', 'up', 'down'].includes(position);
-    const positionsAreOccupied = this.occupiedPositions().includes(position);
+    const positionsAreOccupied = this.occupiedPositions.includes(position);
 
     if (positionIsInvalid) throw new GameException(`Invalid position. Incorrect value [${position}]`);
     if (positionsAreOccupied) throw new GameException(`Position [${position}] is occupied`);
@@ -277,9 +283,9 @@ export default class Game {
     return this.gamePlayers.some((player) => player.id === targetPlayer.id);
   }
 
-  removePlayerFromTheGame(playerId: string): void {
+  removePlayerFromGameById(playerId: string): void {
     const index = this.gamePlayers.findIndex((player) => player.id === playerId);
-    if (index) {
+    if (index > -1) {
       // remove from the array
       this.gamePlayers.splice(index, 1);
     }
@@ -356,9 +362,5 @@ export default class Game {
 
   public statistics() {
     return { message: 'Game finished!' };
-  }
-
-  private occupiedPositions() {
-    return this.gamePlayers.reduce((opAcc, { position }) => [...opAcc, position], [] as PlayerPositionType[]);
   }
 }

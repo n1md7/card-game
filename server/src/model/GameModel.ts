@@ -47,7 +47,7 @@ class GameModel extends BaseModel<Game> {
       throw new Error(`could not find a room to remove`);
     }
 
-    game.removePlayerFromTheGame(userId);
+    game.removePlayerFromGameById(userId);
     // remove gameId from User
     userStore.setGameId(userId, null);
   }
