@@ -20,11 +20,12 @@ import { Token } from 'shared-types';
 export default class Server {
   public koa: Koa;
   public httpServer: HttpServer;
-  public io: SocketIoServer;
+  public ioServer: SocketIoServer;
   private readonly config: ConfigOptions;
   private readonly staticFolderPath: string;
   private socketModule: SocketModule;
   private socketManager: SocketManager;
+  private serverTimer: NodeJS.Timer;
 
   constructor(config: ConfigOptions) {
     this.config = config;
@@ -34,6 +35,18 @@ export default class Server {
     // if (process.env.NODE_ENV === Env.Prod) {
     //   this.config.origin = process.env.ORIGIN;
     // }
+  }
+
+  get io() {
+    return this.ioServer;
+  }
+
+  get socket() {
+    return this.socketModule;
+  }
+
+  get timer() {
+    return this.serverTimer;
   }
 
   init(): Server {
@@ -94,7 +107,7 @@ export default class Server {
   }
 
   attachSocket(): SocketModule {
-    this.io = SocketIO(this.httpServer, {
+    this.ioServer = SocketIO(this.httpServer, {
       path: '/socket.io',
       serveClient: false,
       // below are engine.IO options
@@ -103,10 +116,9 @@ export default class Server {
       cookie: false,
     });
 
-    this.socketModule = new SocketModule(this.io, this.koa, new Events(this.koa));
-    this.socketManager = new SocketManager(this.io);
-    this.socketModule.connectionHandler();
-    this.socketModule.sendUpdatesEvery(100)('milliseconds');
+    this.socketModule = new SocketModule(this.ioServer, this.koa, new Events(this.koa));
+    this.socketManager = new SocketManager(this.ioServer);
+    this.serverTimer = this.socketModule.sendUpdatesEvery(100).milliseconds;
 
     return this.socketModule;
   }

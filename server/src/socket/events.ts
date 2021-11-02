@@ -1,9 +1,7 @@
 import { Card } from '../game/Card';
 import { CardRankName, cardRanksByName, CardSuit, cardSuitsByName } from 'shared-types';
-import User from '../game/User';
 import PlayerModel from '../model/PlayerModel';
 import Koa from 'koa';
-import { KoaEvent } from '../types';
 
 type CardObject = {
   suit: CardSuit;
@@ -18,11 +16,11 @@ type PlayerMoveObject = {
 export default class Events {
   constructor(private readonly koa: Koa) {}
 
-  playerMove(user: User) {
+  playerMove(playerId: string) {
     // {playerMoveObject} is client passed data
     return (playerMoveObject: PlayerMoveObject) => {
       // try {
-      const player = PlayerModel.getById(user.id);
+      const player = PlayerModel.getById(playerId);
       const playerCard = Events.getCardFromCardObject(playerMoveObject.playerCard);
       const tableCards = playerMoveObject.tableCards.map(Events.getCardFromCardObject);
       // When table is not empty than process the request otherwise place target card from hand

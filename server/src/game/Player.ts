@@ -18,6 +18,7 @@ export type PlayerDataType = {
 export default class Player {
   public position: PlayerPositionType;
   public score: number;
+  public socketId: string;
   private playerResult: PlayerResult;
   private readonly name: string;
   private readonly playerId: string;

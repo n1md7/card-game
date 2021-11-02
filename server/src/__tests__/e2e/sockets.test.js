@@ -16,6 +16,7 @@ describe('Sockets', () => {
     socket: null,
     token: null,
     userId: null,
+    timer: null,
   };
 
   /**
@@ -59,6 +60,7 @@ describe('Sockets', () => {
       timeout: 5000,
       validateStatus: (status) => status >= 200 && status < 500,
     });
+    ref.timer = server.timer;
   });
 
   afterEach(() => {
@@ -68,6 +70,11 @@ describe('Sockets', () => {
   });
 
   afterAll(function () {
+    ref.httpServer.on('close', function () {
+      console.log(' Unsubscribe ... timer');
+      clearInterval(ref.timer);
+      process.exit(0);
+    });
     ref.httpServer.close();
     ref.ioServer.close();
   });

@@ -5,6 +5,10 @@ import BaseModel from './BaseModel';
 import { gameStore, playerStore, userStore } from '../store';
 
 class GameModel extends BaseModel<Game> {
+  get games() {
+    return this.store.getStorage();
+  }
+
   public getGamesList() {
     return Object.values(gameStore.getStorage())
       .map((game) => game.details)
