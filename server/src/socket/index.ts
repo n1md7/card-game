@@ -46,25 +46,22 @@ export default class SocketModule {
     });
   }
 
-  public sendUpdatesEvery = (time = 1000) => ({
-    get milliseconds() {
-      return setInterval(() => {
-        for (const gid in GameModel.games) {
-          // eslint-disable-next-line no-prototype-builtins
-          if (GameModel.games.hasOwnProperty(gid)) {
-            const game = GameModel.games[gid];
-            for (const player of game.players) {
-              if (game.isFinished) {
-                this.io.to(player.socketId).emit('game:finished', game.statistics());
-              } else {
-                this.io.to(player.socketId).emit('game:data', game.getGameData(player));
-                this.io.to(player.socketId).emit('player-cards', player.handCards);
-                this.io.to(player.socketId).emit('table-cards:add', game.cardsList);
-              }
+  public sendUpdatesEvery = (milliseconds = 1000) =>
+    setInterval(() => {
+      for (const gid in GameModel.games) {
+        // eslint-disable-next-line no-prototype-builtins
+        if (GameModel.games.hasOwnProperty(gid)) {
+          const game = GameModel.games[gid];
+          for (const player of game.players) {
+            if (game.isFinished) {
+              this.io.to(player.socketId).emit('game:finished', game.statistics());
+            } else {
+              this.io.to(player.socketId).emit('game:data', game.getGameData(player));
+              this.io.to(player.socketId).emit('player-cards', player.handCards);
+              this.io.to(player.socketId).emit('table-cards:add', game.cardsList);
             }
           }
         }
-      }, time);
-    },
-  });
+      }
+    }, milliseconds);
 }

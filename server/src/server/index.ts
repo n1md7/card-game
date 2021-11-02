@@ -5,7 +5,7 @@ import cors from '@koa/cors';
 import logWrite from '../logger';
 import routes from '../routes';
 import handleErrors from '../middleware/ErrorHandler';
-import { KoaEvent } from '../types';
+import { Env, KoaEvent } from '../types';
 import { ConfigOptions } from '../types/config';
 import path from 'path';
 import http, { Server as HttpServer } from 'http';
@@ -16,6 +16,7 @@ import serveIndexHTML from '../middleware/serveIndexHTML';
 import handleApiNotFound from '../middleware/handleApiNotFound';
 import Events from '../socket/events';
 import { Token } from 'shared-types';
+import os from 'os';
 
 export default class Server {
   public koa: Koa;
@@ -97,8 +98,14 @@ export default class Server {
 
     return new Promise((resolve) => {
       this.httpServer.listen(port, hostname, function () {
-        if (process.env.NODE_ENV !== 'test') {
+        if (process.env.NODE_ENV !== Env.Test) {
           logWrite.debug(`Example API endpoint - http://${hostname}:${port}${apiContextPath}/v1/storage`);
+          if (process.env.NODE_ENV === Env.Dev) {
+            const [{ address = '[::1]' }] = Object.values(os.networkInterfaces())
+              .flat()
+              .filter((item) => !item.internal && item.family === 'IPv4');
+            logWrite.debug(`Your local IP: ${address}`);
+          }
           logWrite.debug('Server (re)started! Ready to serve the master');
         }
         resolve(this);
@@ -118,7 +125,7 @@ export default class Server {
 
     this.socketModule = new SocketModule(this.ioServer, this.koa, new Events(this.koa));
     this.socketManager = new SocketManager(this.ioServer);
-    this.serverTimer = this.socketModule.sendUpdatesEvery(100).milliseconds;
+    this.serverTimer = this.socketModule.sendUpdatesEvery(100);
 
     return this.socketModule;
   }
