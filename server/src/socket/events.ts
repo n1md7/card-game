@@ -1,7 +1,6 @@
 import { Card } from '../game/Card';
 import { CardRankName, cardRanksByName, CardSuit, cardSuitsByName } from 'shared-types';
 import PlayerModel from '../model/PlayerModel';
-import Koa from 'koa';
 
 type CardObject = {
   suit: CardSuit;
@@ -14,23 +13,6 @@ type PlayerMoveObject = {
 };
 
 export default class Events {
-  constructor(private readonly koa: Koa) {}
-
-  playerMove(playerId: string) {
-    // {playerMoveObject} is client passed data
-    return (playerMoveObject: PlayerMoveObject) => {
-      // try {
-      const player = PlayerModel.getById(playerId);
-      const playerCard = Events.getCardFromCardObject(playerMoveObject.playerCard);
-      const tableCards = playerMoveObject.tableCards.map(Events.getCardFromCardObject);
-      // When table is not empty than process the request otherwise place target card from hand
-      tableCards.length ? player.takeCardsFromTable(playerCard, tableCards) : player.placeCardFromHand(playerCard);
-      // } catch (error) {
-      //   this.koa.emit(KoaEvent.socketError, error.message || JSON.stringify(error));
-      // }
-    };
-  }
-
   private static getCardFromCardObject = (cardObject: CardObject): Card => {
     const cardSuit = cardSuitsByName.get(cardObject.suit);
     const cardRank = cardObject.rank;
@@ -38,4 +20,15 @@ export default class Events {
 
     return new Card(cardSuit, cardRank, cardValue);
   };
+
+  public playerMove(playerId: string) {
+    // {playerMoveObject} is client passed data
+    return (playerMoveObject: PlayerMoveObject) => {
+      const player = PlayerModel.getById(playerId);
+      const playerCard = Events.getCardFromCardObject(playerMoveObject.playerCard);
+      const tableCards = playerMoveObject.tableCards.map(Events.getCardFromCardObject);
+      // When table is not empty than process the request otherwise place target card from hand
+      tableCards.length ? player.takeCardsFromTable(playerCard, tableCards) : player.placeCardFromHand(playerCard);
+    };
+  }
 }

@@ -13,9 +13,9 @@ export default class Game {
   public isStarted: boolean;
   public isFinished: boolean;
   public activePlayer: Player;
-  public timeToMove: number;
+  private timeToMove: number;
+  private lastUpdate: number;
   private deck: Deck;
-  private timer: any;
   private currentPlayerIndex: number;
   private cards: Card[];
   private creatorId: string;
@@ -44,6 +44,7 @@ export default class Game {
     this.gamePlayers = [];
     this.isStarted = false;
     this.timeToMove = PLAYER_MOVER_INTERVAL;
+    this.lastUpdate = Date.now();
     this.cards = [];
     this.currentPlayerIndex = 0;
     this.creatorId = userId;
@@ -72,6 +73,10 @@ export default class Game {
 
   get players(): Player[] {
     return this.gamePlayers;
+  }
+
+  get playerTime() {
+    return this.timeToMove;
   }
 
   get cardsList() {
@@ -104,7 +109,6 @@ export default class Game {
     this.isStarted = true;
     this.dealCards(true);
     this.activePlayer = this.gamePlayers[this.currentPlayerIndex];
-    this.startTimer();
   }
 
   dealCards(firstDeal = false): void | null {
@@ -237,19 +241,20 @@ export default class Game {
   }
 
   finishGame(winnerPlayer: Player): void {
-    clearInterval(this.timer);
     this.isFinished = true;
     this.gamePlayers.forEach((player) => this.socketManager.sendMessage(player, 'game:finish', player.result));
   }
 
-  // FIXME this might be unnecessary as well. One time should be enough from global level
-  startTimer(): void {
-    this.timer = setInterval(() => {
+  ticker(callback: (tick: boolean, delta: number) => void): void {
+    const now = Date.now();
+    const delta = now - this.lastUpdate;
+    // Tick happens every second
+    const tick = this.isStarted && delta >= 1000;
+    if (tick) {
+      this.lastUpdate = Date.now();
       this.timeToMove--;
-      if (this.timeToMove <= 0) {
-        this.activePlayer.placeRandomCardFromHand();
-      }
-    }, 1000);
+    }
+    callback(tick, delta);
   }
 
   joinPlayer(player: Player, position: PlayerPositionType | null = null): void {
@@ -301,11 +306,14 @@ export default class Game {
   }
 
   tableContainsCards(cards: Card[]): boolean {
+    if (!cards?.length) return false;
+
     for (const card of cards) {
-      if (this.cards.find((c) => c.equals(card)) === undefined) {
+      if (!this.cards.find((c) => c.equals(card))) {
         return false;
       }
     }
+
     return true;
   }
 

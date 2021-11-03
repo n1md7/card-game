@@ -52,6 +52,14 @@ export default class SocketModule {
         // eslint-disable-next-line no-prototype-builtins
         if (GameModel.games.hasOwnProperty(gid)) {
           const game = GameModel.games[gid];
+          game.ticker((tick, delta) => {
+            if (tick) {
+              console.log('tick', delta);
+              // if (game.playerTime <= 0) {
+              game.activePlayer?.placeRandomCardFromHand();
+              // }
+            }
+          });
           for (const player of game.players) {
             if (game.isFinished) {
               this.io.to(player.socketId).emit('game:finished', game.statistics());

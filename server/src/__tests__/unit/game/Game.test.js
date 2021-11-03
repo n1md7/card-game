@@ -186,4 +186,33 @@ describe('Game', function () {
       game.joinPlayer(Andy);
     }).toThrow('Table is full');
   });
+
+  it('should verify .tableContainsCards()', function () {
+    const Jim = new Player('Jim-id', 'Jim');
+    const Pam = new Player('Pam-id', 'Pam');
+    const args = [2, id.game(), true, id.player(), 'Bold game', new SocketManager(SocketIO)];
+    const game = new Game(...args);
+    game.joinPlayer(Jim);
+    game.joinPlayer(Pam);
+    game.startGame();
+
+    const cards = game.cardsList.map((card) => new Card(card.suit, card.rank, card.rank));
+
+    expect(game.tableContainsCards(cards)).toBeTruthy();
+    expect(game.tableContainsCards([])).toBeFalsy();
+  });
+
+  it('should verify .removeCardsFromTable()', function () {
+    const Jim = new Player('Jim-id', 'Jim');
+    const Pam = new Player('Pam-id', 'Pam');
+    const args = [2, id.game(), true, id.player(), 'Bold game', new SocketManager(SocketIO)];
+    const game = new Game(...args);
+    game.joinPlayer(Jim);
+    game.joinPlayer(Pam);
+    game.startGame();
+
+    const cards = game.cardsList.map((card) => new Card(card.suit, card.rank, card.rank));
+    game.removeCardsFromTable(cards);
+    expect(game.tableContainsCards(cards)).toBeFalsy();
+  });
 });

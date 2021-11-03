@@ -43,7 +43,7 @@ export default class Player {
   get data(): PlayerDataType {
     const progressValue =
       this.game && this.game.activePlayer && this.game.activePlayer.equals(this)
-        ? (100 * this.game.timeToMove) / PLAYER_MOVER_INTERVAL
+        ? (100 * this.game.playerTime) / PLAYER_MOVER_INTERVAL
         : 0;
 
     return {
