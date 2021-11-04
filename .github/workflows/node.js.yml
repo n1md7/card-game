@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x]
+        node-version: [14.16.0]
 
     steps:
     - uses: actions/checkout@v2
@@ -26,5 +26,4 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: cd server
     - run: npm i --prefix ./server
-    - run: npm --prefix ./server run test:os-linux
-#     - run: npm run test:os-linux
+    - run: npm --prefix ./server run test
