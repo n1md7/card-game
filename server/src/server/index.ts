@@ -123,7 +123,7 @@ export default class Server {
       cookie: false,
     });
 
-    this.socketModule = new SocketModule(this.ioServer, this.koa, new Events(this.koa));
+    this.socketModule = new SocketModule(this.ioServer, this.koa, new Events());
     this.socketManager = new SocketManager(this.ioServer);
     this.serverTimer = this.socketModule.sendUpdatesEvery(100);
 
