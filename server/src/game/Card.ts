@@ -43,13 +43,12 @@ export class Card {
     }
 
     if (this.value === CardRank.JACK) {
-      const counter = {
+      const counter: { [key: number]: number } = {
         [CardRank.QUEEN]: 0,
         [CardRank.KING]: 0,
       };
       for (const card of cards) {
         if (card.value > CardRank.JACK) {
-          // @ts-ignore
           counter[card.value]++;
         }
       }
