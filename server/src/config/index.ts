@@ -5,7 +5,7 @@ export default {
     hostname: '0.0.0.0',
     // hostname: 'localhost',
     port: 8000,
-    staticFolderPath: '../../../game/build',
+    staticFolderPath: '../../../clientApp/build',
     indexFile: '/index.html',
   },
   origins: [

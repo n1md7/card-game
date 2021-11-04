@@ -5,6 +5,7 @@ RUN apk update
 
 COPY . .
 RUN npm install
+RUN npm rebuild node-sass --prefix clientApp
 RUN npm run server:build:prod
 RUN npm run client:build:prod
 
