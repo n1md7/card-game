@@ -8,6 +8,7 @@
     "server:start:dev": "npm run dev --prefix server",
     "server:start:test": "npm run test --prefix server",
     "server:install": "npm install --prefix server",
+    "server:tests": "npm run test --prefix server",
     "client:build:prod": "npm run build --prefix clientApp",
     "client:start:dev": "npm run start --prefix clientApp",
     "client:start:test": "npm run test --prefix clientApp",
