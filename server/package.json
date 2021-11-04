@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "npx rimraf dist/*",
     "dev": "ts-node-dev src/index.ts",
-    "prod:build": "npx rimraf dist && npx tsc",
+    "prod:build": "npx rimraf dist && tsc",
     "prod": "export NODE_ENV=production && node dist/index.js",
     "mongo:init": "npx migrate-mongo init",
     "mongo:create": "npx migrate-mongo create",

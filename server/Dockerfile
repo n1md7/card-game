@@ -4,10 +4,15 @@ WORKDIR card-game
 RUN apk update
 
 COPY . .
-RUN npm install
+
+RUN npm install --prefix clientApp
 RUN npm rebuild node-sass --prefix clientApp
-RUN npm run server:build:prod
-RUN npm run client:build:prod
+
+RUN npm install --prefix server
+RUN npm run prod:build --prefix server
+
+#RUN npm run server:build:prod
+#RUN npm run client:build:prod
 
 EXPOSE 8000
 
