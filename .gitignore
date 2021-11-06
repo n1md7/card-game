@@ -6,3 +6,4 @@ coverage
 logs
 server/logs
 env
+reports

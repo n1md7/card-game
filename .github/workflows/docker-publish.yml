@@ -43,9 +43,9 @@ jobs:
           fail_ci_if_error: true
           verbose: true
           flags: unittests
-          directory: ./server/coverage
+          directory: ./reports/server
           name: codecov-umbrella
-          files: ./clover.xml
+          files: clover.xml,cobertura-coverage.xml,lcov.info,junit.xml
    
 
   # Push image to GitHub Packages.
