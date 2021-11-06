@@ -38,13 +38,14 @@ jobs:
         run: npm run server:tests
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
-        run: ls -al; pwd; ls server
         with:
           token: ${{ secrets.CODE_COV_SECRET }}
           fail_ci_if_error: true
           verbose: true
+          flags: unittests
+          directory: ./server/coverage
           name: codecov-umbrella
-#          files: ./server/coverage/clover.xml
+          files: ./clover.xml
    
 
   # Push image to GitHub Packages.
