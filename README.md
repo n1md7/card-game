@@ -8,18 +8,28 @@ Read more about the game [here](https://github.com/n1md7/card-game/wiki)
 
 ```bash
 # Install dependencies
-npm install
+$ npm install
 
 # Start development
-npm run dev
+$ npm run dev
 ```
 
 ```bash
 # If you would like to run them separately use commands below
 
 # ClientApp
-npm run client:start:dev
+$ npm run client:start:dev
 
 # Server
-npm run server:start:dev
+$ npm run server:start:dev
+```
+
+### Use Docker image
+
+```bash
+# Pull image from the command line
+$ docker pull docker.pkg.github.com/n1md7/card-game/phurti:latest
+
+# Use as base image in DockerFile:
+FROM docker.pkg.github.com/n1md7/card-game/phurti:latest
 ```
