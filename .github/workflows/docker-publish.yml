@@ -43,7 +43,7 @@ jobs:
           fail_ci_if_error: true
           verbose: true
           name: codecov-umbrella
-          files: ./server/coverage/clover.xml
+#          files: ./server/coverage/clover.xml
    
 
   # Push image to GitHub Packages.
