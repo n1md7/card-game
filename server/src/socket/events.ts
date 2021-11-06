@@ -1,4 +1,4 @@
-import { Card } from '../game/Card';
+import Card from '../game/Card';
 import { CardRankName, cardRanksByName, CardSuit, cardSuitsByName } from 'shared-types';
 import PlayerModel from '../model/PlayerModel';
 
