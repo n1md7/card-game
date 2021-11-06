@@ -7,7 +7,7 @@ import { ActionType, CardRankName, CardSuit } from 'shared-types';
 import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
 import { SocketManager } from '../socket/manager';
 import { PlayerPositionType, TransformedPlayerData } from './types';
-import { not } from '../helpers/extras';
+import { not } from '../helpers';
 
 export default class Game {
   public isStarted: boolean;
@@ -20,7 +20,8 @@ export default class Game {
   private cards: Card[];
   private creatorId: string;
   private lastTaker: Player;
-  private maxScores: number;
+  private readonly maxScores: number = 11;
+  private readonly dealCardsAmount: number = 4;
   private readonly gamePlayers: Player[];
   private readonly gameId: string;
   private readonly numberOfPlayers: number;
@@ -36,7 +37,6 @@ export default class Game {
     userId: string,
     name: string,
     socketManager: SocketManager,
-    maxScores = 11,
   ) {
     this.numberOfPlayers = numberOfPlayers;
     this.deck = new Deck();
@@ -50,7 +50,6 @@ export default class Game {
     this.creatorId = userId;
     this.creatorName = name;
     this.isPublic = isPublic;
-    this.maxScores = maxScores;
     this.socketManager = socketManager;
     this.positions = ['down', 'left', 'up', 'right'];
   }
@@ -102,7 +101,7 @@ export default class Game {
   }
 
   findEmptyPositions() {
-    return this.positions.filter((item) => !this.occupiedPositions.includes(item));
+    return this.positions.filter((item) => not(this.occupiedPositions.includes(item)));
   }
 
   startGame(): void {
@@ -117,13 +116,13 @@ export default class Game {
     }
 
     for (const player of this.gamePlayers) {
-      const numberOfCards = 4 - player.cards.length;
+      const numberOfCards = this.dealCardsAmount - player.cards.length;
       if (numberOfCards > 0) {
         player.takeCardsInHand(this.deck.distributeCards(numberOfCards));
       }
     }
     if (firstDeal) {
-      this.cards = this.deck.distributeCards(4);
+      this.cards = this.deck.distributeCards(this.dealCardsAmount);
     }
   }
 

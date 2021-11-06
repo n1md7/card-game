@@ -1,5 +1,15 @@
+import { Env } from './index';
+
 export type ConfigOptions = {
+  env: Env;
+  test: {
+    port: number;
+  };
+  app: {
+    port: number;
+  };
   server: ServerConfig;
+  computedOrigins: null | string[];
   origins: string[];
   loggerOptions: LoggerOptions;
 };

@@ -1,6 +1,6 @@
 import Card from './Card';
 import { cardRanksByName, cardSuitsByName } from 'shared-types';
-import { getRandomInt } from '../helpers/extras';
+import { getRandomInt } from '../helpers';
 
 export default class Deck {
   private readonly cards: Card[];

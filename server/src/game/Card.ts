@@ -1,5 +1,5 @@
 import { CARD_SUM_VALUE, CardRank, CardRankName, CardSuit } from 'shared-types';
-import { isEven } from '../helpers/extras';
+import { isEven } from '../helpers';
 
 export default class Card {
   public readonly suit: CardSuit;

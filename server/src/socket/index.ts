@@ -1,5 +1,5 @@
 import SocketIO, { Socket } from 'socket.io';
-import { isset } from '../helpers/extras';
+import { isset } from '../helpers';
 import { ErrorType, JWTProps, KoaEvent } from '../types';
 import { Token } from 'shared-types';
 import Events from './events';

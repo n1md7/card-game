@@ -15,8 +15,9 @@
     "mongo:status": "npx migrate-mongo status",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "test": "jest --forceExit",
-    "test:cov": "jest --coverage --forceExit"
+    "test": "export NODE_ENV=test && jest --forceExit",
+    "test:cov": "export NODE_ENV=test && jest --coverage --forceExit",
+    "generate:env-types": "npx gen-env-types .env -o src/env.d.ts -e ."
   },
   "repository": {
     "type": "git",
@@ -77,7 +78,7 @@
     "@types/koa-bodyparser": "^4.3.0",
     "@types/koa-router": "^7.4.1",
     "@types/koa-static": "^4.0.1",
-    "@types/node": "^14.14.25",
+    "@types/node": "^14.17.32",
     "@types/shelljs": "^0.8.8",
     "@types/socket.io": "^2.1.11",
     "@typescript-eslint/eslint-plugin": "^4.15.0",
@@ -85,6 +86,7 @@
     "axios-mock-adapter": "^1.19.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.6.3",
+    "chalk": "^2.4.2",
     "eslint": "^7.19.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",

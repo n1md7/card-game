@@ -1,23 +1,45 @@
-export default {
+import { ConfigOptions, Env } from '../types';
+
+const config: ConfigOptions = {
+  env: process.env.NODE_ENV as Env,
+  test: {
+    port: 3456,
+  },
+  app: {
+    port: +process.env.SERVER_PORT,
+  },
   server: {
     apiContextPath: '/api',
-    // It has to be 0.0.0.0 when serving from Docker container
     hostname: '0.0.0.0',
-    // hostname: 'localhost',
-    port: 8000,
+    port: +process.env.SERVER_PORT,
     staticFolderPath: '../../../clientApp/build',
     indexFile: '/index.html',
   },
-  origins: [
-    'http://localhost',
-    'http://localhost:3000',
-    'http://localhost:8000',
-    'http://localhost:3456',
-    'http://192.168.1.154',
-    'http://192.168.1.154:3000',
-    'http://192.168.1.154:8000',
-    'http://192.168.1.154:3456',
-  ],
+  computedOrigins: null,
+  get origins(): string[] {
+    if (config.computedOrigins) return config.computedOrigins;
+
+    const envOrigins: { ref: string[] } = { ref: [] };
+    try {
+      envOrigins.ref = JSON.parse(process.env.ORIGINS);
+    } catch (e) {
+      envOrigins.ref = [];
+      throw new Error(`Was not able to parse ORIGINS: ${process.env.ORIGINS};`);
+    }
+
+    const http = ' http';
+    const domains = ['localhost', '127.0.0.1'];
+    const ports = [config.app.port, config.server.port, config.test.port];
+    const origins: string[] = [];
+    ports.forEach((port) => {
+      domains.forEach((domain) => {
+        origins.push(`${http}://${domain}:${port}`);
+      });
+    });
+    origins.push(...envOrigins.ref);
+
+    return origins;
+  },
   loggerOptions: {
     fileOptions: {
       maxsize: 100000000,
@@ -28,3 +50,5 @@ export default {
     excludeUrlsFromLogger: ['/health-check'],
   },
 };
+
+export default config;

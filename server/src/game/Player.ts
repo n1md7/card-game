@@ -3,9 +3,9 @@ import { ActionType } from 'shared-types';
 import { gameStore } from '../store';
 import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
 import { PlayerResult } from './PlayerResult';
-import { getRandomInt } from '../helpers/extras';
+import { getRandomInt } from '../helpers';
 import GameException from '../exceptions/GameException';
-import { PlayerCardsRespType, PlayerDataType, PlayerPositionType } from './types/player';
+import { PlayerCardsRespType, PlayerDataType, PlayerPositionType } from './types';
 
 export default class Player {
   public position: PlayerPositionType;

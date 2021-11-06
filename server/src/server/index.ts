@@ -5,8 +5,7 @@ import cors from '@koa/cors';
 import logWrite from '../logger';
 import routes from '../routes';
 import handleErrors from '../middleware/ErrorHandler';
-import { Env, KoaEvent } from '../types';
-import { ConfigOptions } from '../types/config';
+import { ConfigOptions, Env, KoaEvent } from '../types';
 import path from 'path';
 import http, { Server as HttpServer } from 'http';
 import SocketIO, { Server as SocketIoServer } from 'socket.io';
@@ -16,26 +15,21 @@ import serveIndexHTML from '../middleware/serveIndexHTML';
 import handleApiNotFound from '../middleware/handleApiNotFound';
 import Events from '../socket/events';
 import { Token } from 'shared-types';
-import os from 'os';
+import chalk from 'chalk';
+import { ip } from '../helpers';
 
 export default class Server {
   public koa: Koa;
   public httpServer: HttpServer;
   public ioServer: SocketIoServer;
-  private readonly config: ConfigOptions;
-  private readonly staticFolderPath: string;
   private socketModule: SocketModule;
   private socketManager: SocketManager;
   private serverTimer: NodeJS.Timer;
+  private readonly staticFolderPath: string;
 
-  constructor(config: ConfigOptions) {
-    this.config = config;
+  constructor(private readonly config: ConfigOptions) {
     // Makes publicly accessible React build folder
     this.staticFolderPath = path.join(__dirname, config.server.staticFolderPath);
-    // Allow any cross-domain requests when not Production environment
-    // if (process.env.NODE_ENV === Env.Prod) {
-    //   this.config.origin = process.env.ORIGIN;
-    // }
   }
 
   get io() {
@@ -99,12 +93,11 @@ export default class Server {
     return new Promise((resolve) => {
       this.httpServer.listen(port, hostname, function () {
         if (process.env.NODE_ENV !== Env.Test) {
-          logWrite.debug(`Example API endpoint - http://${hostname}:${port}${apiContextPath}/v1/storage`);
+          const localhost = chalk.blue(`http://127.0.0.1:${port}${apiContextPath}/v1/storage`);
+          logWrite.debug(`Example API endpoint: ${localhost}`);
           if (process.env.NODE_ENV === Env.Dev) {
-            const [{ address = '[::1]' }] = Object.values(os.networkInterfaces())
-              .flat()
-              .filter((item) => !item.internal && item.family === 'IPv4');
-            logWrite.debug(`Your local IP: ${address}`);
+            const localEndpoint = chalk.blue(`http://${ip.address}:${port}`);
+            logWrite.debug(`Your local endpoint: ${localEndpoint}`);
           }
           logWrite.debug('Server (re)started! Ready to serve the master');
         }

@@ -2,12 +2,10 @@ import { createLogger as initLogger, format, transports } from 'winston';
 import config from '../config';
 import { Format } from 'logform';
 import { ConsoleTransportInstance, FileTransportInstance } from 'winston/lib/winston/transports';
-import { Level, TransportType } from '../types/logger';
-import { Env } from '../types';
+import { Level, TransportType, Env } from '../types';
 
 class Logger {
   static instance: Logger;
-  static env: Env = process.env.NODE_ENV as Env;
 
   static getInstance(): Logger {
     if (!Logger.instance) {
@@ -45,9 +43,11 @@ class Logger {
 
   createLogger() {
     return initLogger({
-      level: Logger.env === Env.Prod ? Level.Info : Level.Debug,
+      level: config.env === Env.Prod ? Level.Info : Level.Debug,
+      silent: config.env === Env.Test, // do not show any log on tests
+      handleExceptions: true,
       transports:
-        Logger.env === Env.Prod
+        config.env === Env.Prod
           ? Logger.loggingTransport(TransportType.File)
           : Logger.loggingTransport(TransportType.Console),
     });

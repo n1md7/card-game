@@ -1,4 +1,4 @@
-require('../../../helpers/index');
+require('../../../helpers/prototypes');
 
 describe('Test helper functions', () => {
   it('should remove an element from the list', () => {

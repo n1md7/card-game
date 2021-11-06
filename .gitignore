@@ -5,3 +5,4 @@ coverage
 .husky
 logs
 server/logs
+env

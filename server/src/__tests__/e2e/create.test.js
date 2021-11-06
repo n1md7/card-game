@@ -2,7 +2,7 @@ require('dotenv').config({ path: '.env.test' });
 import config from '../../config';
 import Server from '../../server';
 import axios from 'axios';
-import { copy } from '../../helpers/extras';
+import { copy } from '../../helpers';
 import { Token } from 'shared-types';
 import { HttpCode } from '../../types';
 
