@@ -1,13 +1,12 @@
 import SocketIO, { Socket } from 'socket.io';
 import { isset } from '../helpers/extras';
-import { JWTProps, KoaEvent } from '../types';
+import { ErrorType, JWTProps, KoaEvent } from '../types';
 import { Token } from 'shared-types';
 import Events from './events';
 import jsonWebToken from 'jsonwebtoken';
 import PlayerModel from '../model/PlayerModel';
 import GameModel from '../model/GameModel';
 import Koa from 'koa';
-import { ErrorType } from '../types/error';
 
 export default class SocketModule {
   constructor(private readonly io: SocketIO.Server, private readonly koa: Koa, private readonly events: Events) {
