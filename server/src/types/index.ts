@@ -1,8 +1,9 @@
+export * from './config';
+export * from './error';
+export * from './logger';
 import { Context } from 'koa';
 
-/**
- * @description extends {Koa} context with custom state props
- */
+/** @description extends {Koa} context with custom state props */
 interface MyContext extends Context {
   state: {
     user: {
@@ -12,7 +13,9 @@ interface MyContext extends Context {
   };
 }
 
-interface JWTProps {
+export { MyContext as Context };
+
+export interface JWTProps {
   userId: string;
   iat: number;
   exp: number;
@@ -29,5 +32,3 @@ export enum KoaEvent {
   serverError = 'error:server',
   debug = 'debug',
 }
-
-export { MyContext as Context, JWTProps };

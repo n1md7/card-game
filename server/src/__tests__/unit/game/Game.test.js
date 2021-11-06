@@ -6,7 +6,7 @@ import { SocketManager } from '../../../socket/manager';
 import SocketIO from 'socket.io';
 import GameModel from '../../../model/GameModel';
 import PlayerModel from '../../../model/PlayerModel';
-import { Card } from '../../../game/Card';
+import Card from '../../../game/Card';
 import { CardSuit } from 'shared-types';
 import { CardRank, CardRankName } from 'shared-types/index';
 

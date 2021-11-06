@@ -7,5 +7,7 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-prototype-builtins': 'off',
+    '@eslint/no-prototype-builtins': 'off',
+    'no-prototype-builtins': 'off',
   },
 };

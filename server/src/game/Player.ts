@@ -1,19 +1,11 @@
-import { Card } from './Card';
-import { ActionType, CardRankName, CardSuit } from 'shared-types';
+import Card from './Card';
+import { ActionType } from 'shared-types';
 import { gameStore } from '../store';
 import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
 import { PlayerResult } from './PlayerResult';
 import { getRandomInt } from '../helpers/extras';
 import GameException from '../exceptions/GameException';
-
-export type PlayerPositionType = 'down' | 'left' | 'up' | 'right';
-export type PlayerDataType = {
-  taken: boolean;
-  name: string;
-  progress: number;
-  cards: number;
-  score: number;
-};
+import { PlayerCardsRespType, PlayerDataType, PlayerPositionType } from './types/player';
 
 export default class Player {
   public position: PlayerPositionType;
@@ -55,11 +47,7 @@ export default class Player {
     };
   }
 
-  get handCards(): {
-    rank: CardRankName;
-    suit: CardSuit;
-  }[] {
-    // FiXme: transforming object should not be necessary
+  get handCards(): PlayerCardsRespType[] {
     return this.playerCardsInHand.reduce(
       (acc, card: Card) => [
         ...acc,
@@ -68,7 +56,7 @@ export default class Player {
           suit: card.suit,
         },
       ],
-      [],
+      [] as PlayerCardsRespType[],
     );
   }
 

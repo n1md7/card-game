@@ -1,5 +1,5 @@
 import { PlayerResult } from '../../../game/PlayerResult';
-import { Card } from '../../../game/Card';
+import Card from '../../../game/Card';
 import { CardRank, CardRankName, CardSuit } from 'shared-types';
 
 describe('PlayerResult', function () {

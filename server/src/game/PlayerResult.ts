@@ -1,4 +1,4 @@
-import { Card } from './Card';
+import Card from './Card';
 import { CardRank, cardRanksByName, CardSuit } from 'shared-types';
 
 export class PlayerResult {

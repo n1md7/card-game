@@ -4,7 +4,7 @@ import Server from '../../server';
 import axios from 'axios';
 import { copy } from '../../helpers/extras';
 import { Token } from 'shared-types';
-import { HttpCode } from '../../types/error';
+import { HttpCode } from '../../types';
 
 describe('Create user/verify', () => {
   const ref = { httpServer: null, myConfig: null, request: null };

@@ -1,4 +1,5 @@
 const { id } = require('../../../helpers/ids');
+const { not } = require('../../../helpers/extras');
 
 describe.each([
   ['room', 7, 'R'],
@@ -21,5 +22,19 @@ describe.each([
     const generate = id[idFor](len);
     expect(generate).toHaveLength(len + 2);
     expect(generate[0]).toBe(leadingLetter);
+  });
+});
+
+describe.each([
+  [true, false],
+  [false, true],
+  [undefined, true],
+  ['', true],
+  [null, true],
+  [0, true],
+  ['Hey', false],
+])('Testing not function not(%s)=>%s', (state, value) => {
+  it(`Should return ${state}`, () => {
+    expect(not(state)).toBe(value);
   });
 });

@@ -1,6 +1,6 @@
 import Player from '../../../game/Player';
 import { CardRank, CardRankName, CardSuit } from 'shared-types';
-import { Card } from '../../../game/Card';
+import Card from '../../../game/Card';
 import { id } from '../../../helpers/ids';
 import { gameStore, playerStore, userStore } from '../../../store';
 import Game from '../../../game/Game';

@@ -1,13 +1,13 @@
 import Deck from './Deck';
-import Player, { PlayerDataType, PlayerPositionType } from './Player';
+import Player from './Player';
+import User from './User';
+import Card from './Card';
+import GameException from '../exceptions/GameException';
 import { ActionType, CardRankName, CardSuit } from 'shared-types';
-import { Card } from './Card';
 import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
 import { SocketManager } from '../socket/manager';
-import GameException from '../exceptions/GameException';
-import User from './User';
-
-type TransformedPlayerData = { [position in PlayerPositionType]: PlayerDataType };
+import { PlayerPositionType, TransformedPlayerData } from './types';
+import { not } from '../helpers/extras';
 
 export default class Game {
   public isStarted: boolean;
@@ -150,16 +150,13 @@ export default class Game {
       };
     }
 
-    type Result = { [key in PlayerPositionType]: TransformedPlayerData };
-    const result: Result = {} as Result;
+    const result = {} as TransformedPlayerData;
     const positionShift = this.positions.indexOf(requestPlayer.position);
     for (const key in transformedPlayerData) {
-      // eslint-disable-next-line no-prototype-builtins
       if (transformedPlayerData.hasOwnProperty(key)) {
         const newIndex = { value: this.positions.indexOf(key as PlayerPositionType) - positionShift };
         newIndex.value = newIndex.value >= 0 ? newIndex.value : 4 + newIndex.value;
-        const newPosition = this.positions[newIndex.value];
-        // @ts-ignore
+        const newPosition: PlayerPositionType = this.positions[newIndex.value];
         result[newPosition] = transformedPlayerData[key as PlayerPositionType];
       }
     }
@@ -360,8 +357,10 @@ export default class Game {
 
   validateAction(player: Player, type: ActionType, playerCard: Card, tableCards: Card[]): void {
     if (player.not.equals(this.activePlayer)) throw new GameException('Action validation problem. Incorrect player.');
-    if (type === ActionType.TAKE_CARDS && (!tableCards.length || !this.tableContainsCards(tableCards))) {
-      throw new GameException('Action validation problem. Incorrect cards.');
+    if (type === ActionType.TAKE_CARDS) {
+      if (tableCards.length === 0 || not(this.tableContainsCards(tableCards))) {
+        throw new GameException('Action validation problem. Incorrect cards.');
+      }
     }
     if (type === ActionType.TAKE_CARDS && !playerCard.canTakeCards(tableCards)) {
       throw new GameException('Action validation problem. Incorrect move.');
