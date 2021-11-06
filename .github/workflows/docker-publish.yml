@@ -3,9 +3,7 @@ name: Docker
 on:
   push:
     # Publish `master` as Docker `latest` image.
-    branches:
-      - master
-      - develop
+    branches: [ master ]
 
     # Publish `v1.2.3` tags as releases.
     tags:
@@ -13,6 +11,7 @@ on:
 
   # Run tests for any PRs.
   pull_request:
+    branches: [ master ]
 
 env:
   IMAGE_NAME: phurti
@@ -20,26 +19,28 @@ env:
 jobs:
   # Run tests.
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
-  test:
+  verify:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 14.16.0 ]
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Run tests
-        run: |
-          if [ -f docker-compose.test.yml ]; then
-            docker-compose --file docker-compose.test.yml build
-            docker-compose --file docker-compose.test.yml run sut
-          else
-            docker build . --file ./server/Dockerfile
-          fi
+      - name: Use Node.js ${{ matrix.node-version }} to run tests
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - run: npm run server:tests
+   
 
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   push:
     # Ensure test job passes before pushing image.
-    needs: test
+    needs: verify
 
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
