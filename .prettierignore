@@ -1,9 +1,6 @@
-dist
 build
-logs
 .idea
 .github
-deploy
 node_modules
-coverage
+reports
 /shared-types/index.js

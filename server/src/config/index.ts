@@ -12,7 +12,7 @@ const config: ConfigOptions = {
     apiContextPath: '/api',
     hostname: '0.0.0.0',
     port: +process.env.SERVER_PORT,
-    staticFolderPath: '../../../clientApp/build',
+    staticFolderPath: process.env.STATIC_PATH || '../../../clientApp/build',
     indexFile: '/index.html',
   },
   computedOrigins: null,

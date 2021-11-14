@@ -6,13 +6,17 @@ module.exports = {
     '^.+\\.tsx?$': 'ts-jest',
   },
   coveragePathIgnorePatterns: ['src/middleware'],
-  coverageDirectory: "../reports/server",
+  coverageDirectory: '../reports/server',
   reporters: [
-    "default", ["jest-junit", {
-      "suiteName": "Server unit tests",
-      "outputDirectory": "<rootDir>/../reports/server",
-      "outputName": "junit.xml",
-    }]
+    'default',
+    [
+      'jest-junit',
+      {
+        suiteName: 'Server unit tests',
+        outputDirectory: '<rootDir>/../reports/server',
+        outputName: 'junit.xml',
+      },
+    ],
   ],
-  "coverageReporters": ["json", "lcov", "text", "text-summary", "clover", "cobertura"]
+  coverageReporters: ['json', 'lcov', 'text', 'text-summary', 'clover', 'cobertura'],
 };

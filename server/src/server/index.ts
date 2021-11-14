@@ -53,7 +53,8 @@ export default class Server {
     this.koa.use(
       cors({
         origin: (ctx: Koa.Context) => {
-          if (this.config.origins.includes(ctx.headers.origin)) {
+          // Allow preconfigured origins and 'localhost' to path through
+          if (this.config.origins.includes(ctx.headers.origin) || ctx.headers.origin.includes('localhost')) {
             return ctx.headers.origin;
           }
           throw new Error(

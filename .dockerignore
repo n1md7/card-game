@@ -4,3 +4,6 @@ docker-compose*
 .git
 .gitignore
 README.md
+__tests__
+dist
+node_modules

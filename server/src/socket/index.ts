@@ -1,5 +1,5 @@
 import SocketIO, { Socket } from 'socket.io';
-import { isset } from '../helpers';
+import { isset, not } from '../helpers';
 import { ErrorType, JWTProps, KoaEvent } from '../types';
 import { Token } from 'shared-types';
 import Events from './events';
@@ -48,16 +48,17 @@ export default class SocketModule {
   public sendUpdatesEvery = (milliseconds = 1000) =>
     setInterval(() => {
       for (const gid in GameModel.games) {
-        // eslint-disable-next-line no-prototype-builtins
         if (GameModel.games.hasOwnProperty(gid)) {
           const game = GameModel.games[gid];
           game.ticker((tick, delta) => {
-            if (tick) {
-              console.log('tick', delta);
-              // if (game.playerTime <= 0) {
+            // if (tick) {
+            console.log('tick', delta);
+            // if (game.playerTime <= 0) {
+            if (not(game.isFinished)) {
               game.activePlayer?.placeRandomCardFromHand();
-              // }
             }
+            // }
+            // }
           });
           for (const player of game.players) {
             if (game.isFinished) {

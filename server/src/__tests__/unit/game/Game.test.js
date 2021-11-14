@@ -1,5 +1,5 @@
 import Player from '../../../game/Player';
-import { id } from '../../../helpers/ids';
+import { id } from '../../../helpers';
 import { gameStore, playerStore, userStore } from '../../../store';
 import Game from '../../../game/Game';
 import { SocketManager } from '../../../socket/manager';
@@ -214,5 +214,125 @@ describe('Game', function () {
     const cards = game.cardsList.map((card) => new Card(card.suit, card.rank, card.rank));
     game.removeCardsFromTable(cards);
     expect(game.tableContainsCards(cards)).toBeFalsy();
+  });
+
+  it('should do score calculation', function () {
+    const Alex = new Player('Alex-id', 'Alex');
+    const Jason = new Player('Jason-id', 'Jason');
+    Alex.scoreCards([
+      new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.TWO, CardRank.TWO), // +1 point
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+    ]);
+    Jason.scoreCards([
+      new Card(CardSuit.DIAMONDS, CardRankName.TEN, CardRank.TEN), // +1 point
+      new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+      new Card(CardSuit.CLUBS, CardRankName.NINE, CardRank.NINE),
+    ]);
+    // Jason have more cards (+2 points) and more clubs count (+1 point)
+    Game.calculateScores([Alex, Jason]);
+    expect(Alex.score).toBe(1);
+    expect(Jason.score).toBe(4);
+  });
+
+  it('should do score calculation when amount of cards are draw', function () {
+    const Alex = new Player('Alex-id', 'Alex');
+    const Jason = new Player('Jason-id', 'Jason');
+    Alex.scoreCards([
+      new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.TWO, CardRank.TWO), // +1 point
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+    ]);
+    Jason.scoreCards([
+      new Card(CardSuit.DIAMONDS, CardRankName.TEN, CardRank.TEN), // +1 point
+      new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+    ]);
+    // Amount of cards are equal so no one get points so the amount of clubs is equal too
+    Game.calculateScores([Alex, Jason]);
+    expect(Alex.score).toBe(1);
+    expect(Jason.score).toBe(1);
+  });
+
+  it('should do score calculation when only one player scores', function () {
+    const Alex = new Player('Alex-id', 'Alex');
+    const Jason = new Player('Jason-id', 'Jason');
+    Alex.scoreCards([
+      new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.TWO, CardRank.TWO), // +1 point
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+      new Card(CardSuit.DIAMONDS, CardRankName.TEN, CardRank.TEN), // +1 point
+    ]);
+    Jason.scoreCards([new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE)]);
+    Game.calculateScores([Alex, Jason]);
+    expect(Alex.score).toBe(5);
+    expect(Jason.score).toBe(0);
+  });
+
+  it('should do score calculation for 3 players', function () {
+    const Alex = new Player('Alex-id', 'Alex');
+    const Jason = new Player('Jason-id', 'Jason');
+    const Julie = new Player('Julie-id', 'Julie');
+    Alex.scoreCards([
+      new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.TWO, CardRank.TWO), // +1 point
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+      new Card(CardSuit.DIAMONDS, CardRankName.TEN, CardRank.TEN), // +1 point
+    ]);
+    Jason.scoreCards([new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE)]);
+    Julie.scoreCards([
+      new Card(CardSuit.SPADES, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.SPADES, CardRankName.TWO, CardRank.TWO),
+      new Card(CardSuit.CLUBS, CardRankName.THREE, CardRank.THREE),
+      new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),
+      new Card(CardSuit.CLUBS, CardRankName.TEN, CardRank.TEN),
+      new Card(CardSuit.CLUBS, CardRankName.JACK, CardRank.JACK),
+      new Card(CardSuit.CLUBS, CardRankName.QUEEN, CardRank.QUEEN),
+    ]);
+    Game.calculateScores([Alex, Jason, Julie]);
+    expect(Alex.score).toBe(2);
+    expect(Jason.score).toBe(0);
+    expect(Julie.score).toBe(3);
+  });
+
+  it('should do score calculation for 4 players', function () {
+    const Alex = new Player('Alex-id', 'Alex');
+    const Jason = new Player('Jason-id', 'Jason');
+    const Julie = new Player('Julie-id', 'Julie');
+    const Pablo = new Player('Pablo-id', 'Pablo');
+    Alex.scoreCards([
+      new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.CLUBS, CardRankName.TWO, CardRank.TWO), // +1 point
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+    ]);
+    Jason.scoreCards([
+      new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
+      new Card(CardSuit.DIAMONDS, CardRankName.TEN, CardRank.TEN), // +1 point
+    ]);
+    Julie.scoreCards([
+      new Card(CardSuit.SPADES, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.SPADES, CardRankName.TWO, CardRank.TWO),
+      new Card(CardSuit.CLUBS, CardRankName.THREE, CardRank.THREE),
+      new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),
+      new Card(CardSuit.CLUBS, CardRankName.TEN, CardRank.TEN),
+      new Card(CardSuit.CLUBS, CardRankName.JACK, CardRank.JACK),
+      new Card(CardSuit.CLUBS, CardRankName.QUEEN, CardRank.QUEEN),
+    ]);
+    Pablo.scoreCards([
+      new Card(CardSuit.HEARTS, CardRankName.ACE, CardRank.ACE),
+      new Card(CardSuit.HEARTS, CardRankName.TWO, CardRank.TWO),
+      new Card(CardSuit.HEARTS, CardRankName.THREE, CardRank.THREE),
+      new Card(CardSuit.HEARTS, CardRankName.FIVE, CardRank.FIVE),
+      new Card(CardSuit.HEARTS, CardRankName.TEN, CardRank.TEN),
+      new Card(CardSuit.HEARTS, CardRankName.JACK, CardRank.JACK),
+      new Card(CardSuit.HEARTS, CardRankName.QUEEN, CardRank.QUEEN),
+      new Card(CardSuit.HEARTS, CardRankName.KING, CardRank.KING),
+    ]);
+    Game.calculateScores([Alex, Jason, Julie, Pablo]);
+    expect(Alex.score).toBe(1);
+    expect(Jason.score).toBe(1);
+    expect(Julie.score).toBe(1);
+    expect(Pablo.score).toBe(2);
   });
 });

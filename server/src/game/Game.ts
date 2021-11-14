@@ -4,7 +4,13 @@ import User from './User';
 import Card from './Card';
 import GameException from '../exceptions/GameException';
 import { ActionType, CardRankName, CardSuit } from 'shared-types';
-import { PLAYER_MOVER_INTERVAL } from '../constant/gameConfig';
+import {
+  PLAYER_MOVER_INTERVAL,
+  SCORE_FOR_MAX_CARDS,
+  SCORE_FOR_MAX_CLUBS,
+  SCORE_FOR_TEN_OF_DIAMONDS,
+  SCORE_FOR_TWO_OF_CLUBS,
+} from '../constant/gameConfig';
 import { SocketManager } from '../socket/manager';
 import { PlayerPositionType, TransformedPlayerData } from './types';
 import { not } from '../helpers';
@@ -13,13 +19,42 @@ export default class Game {
   public isStarted: boolean;
   public isFinished: boolean;
   public activePlayer: Player;
-  private timeToMove: number;
-  private lastUpdate: number;
+
+  /**
+   * @description Game deck of cards.
+   */
   private deck: Deck;
-  private currentPlayerIndex: number;
+
+  /**
+   * @description Game timer. It keeps track of the game timer when the last update happened to send the events.
+   */
+  private lastUpdate: number;
+
+  /**
+   * @description Current player index. It represents the active player index - whoever is making the move.
+   */
+  private cpi: number;
+
+  /**
+   * @description Table cards array.
+   */
   private cards: Card[];
+
+  /**
+   * @description Game creator(player) identifier
+   */
   private creatorId: string;
-  private lastTaker: Player;
+
+  /**
+   * @description Player time to move. When player time to move is over, the game will place the random card.
+   */
+  private timeToMove: number;
+
+  /**
+   * @description Player whoever scored card the last time
+   */
+  private lastCardTaker: Player;
+
   private readonly maxScores: number = 11;
   private readonly dealCardsAmount: number = 4;
   private readonly gamePlayers: Player[];
@@ -27,7 +62,12 @@ export default class Game {
   private readonly numberOfPlayers: number;
   private readonly creatorName: string;
   private readonly isPublic: boolean;
-  private readonly socketManager: SocketManager;
+
+  /**
+   * @description Game socket manager.
+   * @private
+   */
+  private readonly io: SocketManager;
   private readonly positions: PlayerPositionType[];
 
   constructor(
@@ -46,11 +86,11 @@ export default class Game {
     this.timeToMove = PLAYER_MOVER_INTERVAL;
     this.lastUpdate = Date.now();
     this.cards = [];
-    this.currentPlayerIndex = 0;
+    this.cpi = 0;
     this.creatorId = userId;
     this.creatorName = name;
     this.isPublic = isPublic;
-    this.socketManager = socketManager;
+    this.io = socketManager;
     this.positions = ['down', 'left', 'up', 'right'];
   }
 
@@ -100,6 +140,25 @@ export default class Game {
     return this.gamePlayers.reduce((opAcc, { position }) => [...opAcc, position], [] as PlayerPositionType[]);
   }
 
+  /**
+   * @description It calculates game scores and mutates original players
+   */
+  public static calculateScores(players: Player[]) {
+    const max = { clubs: 0, cards: 0 };
+    for (const player of players) {
+      player.calculateResult();
+      if (player.result.numberOfClubs > max.clubs) max.clubs = player.result.numberOfClubs;
+      if (player.result.numberOfCards > max.cards) max.cards = player.result.numberOfCards;
+      if (player.result.hasTenOfDiamonds) player.score += SCORE_FOR_TEN_OF_DIAMONDS;
+      if (player.result.hasTwoOfClubs) player.score += SCORE_FOR_TWO_OF_CLUBS;
+    }
+
+    const [clubWinner, clubsDrawn = null] = players.filter((player) => player.result.numberOfClubs === max.clubs);
+    const [cardWinner, cardsDrawn = null] = players.filter((player) => player.result.numberOfCards === max.cards);
+    if (null === cardsDrawn) cardWinner.score += SCORE_FOR_MAX_CARDS;
+    if (null === clubsDrawn) clubWinner.score += SCORE_FOR_MAX_CLUBS;
+  }
+
   findEmptyPositions() {
     return this.positions.filter((item) => not(this.occupiedPositions.includes(item)));
   }
@@ -107,7 +166,9 @@ export default class Game {
   startGame(): void {
     this.isStarted = true;
     this.dealCards(true);
-    this.activePlayer = this.gamePlayers[this.currentPlayerIndex];
+    this.activePlayer = this.gamePlayers[this.cpi];
+    // Mainly for testing purposes to have it the default value
+    this.lastCardTaker = this.activePlayer;
   }
 
   dealCards(firstDeal = false): void | null {
@@ -174,61 +235,44 @@ export default class Game {
   }
 
   changePlayer(): void {
-    this.currentPlayerIndex++;
-    if (this.currentPlayerIndex >= this.gamePlayers.length) {
-      this.currentPlayerIndex = 0;
+    this.cpi++;
+    if (this.cpi >= this.gamePlayers.length) {
+      this.cpi = 0;
       if (!this.playersHaveCard()) {
         if (this.deck.isEmpty()) {
-          this.finishDeck();
+          this.finishOneGame();
         } else {
           this.dealCards();
         }
       }
     }
-    this.activePlayer = this.gamePlayers[this.currentPlayerIndex];
+    this.activePlayer = this.gamePlayers[this.cpi];
     this.timeToMove = PLAYER_MOVER_INTERVAL;
   }
 
-  finishDeck(): void {
-    this.playerAction(this.lastTaker, ActionType.TAKE_CARDS, null, this.cards, true);
-    let maxCards = 0;
-    let maxClubs = 0;
-    this.gamePlayers.forEach((player) => {
-      player.calculateResult();
-      if (player.result.numberOfCards > maxCards) {
-        maxCards = player.result.numberOfCards;
-      }
-      if (player.result.numberOfClubs > maxClubs) {
-        maxClubs = player.result.numberOfClubs;
-      }
-    });
-    const clubWinners = this.gamePlayers.filter((pl) => pl.result.numberOfClubs === maxClubs);
-    const cardWinners = this.gamePlayers.filter((pl) => pl.result.numberOfCards === maxCards);
-    this.gamePlayers.forEach((player) => {
-      if (clubWinners.find((pl) => pl.equals(player)) != null) {
-        player.score += 1;
-      }
-      if (cardWinners.find((pl) => pl.equals(player)) != null) {
-        player.score += cardWinners.length > 1 ? 1 : 2;
-      }
-      if (player.result.hasTenOfDiamonds) player.score++;
-      if (player.result.hasTwoOfClubs) player.score++;
-      player.result.score = player.score;
-    });
-    this.gamePlayers.forEach((player) => this.socketManager.sendMessage(player, 'game:finish-deck', player.result));
-    const winnerScores = this.gamePlayers
-      .filter((pl) => pl.score >= this.maxScores)
-      .reduce((scores, pl: Player) => [...scores, pl.score], [])
-      .sort();
-    if (winnerScores.length > 0) {
-      const winnerScore = winnerScores[winnerScores.length - 1];
-      const winnerPlayers = this.gamePlayers.filter((pl) => pl.score === winnerScore);
-      if (winnerPlayers.length === 1) {
-        this.finishGame(winnerPlayers[0]);
+  finishOneGame(): void {
+    Game.calculateScores(this.gamePlayers);
+    const results = this.gamePlayers.map((player) => ({
+      name: player.name,
+      score: player.score,
+      result: player.result,
+    }));
+
+    this.io.to(this.gamePlayers).emit('one-game-finished', results);
+    this.evaluateEndOfGame();
+  }
+
+  evaluateEndOfGame(): void {
+    const scores = this.gamePlayers.map(({ score }) => score);
+    const max = Math.max(...scores);
+    const winnerScore = max >= this.maxScores ? max : null;
+    if (winnerScore) {
+      const [winnerPlayer, noWinner = null] = this.gamePlayers.filter(({ score }) => score === winnerScore);
+      if (null === noWinner) {
+        this.finishGame(winnerPlayer);
         return void 0;
       }
     }
-    this.restartGame();
   }
 
   restartGame(): void {
@@ -238,7 +282,8 @@ export default class Game {
 
   finishGame(winnerPlayer: Player): void {
     this.isFinished = true;
-    this.gamePlayers.forEach((player) => this.socketManager.sendMessage(player, 'game:finish', player.result));
+    const results = this.gamePlayers.map((player) => player.result);
+    this.io.to(this.gamePlayers).emit('game-is-over', results, winnerPlayer.id);
   }
 
   ticker(callback: (tick: boolean, delta: number) => void): void {
@@ -313,40 +358,35 @@ export default class Game {
     return true;
   }
 
-  playerAction(player: Player, type: ActionType, playerCard: Card, tableCards: Card[], forceMove = false): void {
-    if (!forceMove) {
-      this.validateAction(player, type, playerCard, tableCards);
+  playerAction(targetPlayer: Player, type: ActionType, playerCard: Card, tableCards: Card[]): void {
+    this.validateAction(targetPlayer, type, playerCard, tableCards);
+
+    switch (type) {
+      case ActionType.TAKE_CARDS:
+        this.removeCardsFromTable(tableCards);
+        if (playerCard !== null) {
+          targetPlayer.scoreCards([...tableCards, playerCard]);
+          targetPlayer.removeCardFromHand(playerCard);
+        } else {
+          targetPlayer.scoreCards(tableCards);
+        }
+        this.lastCardTaker = targetPlayer;
+        break;
+      case ActionType.PLACE_CARD:
+        this.cards.push(playerCard);
+        targetPlayer.removeCardFromHand(playerCard);
+        break;
+      default:
+        throw new GameException(`Invalid action type [${type}]`);
     }
-    if (type === ActionType.TAKE_CARDS) {
-      if (forceMove) {
-        console.dir('last move!');
-        console.dir(tableCards);
-      }
-      this.removeCardsFromTable(tableCards);
-      if (playerCard != null) {
-        player.scoreCards([...tableCards, playerCard]);
-        player.removeCardFromHand(playerCard);
-      } else {
-        player.scoreCards(tableCards);
-      }
-      this.lastTaker = player;
-    } else if (type === ActionType.PLACE_CARD) {
-      this.cards.push(playerCard);
-      player.removeCardFromHand(playerCard);
-    }
-    if (forceMove) {
-      console.dir('last moved!');
-      console.dir(this.cards);
-    }
-    this.gamePlayers.forEach((pl) => {
-      const positionShift = this.positions.indexOf(pl.position);
-      const movePlayerPositionIndex = {
-        value: this.positions.indexOf(player.position) - positionShift,
-      };
-      movePlayerPositionIndex.value =
-        movePlayerPositionIndex.value >= 0 ? movePlayerPositionIndex.value : 4 + movePlayerPositionIndex.value;
-      this.socketManager.sendMessage(pl, 'game:take-cards', {
-        position: this.positions[movePlayerPositionIndex.value],
+
+    this.gamePlayers.forEach((player) => {
+      const positionShift = this.positions.indexOf(player.position);
+      // Move player to the next position
+      const mppIndex = { value: this.positions.indexOf(targetPlayer.position) - positionShift };
+      mppIndex.value = mppIndex.value >= 0 ? mppIndex.value : 4 + mppIndex.value;
+      this.io.to(player).emit('game:take-cards', {
+        position: this.positions[mppIndex.value],
         playerCard,
         tableCards,
       });

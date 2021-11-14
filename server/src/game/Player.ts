@@ -11,8 +11,8 @@ export default class Player {
   public position: PlayerPositionType;
   public score: number;
   public socketId: string;
+  public readonly name: string;
   private playerResult: PlayerResult;
-  private readonly name: string;
   private readonly playerId: string;
   private playerCardsInHand: Card[] = [];
   private playerScoredCards: Card[] = [];
@@ -99,7 +99,9 @@ export default class Player {
   }
 
   placeRandomCardFromHand() {
-    this.placeCardFromHand(this.playerCardsInHand[getRandomInt(this.playerCardsInHand.length - 1)]);
+    if (this.playerCardsInHand.length > 0) {
+      this.placeCardFromHand(this.playerCardsInHand[getRandomInt(this.playerCardsInHand.length - 1)]);
+    }
   }
 
   placeCardFromHand(cardFromHand: Card) {
