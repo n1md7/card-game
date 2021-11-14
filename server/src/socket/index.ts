@@ -52,7 +52,6 @@ export default class SocketModule {
           const game = GameModel.games[gid];
           game.ticker((tick, delta) => {
             // if (tick) {
-            console.log('tick', delta);
             // if (game.playerTime <= 0) {
             if (not(game.isFinished)) {
               game.activePlayer?.placeRandomCardFromHand();
