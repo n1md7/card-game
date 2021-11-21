@@ -13,7 +13,7 @@ type PlayerMoveObject = {
 };
 
 export default class Events {
-  private static getCardFromCardObject = (cardObject: CardObject): Card => {
+  private static serializeToCardObject = (cardObject: CardObject): Card => {
     const cardSuit = cardSuitsByName.get(cardObject.suit);
     const cardRank = cardObject.rank;
     const cardValue = cardRanksByName.get(cardRank);
@@ -25,8 +25,8 @@ export default class Events {
     // {playerMoveObject} is client passed data
     return (playerMoveObject: PlayerMoveObject) => {
       const player = PlayerModel.getById(playerId);
-      const playerCard = Events.getCardFromCardObject(playerMoveObject.playerCard);
-      const tableCards = playerMoveObject.tableCards.map(Events.getCardFromCardObject);
+      const playerCard = Events.serializeToCardObject(playerMoveObject.playerCard);
+      const tableCards = playerMoveObject.tableCards.map(Events.serializeToCardObject);
       // When table is not empty than process the request otherwise place target card from hand
       tableCards.length ? player.takeCardsFromTable(playerCard, tableCards) : player.placeCardFromHand(playerCard);
     };

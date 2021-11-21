@@ -83,7 +83,7 @@ describe('Player', function () {
       new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE),
     ]);
 
-    expect(player.cards).toHaveLength(2);
+    expect(player.cardsInHand).toHaveLength(2);
   });
 
   it('should test equals()', function () {
@@ -142,9 +142,9 @@ describe('Player', function () {
       new Card(CardSuit.DIAMONDS, CardRankName.NINE, CardRank.NINE),
     ];
     player.takeCardsInHand(cards);
-    expect(player.cards).toHaveLength(3);
+    expect(player.cardsInHand).toHaveLength(3);
     player.removeCardFromHand(new Card(CardSuit.DIAMONDS, CardRankName.ACE, CardRank.ACE));
-    expect(player.cards).toHaveLength(2);
+    expect(player.cardsInHand).toHaveLength(2);
   });
 
   it('should throw when wrong card in removeCardFromHand()', function () {

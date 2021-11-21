@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import store from './redux/store';
+import store from './store/redux/store';
 import 'react-toastify/dist/ReactToastify.css';
 import './css/app.scss';
 import { ToastContainer } from 'react-toastify';

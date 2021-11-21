@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { updateUser } from '../redux/actions';
+import { updateUser } from '../store/redux/actions';
 import { httpClient } from '../services/httpClient';
 import { tokenStore } from '../services/token';
 import { Token } from 'shared-types';

@@ -117,11 +117,11 @@ describe('Sockets', () => {
       },
     );
 
-    console.log({
-      GameStore: gameStore.getStorage(),
-      PlayerStore: playerStore.getStorage(),
-      UserStore: userStore.getStorage(),
-    });
+    // console.log({
+    //   GameStore: gameStore.getStorage(),
+    //   PlayerStore: playerStore.getStorage(),
+    //   UserStore: userStore.getStorage(),
+    // });
     expect(playerStore.getStorage()[Jason.userId]).not.toBeNull();
     expect(playerStore.getStorage()[Jenny.userId]).not.toBeNull();
   });

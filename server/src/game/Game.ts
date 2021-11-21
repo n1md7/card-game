@@ -14,16 +14,18 @@ import {
 import { SocketManager } from '../socket/manager';
 import { PlayerPositionType, TransformedPlayerData } from './types';
 import { not } from '../helpers';
+import { PlayerResult } from './PlayerResult';
 
 export default class Game {
   public isStarted: boolean;
   public isFinished: boolean;
   public activePlayer: Player;
+  public debug = false;
 
   /**
-   * @description Game deck of cards.
+   * @description Game deck of cardsInHand.
    */
-  private deck: Deck;
+  private deckOfCards: Deck;
 
   /**
    * @description Game timer. It keeps track of the game timer when the last update happened to send the events.
@@ -36,7 +38,7 @@ export default class Game {
   private cpi: number;
 
   /**
-   * @description Table cards array.
+   * @description Table cardsInHand array.
    */
   private cards: Card[];
 
@@ -55,7 +57,8 @@ export default class Game {
    */
   private lastCardTaker: Player;
 
-  private readonly maxScores: number = 11;
+  private readonly maxScores: number; // This should be configurable
+  private readonly maxRounds: number; // This should be configurable
   private readonly dealCardsAmount: number = 4;
   private readonly gamePlayers: Player[];
   private readonly gameId: string;
@@ -69,6 +72,8 @@ export default class Game {
    */
   private readonly io: SocketManager;
   private readonly positions: PlayerPositionType[];
+  private roundsCounter: number;
+  private gameResults: PlayerResult[];
 
   constructor(
     numberOfPlayers: number,
@@ -77,9 +82,12 @@ export default class Game {
     userId: string,
     name: string,
     socketManager: SocketManager,
+    shuffleCards = true,
+    maxScores = 5,
+    maxRounds = 1,
   ) {
     this.numberOfPlayers = numberOfPlayers;
-    this.deck = new Deck();
+    this.deckOfCards = shuffleCards ? new Deck().shuffle() : new Deck();
     this.gameId = gameId;
     this.gamePlayers = [];
     this.isStarted = false;
@@ -92,6 +100,17 @@ export default class Game {
     this.isPublic = isPublic;
     this.io = socketManager;
     this.positions = ['down', 'left', 'up', 'right'];
+    this.maxScores = maxScores;
+    this.maxRounds = maxRounds;
+    this.roundsCounter = 1;
+  }
+
+  get results(): PlayerResult[] {
+    return this.gameResults;
+  }
+
+  get deck() {
+    return this.deckOfCards;
   }
 
   get details() {
@@ -116,6 +135,10 @@ export default class Game {
 
   get playerTime() {
     return this.timeToMove;
+  }
+
+  get cardsOnTable() {
+    return this.cards;
   }
 
   get cardsList() {
@@ -164,6 +187,7 @@ export default class Game {
   }
 
   startGame(): void {
+    if (this.isStarted) return;
     this.isStarted = true;
     this.dealCards(true);
     this.activePlayer = this.gamePlayers[this.cpi];
@@ -172,18 +196,18 @@ export default class Game {
   }
 
   dealCards(firstDeal = false): void | null {
-    if (this.deck.isEmpty()) {
+    if (this.deckOfCards.isEmpty()) {
       return null;
     }
 
     for (const player of this.gamePlayers) {
-      const numberOfCards = this.dealCardsAmount - player.cards.length;
+      const numberOfCards = this.dealCardsAmount - player.cardsInHand.length;
       if (numberOfCards > 0) {
-        player.takeCardsInHand(this.deck.distributeCards(numberOfCards));
+        player.takeCardsInHand(this.deckOfCards.distributeCards(numberOfCards));
       }
     }
     if (firstDeal) {
-      this.cards = this.deck.distributeCards(this.dealCardsAmount);
+      this.cards = this.deckOfCards.distributeCards(this.dealCardsAmount);
     }
   }
 
@@ -223,23 +247,23 @@ export default class Game {
 
     return {
       playerData: result,
-      remainedCards: this.deck.size,
+      remainedCards: this.deckOfCards.size,
     };
   }
 
   /**
    * @description Whether or not at least one player is holding a card
    */
-  playersHaveCard(): boolean {
-    return this.gamePlayers.some((player) => player.cards.length);
+  playersHaveCards(): boolean {
+    return this.gamePlayers.some((player) => player.cardsInHand.length);
   }
 
   changePlayer(): void {
     this.cpi++;
     if (this.cpi >= this.gamePlayers.length) {
       this.cpi = 0;
-      if (!this.playersHaveCard()) {
-        if (this.deck.isEmpty()) {
+      if (!this.playersHaveCards()) {
+        if (this.deckOfCards.isEmpty()) {
           this.finishOneGame();
         } else {
           this.dealCards();
@@ -251,13 +275,19 @@ export default class Game {
   }
 
   finishOneGame(): void {
+    // When cards left on the table give it to last taker
+    if (this.cards.length) {
+      this.lastCardTaker.scoreCards(this.cards);
+      this.cards = [];
+    }
+
     Game.calculateScores(this.gamePlayers);
     const results = this.gamePlayers.map((player) => ({
       name: player.name,
       score: player.score,
       result: player.result,
     }));
-
+    this.roundsCounter++;
     this.io.to(this.gamePlayers).emit('one-game-finished', results);
     this.evaluateEndOfGame();
   }
@@ -273,17 +303,20 @@ export default class Game {
         return void 0;
       }
     }
+    if (this.roundsCounter >= this.maxRounds) {
+      this.finishGame(null);
+    }
   }
 
-  restartGame(): void {
-    this.deck = new Deck();
+  restartGame(shuffle: true): void {
+    this.deckOfCards = shuffle ? new Deck().shuffle() : new Deck();
     this.dealCards(true);
   }
 
   finishGame(winnerPlayer: Player): void {
     this.isFinished = true;
-    const results = this.gamePlayers.map((player) => player.result);
-    this.io.to(this.gamePlayers).emit('game-is-over', results, winnerPlayer.id);
+    this.gameResults = this.gamePlayers.map((player) => player.result);
+    this.io.to(this.gamePlayers).emit('game-is-over', this.gameResults, winnerPlayer.id);
   }
 
   ticker(callback: (tick: boolean, delta: number) => void): void {
@@ -351,6 +384,7 @@ export default class Game {
 
     for (const card of cards) {
       if (!this.cards.find((c) => c.equals(card))) {
+        if (this.debug) console.log(`Table does not contain card [`, card, ']');
         return false;
       }
     }
@@ -397,8 +431,11 @@ export default class Game {
   validateAction(player: Player, type: ActionType, playerCard: Card, tableCards: Card[]): void {
     if (player.not.equals(this.activePlayer)) throw new GameException('Action validation problem. Incorrect player.');
     if (type === ActionType.TAKE_CARDS) {
-      if (tableCards.length === 0 || not(this.tableContainsCards(tableCards))) {
-        throw new GameException('Action validation problem. Incorrect cards.');
+      if (tableCards.length === 0) {
+        throw new GameException('Action validation problem. TableCards length is zero.');
+      }
+      if (not(this.tableContainsCards(tableCards))) {
+        throw new GameException(`Action validation problem. Cards do not match tableCards.`);
       }
     }
     if (type === ActionType.TAKE_CARDS && !playerCard.canTakeCards(tableCards)) {

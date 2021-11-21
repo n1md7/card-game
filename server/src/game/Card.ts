@@ -23,9 +23,9 @@ export default class Card {
   }
 
   /**
-   * @Description Only takes argument of cards which suppose to match counting rules.
-   * When the card value is 2 and passed cards are 9 and 3 it will be false because 2+9+3 is not 11.
-   * Thus, it only expects 9 in this case. This is not calculating possible combinations from the passed cards only
+   * @Description Only takes argument of cardsInHand which suppose to match counting rules.
+   * When the card value is 2 and passed cardsInHand are 9 and 3 it will be false because 2+9+3 is not 11.
+   * Thus, it only expects 9 in this case. This is not calculating possible combinations from the passed cardsInHand only
    * validates sum of the values.
    * @param {Card[]} cards
    * @returns {boolean}

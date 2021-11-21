@@ -2,6 +2,7 @@
   "name": "card-game",
   "version": "1.0.0",
   "dependencies": {
+    "@n1md7/indexeddb-promise": "^5.0.23",
     "@reduxjs/toolkit": "^1.4.0",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",

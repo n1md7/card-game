@@ -12,7 +12,6 @@ export default class Deck {
         this.cards.push(new Card(suitType, name, cardType));
       });
     });
-    this.shuffle();
   }
 
   get size(): number {
@@ -31,7 +30,7 @@ export default class Deck {
     return this.cards.splice(0, count);
   }
 
-  private shuffle(): void {
+  public shuffle(): Deck {
     const N = this.cards.length;
     for (let i = 0; i < N; i++) {
       const r = i + getRandomInt(N - i);
@@ -39,5 +38,7 @@ export default class Deck {
       this.cards[i] = this.cards[r];
       this.cards[r] = temp;
     }
+
+    return this;
   }
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { baseURL } from '../constants/urls';
 import { tokenStore } from '../services/token';
 import { httpClient } from '../services/httpClient';
-import { updateUser } from '../redux/actions';
+import { updateUser } from '../store/redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import handleError from '../helpers/handleError';
 import { Token } from 'shared-types';

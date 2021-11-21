@@ -11,7 +11,7 @@ export class SocketManager {
   constructor(private readonly io: SocketIO.Server) {}
 
   private static extractSocketId(player: Player): SocketId {
-    return UserModel.getById(player.id).socketId;
+    return UserModel.getById(player.id)?.socketId;
   }
 
   public emit(event: SocketManagerEvents, ...args: unknown[]): void {

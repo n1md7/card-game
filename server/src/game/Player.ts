@@ -28,6 +28,10 @@ export default class Player {
     this.playerGameId = gameId;
   }
 
+  get scoredCards() {
+    return this.playerScoredCards;
+  }
+
   get game() {
     return gameStore.getById(this.playerGameId);
   }
@@ -68,7 +72,7 @@ export default class Player {
     return this.playerResult;
   }
 
-  get cards() {
+  get cardsInHand() {
     return this.playerCardsInHand;
   }
 
@@ -113,16 +117,15 @@ export default class Player {
   }
 
   /**
-   * @description - Executes the logic whether or not the player can make a specific move to take cards
+   * @description - Executes the logic whether or not the player can make a specific move to take cardsInHand
    * @param cardFromHand - A Card that player is holding and placing on the table to create a combination and score
-   * @param tableCards - Pretty obvious what it is
+   * @param tableCardsToTake - Only those cardsInHand that makes combination with the cardFromHand. When taking only one card should be one element list
    */
-  takeCardsFromTable(cardFromHand: Card, tableCards: Card[]) {
+  takeCardsFromTable(cardFromHand: Card, tableCardsToTake: Card[]) {
     if (!this.playerCardsInHand.find((card) => card.equals(cardFromHand))) {
       throw new GameException('You are not holding such card in hand. Thus, it cannot be placed.');
     }
-    console.debug(`takeCardsFromTable`, cardFromHand, tableCards);
-    this.game.playerAction(this, ActionType.TAKE_CARDS, cardFromHand, tableCards);
+    this.game.playerAction(this, ActionType.TAKE_CARDS, cardFromHand, tableCardsToTake);
   }
 
   calculateResult() {
