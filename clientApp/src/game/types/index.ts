@@ -22,12 +22,13 @@ export type PlayerData = {
     name: string;
     progress: number;
     cards: number;
+    score?: number;
   };
 };
 
 export type GameData = {
   playerData: PlayerData;
-  remainedCards: number;
+  remainedCards: number | null;
 };
 
 export enum Event {

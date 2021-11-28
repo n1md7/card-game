@@ -308,7 +308,7 @@ export default class Game {
     }
   }
 
-  restartGame(shuffle: true): void {
+  restartGame(shuffle = true): void {
     this.deckOfCards = shuffle ? new Deck().shuffle() : new Deck();
     this.dealCards(true);
   }

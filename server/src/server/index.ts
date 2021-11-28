@@ -119,7 +119,7 @@ export default class Server {
 
     this.socketModule = new SocketModule(this.ioServer, this.koa, new Events());
     this.socketManager = new SocketManager(this.ioServer);
-    this.serverTimer = this.socketModule.sendUpdatesEvery(100);
+    this.serverTimer = this.socketModule.sendUpdatesEvery();
 
     return this.socketModule;
   }

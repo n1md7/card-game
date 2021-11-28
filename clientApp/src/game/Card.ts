@@ -6,6 +6,8 @@ export enum ActionType {
   update,
 }
 
+type CreateFor = 'table' | 'actions';
+
 export class Card {
   public readonly rank: Rank;
   public readonly suit: Suit;
@@ -43,8 +45,8 @@ export class Card {
     this.rotate = rotate;
   }
 
-  public appendDOM(parent: Element): Card {
-    parent.appendChild(this.action(ActionType.create));
+  public appendDOM(parent: Element, $for: CreateFor = 'table'): Card {
+    parent.appendChild(this.action(ActionType.create, $for));
 
     return this;
   }
@@ -62,16 +64,18 @@ export class Card {
     return false;
   }
 
-  public action(type: ActionType): HTMLImageElement {
+  public action(type: ActionType, $for: CreateFor = 'table'): HTMLImageElement {
     const card = type === ActionType.create ? new Image() : this.htmlElement;
     card.setAttribute('data-id', this.id);
     card.className = `x-card js_${this.id}`;
-    card.style.position = 'absolute';
-    card.style.left = this.left + 'px';
-    card.style.top = this.top + 'px';
-    card.style.width = this.width + 'px';
-    card.style.height = this.height + 'px';
-    card.style.transform = `rotate(${this.rotate}deg)`;
+    if ($for === 'table') {
+      card.style.position = 'absolute';
+      card.style.left = this.left + 'px';
+      card.style.top = this.top + 'px';
+      card.style.width = this.width + 'px';
+      card.style.height = this.height + 'px';
+      card.style.transform = `rotate(${this.rotate}deg)`;
+    }
     try {
       card.src = require(`../img/cards/${this.id}.svg`);
     } catch ({ message }) {

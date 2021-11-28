@@ -12,6 +12,9 @@ import BaseGame from './BaseGame';
 import { ActionType, Card } from './Card';
 import Ellipse, { isInRange, random } from '../libs/Formulas';
 
+type GameState = 'waiting' | 'playing' | 'finished';
+type PlayerState = 'waiting' | 'playing' | 'finished';
+
 export default class Game extends BaseGame {
   private borderWidth = 4;
   private readonly defaults: Defaults;
@@ -24,10 +27,6 @@ export default class Game extends BaseGame {
   private cardIsDragging = false;
   private cardIsDraggingRef: any | null = null;
   private cardIsDraggingObj: Card | null = null;
-  private mouseInCard = {
-    x: 0,
-    y: 0,
-  };
   private xActionsHeight = 0;
   private zIndex = 0;
   private table = {
@@ -36,10 +35,38 @@ export default class Game extends BaseGame {
     width: 0,
     height: 0,
   };
+  private mouseInCard = {
+    x: 0,
+    y: 0,
+  };
 
   constructor(selector: GameSelectorType, socketIO: SocketType, outerEllipse: EllipseType, defaults: Defaults) {
     super(selector, socketIO);
     this.defaults = defaults;
+  }
+
+  private static calculatedAnimationPoint(left: number, top: number) {
+    return {
+      for: (playerTurn: PlayerPlaceOptions | null) => {
+        const ANIMATION_COEFFICIENT = 100;
+        switch (playerTurn) {
+          case PlayerPlaceOptions.down:
+            top += ANIMATION_COEFFICIENT;
+            break;
+          case PlayerPlaceOptions.up:
+            top -= ANIMATION_COEFFICIENT;
+            break;
+          case PlayerPlaceOptions.left:
+            left -= ANIMATION_COEFFICIENT;
+            break;
+          case PlayerPlaceOptions.right:
+            left += ANIMATION_COEFFICIENT;
+            break;
+        }
+
+        return [left, top, random(0, 180)];
+      },
+    };
   }
 
   public run(): void {
@@ -55,15 +82,31 @@ export default class Game extends BaseGame {
     this.attachEvents();
   }
 
+  public onProcessGameData(callback: (data: GameData) => void): void {
+    this.processGameDataCallback = callback;
+  }
+
   private attachEvents(): void {
     this.socketIO.on(Event.playerTurn, this.processPlayerTurn.bind(this));
     this.socketIO.on(Event.gameData, this.processGameData.bind(this));
     this.socketIO.on(Event.gameTakeCards, this.processGameTakeCards.bind(this));
     this.socketIO.on(Event.gameFinish, this.processGameFinish.bind(this));
     this.socketIO.on(Event.tableCardsAdd, this.processTableCardsAdd.bind(this));
+    this.socketIO.on(Event.playerCards, this.processPlayerCards.bind(this));
 
     this.tableDims();
     this.mouseMoveEvents();
+  }
+
+  private processPlayerCards(cards: Array<TableCardType>): void {
+    // console.log('processPlayerCards', cards);
+    cards.forEach((card) => {
+      const cardObj = new Card(card.rank, card.suit);
+      console.log('cardObj', cardObj.htmlElement);
+      cardObj.htmlElement.removeAttribute('style');
+      cardObj.appendDOM(this.selector.actions, 'actions');
+      // this.tableCards[card.key] = cardObj;
+    });
   }
 
   private processPlayerTurn(position: PlayerPlaceOptions): void {
@@ -71,17 +114,9 @@ export default class Game extends BaseGame {
   }
 
   private processGameData(data: GameData): void {
-    //console.log({
-    //  gameData: data
-    //});
-    // exec callback
     if (this.processGameDataCallback) {
       this.processGameDataCallback(data);
     }
-  }
-
-  public onProcessGameData(callback: (data: GameData) => void): void {
-    this.processGameDataCallback = callback;
   }
 
   private processGameTakeCards(data: GameData): void {}
@@ -97,7 +132,7 @@ export default class Game extends BaseGame {
       width: (this.selector.table as HTMLDivElement).offsetWidth,
       height: (this.selector.table as HTMLDivElement).offsetHeight,
     };
-    cards.map((card) => {
+    cards.forEach((card) => {
       const { rank, suit } = card;
       const tableRange = {
         x: {
@@ -118,7 +153,7 @@ export default class Game extends BaseGame {
         const [$left, $top, $rotate] = Game.calculatedAnimationPoint(left, top).for(this.playerTurn);
         $card.setPosition($left, $top);
         $card.setRotation($rotate);
-        $card.appendDOM(this.selector.room);
+        $card.appendDOM(this.selector.table);
         $card.attachEvent('click', (event) => {
           event.preventDefault();
         });
@@ -154,33 +189,6 @@ export default class Game extends BaseGame {
     return {
       xActionsHeight: this.xActionsHeight,
       table: this.table,
-    };
-  }
-
-  private static calculatedAnimationPoint(
-    left: number,
-    top: number,
-  ): { for: (playerTurn: PlayerPlaceOptions | null) => [number, number, number] } {
-    return {
-      for: (playerTurn: PlayerPlaceOptions | null) => {
-        const ANIMATION_COEFFICIENT = 100;
-        switch (playerTurn) {
-          case PlayerPlaceOptions.down:
-            top += ANIMATION_COEFFICIENT;
-            break;
-          case PlayerPlaceOptions.up:
-            top -= ANIMATION_COEFFICIENT;
-            break;
-          case PlayerPlaceOptions.left:
-            left -= ANIMATION_COEFFICIENT;
-            break;
-          case PlayerPlaceOptions.right:
-            left += ANIMATION_COEFFICIENT;
-            break;
-        }
-
-        return [left, top, random(0, 180)];
-      },
     };
   }
 

@@ -2,8 +2,20 @@ import React from 'react';
 import Card from '../cards/Card';
 import { list } from '../../helpers/Protos';
 
-export default ({ cards, progress, ...props }) => {
-  const style = {};
+type Props = {
+  cards: number;
+  progress: number;
+  name: string;
+  score?: number;
+  props: {
+    [Key in keyof React.HTMLAttributes<HTMLDivElement>]: React.HTMLAttributes<HTMLDivElement>;
+  };
+};
+type Style = {
+  width: string;
+};
+export default ({ cards, progress, ...props }: Props) => {
+  const style: Style = {} as Style;
   if (!isNaN(progress)) {
     style.width = progress + '%';
   }
@@ -16,6 +28,7 @@ export default ({ cards, progress, ...props }) => {
     <div {...props}>
       <div className="x-player-cards">
         {list(cards).map((i) => (
+          // @ts-ignore
           <Card h={24} key={i} />
         ))}
       </div>
