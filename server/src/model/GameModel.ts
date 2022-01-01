@@ -9,10 +9,12 @@ class GameModel extends BaseModel<Game> {
     return this.store.getStorage();
   }
 
-  public getGamesList() {
-    return Object.values(gameStore.getStorage())
+  public getGamesList(reverse = false) {
+    const list = Object.values(gameStore.getStorage())
       .map((game) => game.details)
       .filter((game) => game.isPublic === true);
+
+    return reverse ? list.reverse() : list;
   }
 
   public join(id: string, userId: string, name: string): Game {

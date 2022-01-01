@@ -1,15 +1,9 @@
-type Storage<T> = {
+export type Storage<T> = {
   [id: string]: T;
 };
 
-export { Storage };
-
 export default class BaseStore<T> {
-  protected storage: Storage<T> = {};
-
-  public constructor(defaultStorageData: Storage<T> = {}) {
-    this.storage = defaultStorageData;
-  }
+  public constructor(protected storage: Storage<T> = {}) {}
 
   public getStorage(): Storage<T> {
     return this.storage;
@@ -30,5 +24,11 @@ export default class BaseStore<T> {
 
   public getById(id: string): T | undefined {
     return this.storage[id];
+  }
+
+  public removeById(id: string): T | undefined {
+    const item = this.storage[id];
+    delete this.storage[id];
+    return item;
   }
 }

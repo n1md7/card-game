@@ -7,6 +7,9 @@ import jsonWebToken from 'jsonwebtoken';
 import PlayerModel from '../model/PlayerModel';
 import GameModel from '../model/GameModel';
 import Koa from 'koa';
+import { SocketManager } from './manager';
+import ms from 'ms';
+import { gameStore } from '../store';
 
 export default class SocketModule {
   constructor(private readonly io: SocketIO.Server, private readonly koa: Koa, private readonly events: Events) {
@@ -20,10 +23,28 @@ export default class SocketModule {
           // noinspection ExceptionCaughtLocallyJS
           throw new Error(`We couldn't find a player with the id:${playerId}`);
         }
+        const game = GameModel.getById(player.gameId);
+        if (!isset(game)) {
+          // noinspection ExceptionCaughtLocallyJS
+          throw new Error(`We couldn't find a game with the id:${player.gameId}`);
+        }
+        socket.join(game.id);
+        this.koa.emit(KoaEvent.debug, `Socket room created`);
+        this.koa.emit(KoaEvent.debug, `Player ${player.name} connected`);
         // One every new connection update player socket ID
         player.socketId = socket.id;
-        // Listen and process client request on "player:move"
-        socket.on('player:move', this.events.playerMove(player.id));
+        PlayerModel.setById(player.id, player);
+        game.updatePlayer(player);
+        if (game.isFinished) {
+          this.koa.emit(KoaEvent.debug, `Game ${game.id} is finished`);
+          this.io.in(game.id).emit('full-game-finished', game.results, game.winner);
+          this.io.in(game.id).emit('game:round-results', game.roundResults);
+          this.io.in(game.id).emit('game:results', game.results, game.winner);
+        } else {
+          game.emitInitialData();
+          // Listen and process client request on "player:move"
+          socket.on('player:move', this.events.playerMove(player, this.io, game));
+        }
       } catch (error) {
         // Socket error handling
         switch (error.name) {
@@ -36,6 +57,7 @@ export default class SocketModule {
           default:
             this.io.to(socket.id).emit('error', error.message);
         }
+        this.koa.emit(KoaEvent.socketError, error.message);
       }
     });
 
@@ -45,31 +67,29 @@ export default class SocketModule {
     });
   }
 
-  public sendUpdatesEvery = (milliseconds = 1000) =>
+  public sendUpdatesEvery = (socketManager: SocketManager, milliseconds = 1000) =>
     setInterval(() => {
       for (const gid in GameModel.games) {
         if (GameModel.games.hasOwnProperty(gid)) {
           const game = GameModel.games[gid];
+          if (!game || !game.players) continue;
+
           game.ticker((tick, delta) => {
-            // if (tick) {
-            // if (game.playerTime <= 0) {
-            if (not(game.isFinished)) {
-              game.activePlayer?.placeRandomCardFromHand();
+            if (tick) {
+              if (!game.isFinished && game.isStarted) {
+                if (game.playerTime <= 0) {
+                  game.forceActivePlayerToPlaceRandomCard();
+                }
+              }
+
+              // Clean up finished games
+              if (game.isFinished) {
+                if (Date.now() - game.finishedAt >= ms('5m')) {
+                  gameStore.removeById(game.id);
+                }
+              }
             }
-            // }
-            // }
           });
-          for (const player of game.players) {
-            if (game.isFinished) {
-              // FIXME: This is a tmp to make the game end
-              game.restartGame();
-              this.io.to(player.socketId).emit('game:finished', game.statistics());
-            } else {
-              this.io.to(player.socketId).emit('game:data', game.getGameData(player));
-              this.io.to(player.socketId).emit('player-cards', player.handCards);
-              this.io.to(player.socketId).emit('table-cards:add', game.cardsList);
-            }
-          }
         }
       }
     }, milliseconds);

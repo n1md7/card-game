@@ -12,51 +12,47 @@ import {
   SCORE_FOR_TWO_OF_CLUBS,
 } from '../constant/gameConfig';
 import { SocketManager } from '../socket/manager';
-import { PlayerPositionType, TransformedPlayerData } from './types';
+import { GameResult, PlayerPositionType, RoundResult, TransformedPlayerData } from './types';
 import { not } from '../helpers';
-import { PlayerResult } from './PlayerResult';
+import * as R from 'rambda';
 
 export default class Game {
   public isStarted: boolean;
   public isFinished: boolean;
   public activePlayer: Player;
   public debug = false;
-
+  public createdAt: Date = new Date();
+  public updatedAt: Date = new Date();
+  public winner: Player;
+  public finishedAt = Number.MAX_SAFE_INTEGER;
   /**
    * @description Game deck of cardsInHand.
    */
   private deckOfCards: Deck;
-
   /**
    * @description Game timer. It keeps track of the game timer when the last update happened to send the events.
    */
   private lastUpdate: number;
-
   /**
    * @description Current player index. It represents the active player index - whoever is making the move.
    */
   private cpi: number;
-
   /**
    * @description Table cardsInHand array.
    */
   private cards: Card[];
-
   /**
    * @description Game creator(player) identifier
    */
   private creatorId: string;
-
   /**
    * @description Player time to move. When player time to move is over, the game will place the random card.
    */
   private timeToMove: number;
-
   /**
    * @description Player whoever scored card the last time
    */
   private lastCardTaker: Player;
-
   private readonly maxScores: number; // This should be configurable
   private readonly maxRounds: number; // This should be configurable
   private readonly dealCardsAmount: number = 4;
@@ -65,15 +61,16 @@ export default class Game {
   private readonly numberOfPlayers: number;
   private readonly creatorName: string;
   private readonly isPublic: boolean;
-
   /**
    * @description Game socket manager.
    * @private
    */
   private readonly io: SocketManager;
   private readonly positions: PlayerPositionType[];
-  private roundsCounter: number;
-  private gameResults: PlayerResult[];
+  private roundsCounter = 1;
+  private latestRoundResults: RoundResult[] = [];
+  private allRoundResults: RoundResult[][] = [];
+  private gameResult: GameResult[] = [];
 
   constructor(
     numberOfPlayers: number,
@@ -83,8 +80,8 @@ export default class Game {
     name: string,
     socketManager: SocketManager,
     shuffleCards = true,
-    maxScores = 5,
-    maxRounds = 1,
+    maxScores = 6,
+    maxRounds = 3, // TODO Make this configurable
   ) {
     this.numberOfPlayers = numberOfPlayers;
     this.deckOfCards = shuffleCards ? new Deck().shuffle() : new Deck();
@@ -102,11 +99,6 @@ export default class Game {
     this.positions = ['down', 'left', 'up', 'right'];
     this.maxScores = maxScores;
     this.maxRounds = maxRounds;
-    this.roundsCounter = 1;
-  }
-
-  get results(): PlayerResult[] {
-    return this.gameResults;
   }
 
   get deck() {
@@ -122,7 +114,16 @@ export default class Game {
         name: this.creatorName,
       },
       isPublic: this.isPublic,
+      createdAt: this.createdAt,
     };
+  }
+
+  get results() {
+    return this.gameResult;
+  }
+
+  get roundResults() {
+    return this.allRoundResults;
   }
 
   get id(): string {
@@ -193,6 +194,9 @@ export default class Game {
     this.activePlayer = this.gamePlayers[this.cpi];
     // Mainly for testing purposes to have it the default value
     this.lastCardTaker = this.activePlayer;
+    // emit event to all in the room [gameId]
+    this.io.originalIO.in(this.id).emit('game:start', this.details);
+    this.emitInitialData();
   }
 
   dealCards(firstDeal = false): void | null {
@@ -203,7 +207,13 @@ export default class Game {
     for (const player of this.gamePlayers) {
       const numberOfCards = this.dealCardsAmount - player.cardsInHand.length;
       if (numberOfCards > 0) {
-        player.takeCardsInHand(this.deckOfCards.distributeCards(numberOfCards));
+        const dealCards = this.deckOfCards.distributeCards(numberOfCards);
+        player.takeCardsInHand(dealCards);
+        const serializedCards = dealCards.reduce(
+          (acc, card) => [...acc, { rank: card.name, suit: card.suit }],
+          [] as Card[],
+        );
+        this.io.to(player).emit('player-cards', serializedCards);
       }
     }
     if (firstDeal) {
@@ -211,7 +221,7 @@ export default class Game {
     }
   }
 
-  getGameData(requestPlayer: Player) {
+  getGamePlayersData(requestPlayer: Player) {
     if (!requestPlayer.position) {
       throw new GameException('Property [position] has to be defined for the object');
     }
@@ -228,9 +238,9 @@ export default class Game {
       transformedPlayerData[position] = {
         taken: false,
         name: '',
-        progress: 0,
+        time: PLAYER_MOVER_INTERVAL,
         cards: 0,
-        score: 0,
+        isActive: false,
       };
     }
 
@@ -282,41 +292,95 @@ export default class Game {
     }
 
     Game.calculateScores(this.gamePlayers);
-    const results = this.gamePlayers.map((player) => ({
-      name: player.name,
-      score: player.score,
-      result: player.result,
-    }));
+    this.latestRoundResults = R.clone(
+      this.gamePlayers.map((player) => ({
+        playerId: player.id,
+        name: player.name,
+        result: player.result,
+        score: player.score,
+        round: this.roundsCounter,
+      })),
+    );
+    this.allRoundResults.push(R.clone(this.latestRoundResults));
+    this.gamePlayers.forEach((player) => player.scoreReset());
     this.roundsCounter++;
-    this.io.to(this.gamePlayers).emit('one-game-finished', results);
+    this.io.to(this.gamePlayers).emit('one-game-finished', this.allRoundResults);
     this.evaluateEndOfGame();
   }
 
   evaluateEndOfGame(): void {
-    const scores = this.gamePlayers.map(({ score }) => score);
+    this.calculateGameResult();
+    const scores = this.gameResult.map(({ score }) => score);
     const max = Math.max(...scores);
     const winnerScore = max >= this.maxScores ? max : null;
     if (winnerScore) {
-      const [winnerPlayer, noWinner = null] = this.gamePlayers.filter(({ score }) => score === winnerScore);
-      if (null === noWinner) {
-        this.finishGame(winnerPlayer);
+      const gameResult = this.gameResult.find(({ score }) => score === winnerScore);
+      const [winnerPlayer, secondWinner = null] = this.gamePlayers.filter(({ id }) => gameResult.playerId === id);
+      if (!secondWinner) {
+        this.winner = winnerPlayer;
+        this.finishGame();
         return void 0;
       }
     }
     if (this.roundsCounter >= this.maxRounds) {
-      this.finishGame(null);
+      const gameResult = this.gameResult.find(({ score }) => score === max);
+      const [winnerPlayer, secondWinner = null] = this.gamePlayers.filter(({ id }) => gameResult.playerId === id);
+      if (!secondWinner) {
+        this.winner = winnerPlayer;
+        this.finishGame();
+        return void 0;
+      }
     }
+
+    this.startNewRound();
+  }
+
+  startNewRound(): void {
+    this.restartGame();
   }
 
   restartGame(shuffle = true): void {
+    this.isStarted = true;
+    this.isFinished = false;
     this.deckOfCards = shuffle ? new Deck().shuffle() : new Deck();
     this.dealCards(true);
+    this.emitInitialData();
   }
 
-  finishGame(winnerPlayer: Player): void {
+  emitInitialData(): void {
+    this.players.forEach((player) => {
+      this.io.to(player).emit('add-card-on-table', this.cardsOnTable);
+      this.io.to(player).emit('player-cards', player.handCards);
+      this.io.to(player).emit('game:players-data', this.getGamePlayersData(player));
+      this.io.to(player).emit('game:round-results', this.allRoundResults);
+      this.io.to(player).emit('game:results', this.gameResult, this.winner?.id);
+    });
+  }
+
+  calculateGameResult() {
+    this.gameResult = this.gamePlayers.map((player) => {
+      const playerResults = this.allRoundResults.reduce((acc, roundResults) => {
+        const playerResult = roundResults.find(({ playerId }) => playerId === player.id);
+        if (playerResult) {
+          acc.push(playerResult.score);
+        }
+        return acc;
+      }, [] as number[]);
+      const playerScore = playerResults.reduce((acc, result) => acc + result, 0);
+      return {
+        playerId: player.id,
+        name: player.name,
+        score: playerScore,
+        isWinner: this.winner?.id === player.id,
+      };
+    });
+  }
+
+  finishGame(): void {
+    this.finishedAt = Date.now();
     this.isFinished = true;
-    this.gameResults = this.gamePlayers.map((player) => player.result);
-    this.io.to(this.gamePlayers).emit('game-is-over', this.gameResults, winnerPlayer.id);
+    this.calculateGameResult();
+    this.io.to(this.gamePlayers).emit('full-game-finished', this.gameResult, this.winner?.id);
   }
 
   ticker(callback: (tick: boolean, delta: number) => void): void {
@@ -356,6 +420,14 @@ export default class Game {
     if (this.gamePlayers.length === this.numberOfPlayers) {
       this.startGame();
     }
+  }
+
+  updatePlayer(player: Player): void {
+    const playerIndex = this.gamePlayers.findIndex((p) => p.id === player.id);
+    if (playerIndex === -1) {
+      throw new GameException(`Player with id ${player.id} not found`);
+    }
+    this.gamePlayers[playerIndex] = player;
   }
 
   playerAlreadyInGameRoom(targetPlayer: Player | User): boolean {
@@ -405,27 +477,36 @@ export default class Game {
           targetPlayer.scoreCards(tableCards);
         }
         this.lastCardTaker = targetPlayer;
+        this.gamePlayers.forEach((player) => {
+          this.io.to(player).emit('take-card-from-table', tableCards, playerCard);
+        });
         break;
       case ActionType.PLACE_CARD:
         this.cards.push(playerCard);
         targetPlayer.removeCardFromHand(playerCard);
+        this.gamePlayers.forEach((player) => {
+          this.io.to(player).emit('add-card-on-table', playerCard);
+        });
         break;
       default:
         throw new GameException(`Invalid action type [${type}]`);
     }
+    // Changes active player
+    this.changePlayer();
 
     this.gamePlayers.forEach((player) => {
+      this.io.to(player).emit('player-cards', player.handCards);
+      this.io.to(player).emit('game:players-data', this.getGamePlayersData(player));
       const positionShift = this.positions.indexOf(player.position);
       // Move player to the next position
       const mppIndex = { value: this.positions.indexOf(targetPlayer.position) - positionShift };
       mppIndex.value = mppIndex.value >= 0 ? mppIndex.value : 4 + mppIndex.value;
-      this.io.to(player).emit('game:take-cards', {
+      this.io.to(player).emit('take-card-from-table', {
         position: this.positions[mppIndex.value],
         playerCard,
         tableCards,
       });
     });
-    this.changePlayer();
   }
 
   validateAction(player: Player, type: ActionType, playerCard: Card, tableCards: Card[]): void {
@@ -445,5 +526,11 @@ export default class Game {
 
   public statistics() {
     return { message: 'Game finished!' };
+  }
+
+  public forceActivePlayerToPlaceRandomCard() {
+    if (this.activePlayer) {
+      this.playerAction(this.activePlayer, ActionType.PLACE_CARD, this.activePlayer.getRandomCardFromHand(), []);
+    }
   }
 }

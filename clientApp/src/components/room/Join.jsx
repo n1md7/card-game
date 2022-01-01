@@ -17,6 +17,7 @@ export default () => {
                 <tr>
                   <td>ID</td>
                   <td>Creator</td>
+                  <td>CreatedAt</td>
                   <td>Players</td>
                   <td>Action</td>
                 </tr>

@@ -10,7 +10,7 @@ enum AlertType {
 
 function Alert(type: AlertType, message: string, time: number = 5) {
   const options = {
-    position: 'top-right' as ToastPosition,
+    position: 'bottom-right' as ToastPosition,
     autoClose: time * 1000,
     hideProgressBar: false,
     closeOnClick: true,

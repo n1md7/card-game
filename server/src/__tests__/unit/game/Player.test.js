@@ -26,8 +26,6 @@ describe('Player', function () {
     expect(player.equals).toBeDefined();
     expect(player.scoreCards).toBeDefined();
     expect(player.removeCardFromHand).toBeDefined();
-    expect(player.placeRandomCardFromHand).toBeDefined();
-    expect(player.placeCardFromHand).toBeDefined();
     expect(player.takeCardsFromTable).toBeDefined();
     expect(player.calculateResult).toBeDefined();
   });

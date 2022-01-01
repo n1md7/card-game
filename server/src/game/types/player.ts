@@ -4,9 +4,9 @@ export type PlayerPositionType = 'down' | 'left' | 'up' | 'right';
 export type PlayerDataType = {
   taken: boolean;
   name: string;
-  progress: number;
+  time: number;
   cards: number;
-  score: number;
+  isActive: boolean;
 };
 export type PlayerCardsRespType = {
   rank: CardRankName;

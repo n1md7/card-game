@@ -28,6 +28,10 @@ export default class Player {
     this.playerGameId = gameId;
   }
 
+  get gameId(): string {
+    return this.playerGameId;
+  }
+
   get scoredCards() {
     return this.playerScoredCards;
   }
@@ -45,9 +49,9 @@ export default class Player {
     return {
       taken: true,
       name: this.name,
-      progress: progressValue,
+      time: this.game.playerTime,
       cards: this.playerCardsInHand.length,
-      score: this.score,
+      isActive: this.game && this.game.activePlayer && this.game.activePlayer.equals(this),
     };
   }
 
@@ -102,9 +106,9 @@ export default class Player {
     this.playerCardsInHand.splice(index, 1);
   }
 
-  placeRandomCardFromHand() {
+  getRandomCardFromHand() {
     if (this.playerCardsInHand.length > 0) {
-      this.placeCardFromHand(this.playerCardsInHand[getRandomInt(this.playerCardsInHand.length - 1)]);
+      return this.playerCardsInHand[getRandomInt(this.playerCardsInHand.length - 1)];
     }
   }
 
@@ -130,5 +134,12 @@ export default class Player {
 
   calculateResult() {
     this.playerResult = new PlayerResult(this.playerScoredCards);
+  }
+
+  scoreReset() {
+    this.score = 0;
+    this.playerResult = null;
+    this.playerCardsInHand = [];
+    this.playerScoredCards = [];
   }
 }

@@ -15,11 +15,15 @@ export default class Ellipse {
 
 export const ellipseRanges = (width: number, skips = 4) => {
   const list = [];
-  for (let i = -1 * width; i < width; i += skips) {
+  for (let i = (-1 * width) / 2; i < width / 2; i += skips) {
     list.push(i);
   }
 
   return list;
+};
+
+export const ellipseFirstRange = (width: number) => {
+  return [(-1 * width) / 2, width / 2];
 };
 
 export const random = (min: number, max: number) => {

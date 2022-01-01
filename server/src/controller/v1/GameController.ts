@@ -1,12 +1,11 @@
 import { id as Id } from '../../helpers/ids';
-import { Context } from '../../types';
+import { Context, HttpCode } from '../../types';
 import BaseController from './BaseController';
 import PlayerModel from '../../model/PlayerModel';
 import GameModel from '../../model/GameModel';
 import GameInterface from './interfaces/GameInterface';
 import { createGameSchema, enterGameSchema } from './validators/GameRequestValidator';
 import ValidationErrorException from '../../exceptions/ValidationErrorException';
-import { HttpCode } from '../../types';
 import { gameStore, playerStore, userStore } from '../../store';
 import { SocketManager } from '../../socket/manager';
 import Player from '../../game/Player';
@@ -32,7 +31,7 @@ class GameController extends BaseController implements GameInterface {
   };
 
   public getAllPublicGames = async (ctx: Context): Promise<void> => {
-    ctx.body = GameModel.getGamesList();
+    ctx.body = GameModel.getGamesList(true);
   };
 
   public enterGame = async (ctx: Context): Promise<void> => {

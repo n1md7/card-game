@@ -12,6 +12,7 @@ export enum CardRank {
   JACK = 12,
   QUEEN,
   KING,
+  NONE,
 }
 
 export enum CardRankName {
@@ -28,6 +29,7 @@ export enum CardRankName {
   JACK = 'jack',
   QUEEN = 'queen',
   KING = 'king',
+  NONE = 'none',
 }
 
 export enum CardSuit {
@@ -35,6 +37,7 @@ export enum CardSuit {
   DIAMONDS = 'diamonds',
   HEARTS = 'hearts',
   SPADES = 'spades',
+  NONE = 'none',
 }
 
 export enum ActionType {
@@ -79,3 +82,23 @@ export enum Room {
   three,
   four,
 }
+
+export type GameEvents =
+  | 'one-game-finished'
+  | 'full-game-finished'
+  | 'add-card-on-table'
+  | 'add-card-on-hand'
+  | 'take-card-from-table'
+  | 'all-players-info'
+  | 'game:take-cards'
+  | 'player:turn'
+  | 'game:players-data'
+  | 'game:finish-deck'
+  | 'player-cards'
+  | 'table-cards:add'
+  | 'table-cards:remove'
+  | 'game:start'
+  | 'game:pending'
+  | 'game:results'
+  | 'game:round-results'
+  | 'game:finish';

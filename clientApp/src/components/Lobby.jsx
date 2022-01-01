@@ -8,7 +8,8 @@ export default function Lobby({ history }) {
   useEffect(() => {
     // check whether user has already in the room
     if (userInfo?.gameId) {
-      history.push(`/room/${userInfo.gameId}`);
+      const id = String(userInfo?.gameId).replace(/G-/g, '');
+      history.push(`/G/${id}`);
     }
   }, [userInfo]);
 

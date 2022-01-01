@@ -1,11 +1,11 @@
 import { Socket } from 'socket.io-client';
 
 export type GameSelectorType = {
-  root: Element;
-  table: Element;
-  actions: Element;
-  room: Element;
-  nav: Element;
+  root: HTMLDivElement;
+  table: HTMLDivElement;
+  actions: HTMLDivElement;
+  room: HTMLDivElement;
+  nav: HTMLDivElement;
 };
 export type SocketType = typeof Socket;
 
@@ -20,9 +20,9 @@ export type PlayerData = {
   [places in PlayerPlaceOptions]: {
     taken: boolean;
     name: string;
-    progress: number;
+    time: number;
     cards: number;
-    score?: number;
+    isActive: boolean;
   };
 };
 
@@ -33,7 +33,7 @@ export type GameData = {
 
 export enum Event {
   playerTurn = 'player:turn',
-  gameData = 'game:data',
+  gamePlayers = 'game:players-data',
   gameFinish = 'game:finish',
   gameFinishDeck = 'game:finish-deck',
   gameTakeCards = 'game:take-cards',
@@ -72,6 +72,12 @@ export type TableCardType = {
   top?: number;
   left?: number;
   rotate?: number;
+};
+
+export type PlayerCardType = {
+  name: Rank;
+  suit: Suit;
+  value: string;
 };
 
 export type Defaults = {

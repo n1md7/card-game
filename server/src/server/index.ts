@@ -83,7 +83,7 @@ export default class Server {
     this.koa.use(serveIndexHTML(indexHTMLPath, this.koa));
     this.koa.on(KoaEvent.serverError, (errorMessage) => logWrite.error(`[server] ${errorMessage}`));
     this.koa.on(KoaEvent.socketError, (errorMessage) => logWrite.error(`[socket] ${errorMessage}`));
-    this.koa.on(KoaEvent.debug, (debugMessage) => logWrite.error(`${debugMessage}`));
+    this.koa.on(KoaEvent.debug, (debugMessage) => logWrite.debug(`[debug] ${debugMessage}`));
 
     return this;
   }
@@ -119,7 +119,7 @@ export default class Server {
 
     this.socketModule = new SocketModule(this.ioServer, this.koa, new Events());
     this.socketManager = new SocketManager(this.ioServer);
-    this.serverTimer = this.socketModule.sendUpdatesEvery();
+    this.serverTimer = this.socketModule.sendUpdatesEvery(this.socketManager);
 
     return this.socketModule;
   }

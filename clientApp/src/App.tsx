@@ -14,7 +14,7 @@ export default function App() {
       <ProtectedRoute path="/lobby" component={Lobby} />
       <ProtectedRoute path="/create" component={CreateRoom} />
       <ProtectedRoute path="/join" component={JoinRoom} />
-      <ProtectedRoute path="/room/:roomId" component={EnterRoom} />
+      <ProtectedRoute path="/G/:roomId" component={EnterRoom} />
       <Redirect to="/auth" />
     </Switch>
   );

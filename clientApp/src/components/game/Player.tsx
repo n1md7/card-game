@@ -1,42 +1,44 @@
 import React from 'react';
 import Card from '../cards/Card';
 import { list } from '../../helpers/Protos';
+import Spinner from 'react-bootstrap/Spinner';
 
 type Props = {
   cards: number;
-  progress: number;
+  time: number;
+  isActive: boolean;
   name: string;
-  score?: number;
   props: {
     [Key in keyof React.HTMLAttributes<HTMLDivElement>]: React.HTMLAttributes<HTMLDivElement>;
   };
 };
-type Style = {
-  width: string;
-};
-export default ({ cards, progress, ...props }: Props) => {
-  const style: Style = {} as Style;
-  if (!isNaN(progress)) {
-    style.width = progress + '%';
-  }
 
+export default ({ cards, time, isActive, ...props }: Props) => {
   if (!props?.name) {
     return <div {...props}>{''}</div>;
   }
+  const style = isActive
+    ? {
+        animation: `width-animation ${time}s reverse ease-out`,
+      }
+    : {};
 
   return (
     <div {...props}>
       <div className="x-player-cards">
-        {list(cards).map((i) => (
-          // @ts-ignore
-          <Card h={24} key={i} />
-        ))}
+        {cards ? (
+          list(cards).map((i) => (
+            // @ts-ignore
+            <Card h={24} key={i} />
+          ))
+        ) : (
+          <Spinner animation="grow" variant="danger" size="sm" />
+        )}
       </div>
       <div className="x-progress" style={style}>
         {''}
       </div>
       <div className="x-name">{props.name}</div>
-      <div className="x-score">{props?.score || 0}</div>
     </div>
   );
 };

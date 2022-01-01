@@ -6,7 +6,6 @@ export class PlayerResult {
   public readonly numberOfCards: number;
   public readonly hasTwoOfClubs: boolean;
   public readonly hasTenOfDiamonds: boolean;
-  public score: number;
 
   constructor(cards: Card[]) {
     this.numberOfCards = cards.length;

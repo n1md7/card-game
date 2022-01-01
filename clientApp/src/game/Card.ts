@@ -1,5 +1,5 @@
-import { Rank, Suit } from './types';
 import cover from '../img/card-cover.svg';
+import { Rank, Suit } from './types';
 
 export enum ActionType {
   create = 1,
@@ -67,6 +67,9 @@ export class Card {
   public action(type: ActionType, $for: CreateFor = 'table'): HTMLImageElement {
     const card = type === ActionType.create ? new Image() : this.htmlElement;
     card.setAttribute('data-id', this.id);
+    card.setAttribute('data-key', this.key);
+    card.setAttribute('data-rank', this.rank);
+    card.setAttribute('data-suit', this.suit);
     card.className = `x-card js_${this.id}`;
     if ($for === 'table') {
       card.style.position = 'absolute';
@@ -74,7 +77,7 @@ export class Card {
       card.style.top = this.top + 'px';
       card.style.width = this.width + 'px';
       card.style.height = this.height + 'px';
-      card.style.transform = `rotate(${this.rotate}deg)`;
+      card.style.transform = `rotateZ(${this.rotate}deg)`;
     }
     try {
       card.src = require(`../img/cards/${this.id}.svg`);
@@ -100,5 +103,25 @@ export class Card {
 
   public set zIndex(index: number) {
     this.htmlElement.style.zIndex = String(index);
+  }
+
+  public setZIndex(index: number): void {
+    this.htmlElement.style.zIndex = String(index);
+  }
+
+  public setTransition(property: string, duration: string): void {
+    this.htmlElement.style.transition = `${property} ${duration}`;
+  }
+
+  public removeTransition(): void {
+    this.htmlElement.style.removeProperty('transition');
+  }
+
+  public animate(props: { translatedX: number; translatedY: number; angle?: number }, duration: number = 100): void {
+    setTimeout(() => {
+      this.setPosition(props.translatedX, props.translatedY);
+      this.setRotation(props.angle || 0);
+      this.action(ActionType.update);
+    }, duration);
   }
 }

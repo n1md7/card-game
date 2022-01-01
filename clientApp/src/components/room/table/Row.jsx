@@ -17,7 +17,8 @@ export default function Row(props) {
       .then((response) => {
         if (response.status === 200) {
           // Redirect to game room
-          return history.push(`/room/${response.data.id}`);
+          const id = String(response.data.id).replace(/G-/g, '');
+          return history.push(`/G/${id}`);
         }
         throw new Error(response.data);
       })
@@ -34,6 +35,7 @@ export default function Row(props) {
     <tr>
       <td>{props.id}</td>
       <td>{props.creator.name}</td>
+      <td>{props.createdAt}</td>
       <td>
         {props.inRoomSize}/{props.size}
       </td>

@@ -16,6 +16,7 @@ var CardRank;
     CardRank[CardRank["JACK"] = 12] = "JACK";
     CardRank[CardRank["QUEEN"] = 13] = "QUEEN";
     CardRank[CardRank["KING"] = 14] = "KING";
+    CardRank[CardRank["NONE"] = 15] = "NONE";
 })(CardRank = exports.CardRank || (exports.CardRank = {}));
 var CardRankName;
 (function (CardRankName) {
@@ -32,6 +33,7 @@ var CardRankName;
     CardRankName["JACK"] = "jack";
     CardRankName["QUEEN"] = "queen";
     CardRankName["KING"] = "king";
+    CardRankName["NONE"] = "none";
 })(CardRankName = exports.CardRankName || (exports.CardRankName = {}));
 var CardSuit;
 (function (CardSuit) {
@@ -39,6 +41,7 @@ var CardSuit;
     CardSuit["DIAMONDS"] = "diamonds";
     CardSuit["HEARTS"] = "hearts";
     CardSuit["SPADES"] = "spades";
+    CardSuit["NONE"] = "none";
 })(CardSuit = exports.CardSuit || (exports.CardSuit = {}));
 var ActionType;
 (function (ActionType) {

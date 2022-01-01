@@ -1,6 +1,5 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import GameRoom from '../game/Room';
 import PlayGround from '../game/PlayGround';
 import useJoinRoom from '../../hooks/useJoinRoom';
 import Header from '../Header';
@@ -13,7 +12,7 @@ export default function Room() {
   // when accessed directly from the URL
   // we dont know that roomId definitely exists
   // or the user is able to join the table
-  const [gameId, isLoading, errorMessage] = useJoinRoom(roomId);
+  const [gameId, isLoading, errorMessage] = useJoinRoom(`G-${roomId}`);
 
   if (isLoading) {
     return <div>Joining...</div>;

@@ -37,7 +37,7 @@ describe('Game', function () {
       new SocketManager(SocketIO),
     );
     game.joinPlayer(player);
-    const gameData = game.getGameData(player);
+    const gameData = game.getGamePlayersData(player);
 
     expect(gameData).toEqual({
       playerData: expect.any(Object),

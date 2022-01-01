@@ -1,7 +1,6 @@
 import { Context, Next } from 'koa';
-import { ErrorType, HttpText, HttpCode, MongoErrorType, MongoErrorCode, ExceptionType } from '../types/error';
+import { ErrorType, HttpText, HttpCode, MongoErrorType, MongoErrorCode, ExceptionType, KoaEvent } from '../types';
 import { ValidationErrorItem } from 'joi';
-import { KoaEvent } from '../types';
 
 class ErrorHandler {
   static async handle(ctx: Context, next: Next): Promise<void> {
