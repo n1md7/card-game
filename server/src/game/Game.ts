@@ -66,7 +66,7 @@ export default class Game {
    * @private
    */
   private readonly io: SocketManager;
-  private readonly positions: PlayerPositionType[];
+  private readonly positions: { [key: number]: PlayerPositionType[] };
   private roundsCounter = 1;
   private latestRoundResults: RoundResult[] = [];
   private allRoundResults: RoundResult[][] = [];
@@ -96,7 +96,11 @@ export default class Game {
     this.creatorName = name;
     this.isPublic = isPublic;
     this.io = socketManager;
-    this.positions = ['down', 'left', 'up', 'right'];
+    this.positions = {
+      [2]: ['down', 'up'],
+      [3]: ['down', 'left', 'right'],
+      [4]: ['down', 'left', 'up', 'right'],
+    };
     this.maxScores = maxScores;
     this.maxRounds = maxRounds;
   }
@@ -184,7 +188,7 @@ export default class Game {
   }
 
   findEmptyPositions() {
-    return this.positions.filter((item) => not(this.occupiedPositions.includes(item)));
+    return this.positions[this.numberOfPlayers].filter((item) => not(this.occupiedPositions.includes(item)));
   }
 
   startGame(): void {
@@ -192,10 +196,7 @@ export default class Game {
     this.isStarted = true;
     this.dealCards(true);
     this.activePlayer = this.gamePlayers[this.cpi];
-    // Mainly for testing purposes to have it the default value
     this.lastCardTaker = this.activePlayer;
-    // emit event to all in the room [gameId]
-    this.io.originalIO.in(this.id).emit('game:start', this.details);
     this.emitInitialData();
   }
 
@@ -234,7 +235,8 @@ export default class Game {
       {} as TransformedPlayerData,
     );
 
-    for (const position of this.findEmptyPositions()) {
+    const emptyPositions = this.findEmptyPositions();
+    for (const position of emptyPositions) {
       transformedPlayerData[position] = {
         taken: false,
         name: '',
@@ -245,13 +247,13 @@ export default class Game {
     }
 
     const result = {} as TransformedPlayerData;
-    const positionShift = this.positions.indexOf(requestPlayer.position);
     for (const key in transformedPlayerData) {
       if (transformedPlayerData.hasOwnProperty(key)) {
-        const newIndex = { value: this.positions.indexOf(key as PlayerPositionType) - positionShift };
-        newIndex.value = newIndex.value >= 0 ? newIndex.value : 4 + newIndex.value;
-        const newPosition: PlayerPositionType = this.positions[newIndex.value];
-        result[newPosition] = transformedPlayerData[key as PlayerPositionType];
+        // Fake player data is only used for position shifting
+        const fakePlayer = new Player('', '');
+        fakePlayer.position = key as PlayerPositionType;
+        const [position] = this.positionShift(requestPlayer, fakePlayer);
+        result[position] = transformedPlayerData[fakePlayer.position];
       }
     }
 
@@ -349,7 +351,11 @@ export default class Game {
 
   emitInitialData(): void {
     this.players.forEach((player) => {
-      this.io.to(player).emit('add-card-on-table', this.cardsOnTable);
+      if (this.isStarted) {
+        this.io.to(player).emit('game:start');
+      }
+      const [position] = this.positionShift(player, player);
+      this.io.to(player).emit('add-card-on-table', { cards: this.cardsOnTable, position });
       this.io.to(player).emit('player-cards', player.handCards);
       this.io.to(player).emit('game:players-data', this.getGamePlayersData(player));
       this.io.to(player).emit('game:round-results', this.allRoundResults);
@@ -464,6 +470,16 @@ export default class Game {
     return true;
   }
 
+  // This positions player as a base for each UI view to be on the bottom and other players will be rotated accordingly
+  positionShift(player: Player, targetPlayer: Player) {
+    const positionShift = this.positions[this.numberOfPlayers].indexOf(player.position);
+    // Move player to the next position
+    const mppIndex = { value: this.positions[this.numberOfPlayers].indexOf(targetPlayer.position) - positionShift };
+    mppIndex.value = mppIndex.value >= 0 ? mppIndex.value : this.numberOfPlayers + mppIndex.value;
+
+    return [this.positions[this.numberOfPlayers][mppIndex.value]];
+  }
+
   playerAction(targetPlayer: Player, type: ActionType, playerCard: Card, tableCards: Card[]): void {
     this.validateAction(targetPlayer, type, playerCard, tableCards);
 
@@ -478,14 +494,20 @@ export default class Game {
         }
         this.lastCardTaker = targetPlayer;
         this.gamePlayers.forEach((player) => {
-          this.io.to(player).emit('take-card-from-table', tableCards, playerCard);
+          const [position] = this.positionShift(player, targetPlayer);
+          this.io.to(player).emit('take-card-from-table', {
+            position,
+            playerCard,
+            tableCards,
+          });
         });
         break;
       case ActionType.PLACE_CARD:
         this.cards.push(playerCard);
         targetPlayer.removeCardFromHand(playerCard);
         this.gamePlayers.forEach((player) => {
-          this.io.to(player).emit('add-card-on-table', playerCard);
+          const [position] = this.positionShift(player, targetPlayer);
+          this.io.to(player).emit('add-card-on-table', { cards: playerCard, position });
         });
         break;
       default:
@@ -497,15 +519,6 @@ export default class Game {
     this.gamePlayers.forEach((player) => {
       this.io.to(player).emit('player-cards', player.handCards);
       this.io.to(player).emit('game:players-data', this.getGamePlayersData(player));
-      const positionShift = this.positions.indexOf(player.position);
-      // Move player to the next position
-      const mppIndex = { value: this.positions.indexOf(targetPlayer.position) - positionShift };
-      mppIndex.value = mppIndex.value >= 0 ? mppIndex.value : 4 + mppIndex.value;
-      this.io.to(player).emit('take-card-from-table', {
-        position: this.positions[mppIndex.value],
-        playerCard,
-        tableCards,
-      });
     });
   }
 

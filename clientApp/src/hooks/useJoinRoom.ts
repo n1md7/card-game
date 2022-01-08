@@ -19,7 +19,7 @@ const useJoinRoom = (roomId: string): [string | undefined, boolean, string | und
       data.append('name', name);
       httpClient({
         method: 'POST',
-        url: `${baseURL}v1/game/enter`,
+        url: `v1/game/enter`,
         data: {
           id: roomId,
           name,

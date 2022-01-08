@@ -7,6 +7,7 @@ export enum ActionType {
 }
 
 type CreateFor = 'table' | 'actions';
+type GeneratedCardID = string;
 
 export class Card {
   public readonly rank: Rank;
@@ -15,7 +16,7 @@ export class Card {
   public readonly id: string;
   public htmlElement: HTMLImageElement;
   public parent: HTMLElement | null;
-  public height: number = 90;
+  public height: number = 86;
   public width: number = 60;
   public left: number = 32;
   public top: number = 32;
@@ -26,9 +27,24 @@ export class Card {
     this.rank = rank;
     this.suit = suit;
     this.key = suit + rank;
-    this.id = `${this.rank}_of_${this.suit}`;
+    this.id = Card.generateCardId(rank, suit);
     this.htmlElement = new Image();
     this.parent = null;
+  }
+
+  public static generateCardId(rank: Rank, suit: Suit): GeneratedCardID {
+    return `${rank}_of_${suit}`;
+  }
+
+  public toValue(): number {
+    const map = {
+      ['ace' as keyof typeof Rank]: 1,
+      ['jack' as keyof typeof Rank]: 11,
+      ['queen' as keyof typeof Rank]: 12,
+      ['king' as keyof typeof Rank]: 13,
+    };
+    const [rank] = this.id.split('_of_');
+    return map[rank as keyof typeof Rank] ? map[rank as keyof typeof Rank] : +rank;
   }
 
   public setDimensions(width: number, height: number): void {
@@ -117,11 +133,16 @@ export class Card {
     this.htmlElement.style.removeProperty('transition');
   }
 
-  public animate(props: { translatedX: number; translatedY: number; angle?: number }, duration: number = 100): void {
+  public animate(
+    props: { translatedX: number; translatedY: number; angle?: number },
+    cb?: () => void,
+    duration: number = 100,
+  ): void {
     setTimeout(() => {
       this.setPosition(props.translatedX, props.translatedY);
       this.setRotation(props.angle || 0);
       this.action(ActionType.update);
+      cb && cb();
     }, duration);
   }
 }

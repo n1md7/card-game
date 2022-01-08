@@ -19,7 +19,7 @@ const useRooms = (): Room[] => {
   useEffect(() => {
     const updateRoomsList = () => {
       httpClient
-        .get(`${baseURL}v1/games`)
+        .get(`v1/games`)
         .then(({ data, status }) => {
           if (status === 200) {
             return setList(data as Room[]);

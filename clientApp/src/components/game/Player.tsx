@@ -19,7 +19,7 @@ export default ({ cards, time, isActive, ...props }: Props) => {
   }
   const style = isActive
     ? {
-        animation: `width-animation ${time}s reverse ease-out`,
+        animation: `width-animation ${time}s reverse cubic-bezier(0, 0, 0.71, 0.14)`,
       }
     : {};
 

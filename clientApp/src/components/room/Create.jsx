@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { httpClient } from '../../services/httpClient';
-import { baseURL } from '../../constants/urls';
 import { useSelector } from 'react-redux';
 import Header from '../Header';
 import handleError from '../../helpers/handleError';

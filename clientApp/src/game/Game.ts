@@ -1,37 +1,30 @@
 import {
+  AddCardType,
   Defaults,
   EllipseType,
   GameData,
   GameSelectorType,
-  PlayerCardType,
   PlayerPlaceOptions,
+  PlayerScoresCardDto,
   SocketType,
   TableCardType,
 } from './types';
 import BaseGame from './BaseGame';
-import { ActionType, Card } from './Card';
-import Ellipse, { ellipseFirstRange, isInRange, random } from '../libs/Formulas';
-import { calculateAngle } from '../helpers/html-utils';
-import Lo from 'lodash';
+import { Card } from './Card';
+import { random } from '../libs/Formulas';
 import { GameEvents } from 'shared-types';
-
-type GameState = 'waiting' | 'playing' | 'finished';
-type PlayerState = 'waiting' | 'playing' | 'finished';
+// @ts-ignore
+import Draggable from 'draggable';
 
 export default class Game extends BaseGame {
-  private borderWidth = 4;
   private readonly defaults: Defaults;
   private tableCards: { [x: string]: Card } = {};
+  private selectedTableCards: { [x: string]: Card } = {};
   private playerTurn: PlayerPlaceOptions | null = PlayerPlaceOptions.down;
   private processGameDataCallback: ((data: GameData) => void) | null = null;
   private processOffcanvasRoundResults: ((data: any) => void) | null = null;
   private processOffcanvasGameResults: ((data: any) => void) | null = null;
-  private mouseX: number = 0;
-  private mouseY: number = 0;
-  private cardIsDragging = false;
-  private cardIsDraggingRef: any | null = null;
-  private cardIsDraggingObj: Card | null = null;
-  private xActionsHeight = 0;
+  private xActionsHeight = 40;
   private zIndex = 0;
   private table = {
     top: 0,
@@ -39,10 +32,7 @@ export default class Game extends BaseGame {
     width: 0,
     height: 0,
   };
-  private mouseInCard = {
-    x: 0,
-    y: 0,
-  };
+  private gameIsStarted = false;
 
   constructor(selector: GameSelectorType, socketIO: SocketType, outerEllipse: EllipseType, defaults: Defaults) {
     super(selector, socketIO);
@@ -104,14 +94,19 @@ export default class Game extends BaseGame {
     this.on('game:start', this['process:game-start'].bind(this));
 
     this.calculateTableDims();
-    this.activateMouseMoveEvents();
   }
 
   private 'process:game-start'() {
+    this.gameIsStarted = true;
     console.log('game:started');
   }
 
   private 'process:player-cards'(cards: TableCardType[]): void {
+    console.log('player-cards', cards);
+    if (!cards?.length && !this.gameIsStarted) {
+      return;
+    }
+
     this.selector.actions.innerHTML = '';
 
     const fragment = new DocumentFragment();
@@ -123,10 +118,10 @@ export default class Game extends BaseGame {
       const actions = document.createElement('div');
       actions.className = 'x-card-actions';
       const placeBtn = document.createElement('button');
-      placeBtn.className = 'btn btn-sm btn-outline-dark';
+      placeBtn.className = 'btn btn-sm btn-dark';
       placeBtn.innerText = 'Place';
       const takeBtn = document.createElement('button');
-      takeBtn.className = 'btn btn-sm btn-outline-dark';
+      takeBtn.className = 'btn btn-sm btn-dark';
       takeBtn.innerText = 'Take';
       actions.appendChild(placeBtn);
       actions.appendChild(takeBtn);
@@ -144,11 +139,21 @@ export default class Game extends BaseGame {
       const { cardContainer, cardObject, takeBtn, placeBtn } = createCardFragment(card);
       cardObject.htmlElement.setAttribute('height', '128');
       takeBtn.onclick = () => {
+        const serializeTableCards = [];
+        for (const sci in this.selectedTableCards) {
+          const sciCard = this.selectedTableCards[sci];
+          if (sciCard) {
+            serializeTableCards.push({
+              rank: sciCard.rank,
+              suit: sciCard.suit,
+            });
+          }
+        }
         console.log('take card', card);
+
         this.socketIO.emit('player:move', {
           playerCard: card,
-          // TODO implement selected cards here
-          tableCards: [],
+          tableCards: serializeTableCards,
         });
       };
       placeBtn.onclick = () => {
@@ -169,13 +174,49 @@ export default class Game extends BaseGame {
   }
 
   private 'process: individual players in the game room'(data: GameData): void {
+    this.clearSelectedTableCardSelection();
     console.log(`data:`, data);
     if (this.processGameDataCallback) {
       this.processGameDataCallback(data);
     }
   }
 
-  private 'process:take-card-from-table'(data: GameData): void {}
+  private 'process:take-card-from-table'(dto: PlayerScoresCardDto): void {
+    const cardWidth = 60;
+    const cardHeight = 90;
+    const playerCard = new Card(dto.playerCard.name, dto.playerCard.suit);
+    const centerPosition = {
+      x: this.table.width / 2 - cardWidth / 2,
+      y: this.table.height / 2 - cardHeight / 2,
+    };
+    playerCard.setPosition(centerPosition.x, centerPosition.y);
+    playerCard.htmlElement.classList.add('x-card-selected');
+    playerCard.zIndex = this.zIndex + 1;
+    playerCard.appendDOM(this.selector.table, 'table');
+    const [translatedX, translatedY] = Game.calculatedAnimationPoint(
+      centerPosition.x,
+      centerPosition.y,
+      random(-30, 30),
+    ).for(dto.position);
+
+    setTimeout(() => {
+      playerCard.animate({ translatedX, translatedY }, () => {
+        playerCard.remove();
+      });
+    }, 1500);
+
+    dto.tableCards.forEach((dtoTableCard) => {
+      const cardId = Card.generateCardId(dtoTableCard.name, dtoTableCard.suit);
+      const tableCard = this.tableCards[cardId];
+      if (tableCard) {
+        tableCard.htmlElement.classList.add('x-card-selected');
+        tableCard.zIndex = this.zIndex + 1;
+        setTimeout(() => {
+          tableCard.remove();
+        }, 1500);
+      }
+    });
+  }
 
   private 'process:game-finish-one'(data: any): void {
     console.log(`game:finish`, data);
@@ -206,43 +247,51 @@ export default class Game extends BaseGame {
   }
 
   private 'process: add a single card on the table'(card: Card) {
-    const { translatedX, translatedY, angle } = this.calculatedEllipsePointsAgainstCard(card);
     if (!this.tableCards.hasOwnProperty(card.id)) {
+      this.calculateTableDims();
+      const { left, top } = this.calculateCardPlacePosition(this.playerTurn);
       this.tableCards[card.id] = card;
-      const calculatedAnimatedPoint = Game.calculatedAnimationPoint(translatedX, translatedY, angle);
+      const angle = random(-30, 30);
+      const calculatedAnimatedPoint = Game.calculatedAnimationPoint(left, top, angle);
       const [$left, $top, $rotate] = calculatedAnimatedPoint.for(this.playerTurn);
       card.setPosition($left, $top);
       card.setRotation($rotate);
       card.appendDOM(this.selector.table);
       card.attachEvent('click', (event) => {
         event.preventDefault();
-      });
-      card.attachEvent('mousedown', (event) => {
-        event.preventDefault();
-        this.cardIsDragging = true;
-        this.cardIsDraggingRef = event;
-        this.cardIsDraggingObj = card;
-        this.mouseInCard = {
-          x: event.clientX - event.target.offsetLeft,
-          y: event.clientY - event.target.offsetTop,
-        };
+        if (!this.selectedTableCards.hasOwnProperty(card.id)) {
+          this.selectedTableCards[card.id] = card;
+        } else {
+          delete this.selectedTableCards[card.id];
+        }
         card.zIndex = ++this.zIndex;
+        card.htmlElement.classList.toggle('x-card-selected');
       });
-      card.animate({ translatedX, translatedY, angle });
+      const draggable = new Draggable(card.htmlElement, {
+        limit: {
+          x: [this.table.left, this.table.left + this.table.width - card.width],
+          y: [
+            this.table.top - this.xActionsHeight,
+            this.table.top + this.table.height - card.height - this.xActionsHeight,
+          ],
+        },
+      });
+      card.animate({ translatedX: left, translatedY: top, angle });
     }
   }
 
-  private 'process: add single/multiple card(s) on the table'(cards: PlayerCardType | PlayerCardType[]): void {
-    if (!Array.isArray(cards)) {
-      cards = [cards];
+  private 'process: add single/multiple card(s) on the table'(dto: AddCardType): void {
+    if (!Array.isArray(dto.cards)) {
+      dto.cards = [dto.cards];
     }
-    cards.forEach(({ name, suit }) => {
+    this.playerTurn = dto.position;
+    dto.cards.forEach(({ name, suit }) => {
       const card = new Card(name, suit);
       this['process: add a single card on the table'](card);
     });
   }
 
-  private calculatedEllipsePoints() {
+  private calculateCardPlacePosition(position?: PlayerPlaceOptions | null) {
     const table = {
       top: this.selector.table.offsetTop + this.xActionsHeight,
       left: this.selector.table.offsetLeft,
@@ -250,53 +299,31 @@ export default class Game extends BaseGame {
       height: this.selector.table.offsetHeight,
     };
 
-    const widthPadding = 0;
-    const heightPadding = widthPadding * (table.height / table.width);
-    const height = table.height - this.borderWidth * 2 - 2 * heightPadding;
-    const width = table.width - this.borderWidth * 2 - 2 * widthPadding;
-    const ellipse = new Ellipse(width, height);
+    const cardHeight = 90;
 
-    return {
-      table,
-      width,
-      height,
-      ellipse,
-      widthPadding,
-      heightPadding,
-    };
-  }
-
-  private calculatedEllipsePointsAgainstCard(card: Card, x$?: number) {
-    const cWidth = card?.width ? card.width / 2 : 0;
-    const cHeight = card?.height ? card.height / 2 : 0;
-    const { table, ellipse, width, widthPadding, heightPadding, height } = this.calculatedEllipsePoints();
-    // Translate xRanges from negative axis to positive
-    const [startPointX, endPointX] = ellipseFirstRange(width);
-    const startPointY = Math.abs(ellipse.y(startPointX)[0]);
-    // Center of the ellipse(r is rotation)
-    const base = {
-      x: startPointX + width / 2 + widthPadding,
-      y: startPointY + height / 2 + heightPadding,
-      r: 0,
-    };
-    const x = x$ || random(startPointX, endPointX);
-    const [yMin, yMax] = ellipse.y(x);
-    const y = Lo.sample([yMin, yMax - cHeight]) as number;
-    const translatedY = y + height / 2 + heightPadding;
-    const translatedX = x + width / 2 + widthPadding;
-    const A = { x: translatedX + cWidth, y: translatedY + cHeight };
-    const B = { x: base.x, y: base.y };
-    const C = { x: table.width / 2, y: table.height / 2 };
-    const angle = 90 + calculateAngle(A, B, C) * (y > 0 ? -1 : 1);
-
-    return {
-      translatedX,
-      translatedY,
-      angle,
-      card,
-      table,
-      ellipse,
-    };
+    switch (position) {
+      case PlayerPlaceOptions.up:
+        return {
+          left: random(table.width * 0.25, table.width * 0.75),
+          top: random(0, table.height * 0.5),
+        };
+      case PlayerPlaceOptions.right:
+        return {
+          left: random(table.width * 0.5, table.width - cardHeight),
+          top: random(0, table.height - cardHeight),
+        };
+      case PlayerPlaceOptions.left:
+        return {
+          left: random(0, table.width * 0.5),
+          top: random(0, table.height - cardHeight),
+        };
+      case PlayerPlaceOptions.down:
+      default:
+        return {
+          left: random(table.width * 0.25, table.width * 0.75),
+          top: random(table.height * 0.5, table.height - cardHeight),
+        };
+    }
   }
 
   private calculateTableDims() {
@@ -314,66 +341,10 @@ export default class Game extends BaseGame {
     };
   }
 
-  private getXYAxisValues() {
-    const { width, widthPadding } = this.calculatedEllipsePoints();
-    const translatedMouseX = -this.mouseX + width / 2 + widthPadding;
-    const { table, ellipse, angle } = this.calculatedEllipsePointsAgainstCard(
-      this.cardIsDraggingObj as Card,
-      translatedMouseX,
-    );
-    const [yMin, yMax] = ellipse.y(this.mouseX - this.table.left - this.table.width / 2);
-    const yAxisMin = yMin + table.height / 2 + table.top + this.borderWidth;
-    const yAxisMax = yMax + table.height / 2 + table.top;
-
-    return {
-      yAxisMin,
-      yAxisMax,
-      angle,
-    };
-  }
-
-  private activateMouseMoveEvents(): void {
-    document.addEventListener('mousemove', (event) => {
-      this.zIndex++;
-      this.mouseX = event.clientX;
-      this.mouseY = event.clientY;
-      const tableRange = {
-        x: {
-          min: this.table.left,
-          max: this.table.left + this.table.width,
-        },
-      };
-
-      const { yAxisMin, yAxisMax } = this.getXYAxisValues();
-
-      if (this.cardIsDragging) {
-        if (this.cardIsDraggingObj && this.cardIsDraggingRef) {
-          const left = this.mouseX - this.mouseInCard.x;
-          const top = this.mouseY - this.mouseInCard.y;
-          const xInRange = isInRange([tableRange.x.min, tableRange.x.max], this.mouseX);
-          const yInRange = isInRange([yAxisMin, yAxisMax], this.mouseY);
-          if (!xInRange || !yInRange) return;
-          this.cardIsDraggingObj.setZIndex(this.zIndex);
-          this.cardIsDraggingObj.setPosition(left, top);
-          this.cardIsDraggingObj.setTransition('300ms', 'all');
-          this.cardIsDraggingObj.action(ActionType.update);
-          this.cardIsDraggingObj.removeTransition();
-        }
-      }
+  private clearSelectedTableCardSelection(): void {
+    Object.values(this.selectedTableCards).forEach((card) => {
+      card.htmlElement.classList.remove('x-card-selected');
     });
-
-    document.addEventListener('mouseup', (event) => {
-      event.preventDefault();
-      // FIXME: the angle calculation is obviously incorrect
-      // const { angle } = this.getXYAxisValues();
-      // this.cardIsDraggingObj?.setRotation(angle);
-      this.cardIsDragging = false;
-      this.cardIsDraggingRef = null;
-      this.cardIsDraggingObj = null;
-      this.mouseInCard = {
-        x: 0,
-        y: 0,
-      };
-    });
+    this.selectedTableCards = {};
   }
 }

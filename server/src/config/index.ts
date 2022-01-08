@@ -27,7 +27,7 @@ const config: ConfigOptions = {
       throw new Error(`Was not able to parse ORIGINS: ${process.env.ORIGINS};`);
     }
 
-    const http = ' http';
+    const http = 'http';
     const domains = ['localhost', '127.0.0.1'];
     const ports = [config.app.port, config.server.port, config.test.port];
     const origins: string[] = [];

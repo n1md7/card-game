@@ -80,6 +80,11 @@ export type PlayerCardType = {
   value: string;
 };
 
+export type AddCardType = {
+  cards: PlayerCardType | PlayerCardType[];
+  position: PlayerPlaceOptions;
+};
+
 export type Defaults = {
   windowWidth: number;
   tableWidth: number;
@@ -96,4 +101,10 @@ export type Defaults = {
 
 export type EllipseType = {
   y: (x: number) => [number, number];
+};
+
+export type PlayerScoresCardDto = {
+  position: PlayerPlaceOptions;
+  playerCard: PlayerCardType;
+  tableCards: PlayerCardType[];
 };

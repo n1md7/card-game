@@ -7,3 +7,4 @@ logs
 server/logs
 env
 reports
+.env.production

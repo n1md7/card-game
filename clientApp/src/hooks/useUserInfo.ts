@@ -16,7 +16,7 @@ const useUserInfo = (): [UserInfo, boolean] => {
 
   useEffect(() => {
     httpClient
-      .get(`${baseURL}v1/user`)
+      .get(`v1/user`)
       .then((response) => {
         if (response.status === 200) {
           return setUserInfo(response.data);

@@ -1,7 +1,7 @@
 export const list = function (n) {
-  const list = Array(+n);
+  const l = Array(+n);
   for (let i = 0; i < +n; i++) {
-    list[i] = i;
+    l[i] = i;
   }
-  return list;
+  return l;
 };

@@ -35,7 +35,7 @@ const useAuth = (showError = true): [boolean, boolean] => {
     tokenStore.setToken(tokenValue);
     // check whether or not our token is valid
     httpClient
-      .get(`${baseURL}v1/auth/status`)
+      .get(`v1/auth/status`)
       .then((response) => {
         if (response.status === 401) {
           return null;

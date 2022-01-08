@@ -1,5 +1,6 @@
 const { REACT_APP_SERVER_PORT: port, REACT_APP_BASE_URL } = process.env;
-export const baseURL = `${REACT_APP_BASE_URL}:${port}/api/`;
+const app_env = process.env.REACT_APP_ENV;
+export const baseURL = app_env === 'production' ? '/api/' : `${REACT_APP_BASE_URL}:${port}/api/`;
 export const urls = {
   init: 'init',
   statusCheck: 'status-check',
@@ -9,4 +10,4 @@ export const urls = {
   leaveRoom: 'leave-room',
   userInfo: 'user-info',
 };
-export const SOCKET_ENDPOINT = `${REACT_APP_BASE_URL}:${port}`;
+export const SOCKET_ENDPOINT = app_env === 'production' ? '/' : `${REACT_APP_BASE_URL}:${port}`;

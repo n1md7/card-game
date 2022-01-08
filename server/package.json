@@ -5,7 +5,7 @@
   "main": "dist/server/src/index.js",
   "scripts": {
     "clean": "npx rimraf dist/*",
-    "dev": "ts-node-dev src/index.ts",
+    "dev": "NODE_ENV=development ts-node-dev src/index.ts",
     "prod:build": "npx rimraf dist && tsc",
     "prod": "export NODE_ENV=production && node dist/index.js",
     "mongo:init": "npx migrate-mongo init",
