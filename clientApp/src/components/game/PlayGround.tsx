@@ -11,8 +11,10 @@ import { Alert, AlertType } from '../../helpers/toaster';
 import Player from './Player';
 import { Token } from 'shared-types';
 import { GameData, GameSelectorType, PlayerData, PlayerPlaceOptions } from '../../game/types';
-import cover from '../../img/card-cover.svg';
 import { Offcanvas } from 'react-bootstrap';
+import IdleView from './IdleView';
+import Results from './Results';
+import ResultsView from './ResultsView';
 
 export default () => {
   const history = useHistory();
@@ -26,6 +28,8 @@ export default () => {
   const [roundResults, setRoundResults] = useState<null | Object[]>(null);
   const [gameResults, setGameResults] = useState<null | Object[]>(null);
   const [showResults, setShowResults] = useState<boolean>(false);
+  const [idle, setIdle] = useState<number>(0);
+  const [showGameResults, setShowGameResults] = useState<boolean>(false);
   const [gameData, setGameData] = useState<GameData>({
     playerData: {} as PlayerData,
     remainedCards: null,
@@ -57,6 +61,11 @@ export default () => {
     });
   };
 
+  const handleGameResultData = (data: null | Object[]) => {
+    setGameResults(data);
+    setShowGameResults(true);
+  };
+
   useLayoutEffect(() => {
     if (!defaults) return;
     const nav = document.querySelector('div.x-actions');
@@ -77,32 +86,44 @@ export default () => {
       reconnectionAttempts: 8,
       secure: true,
     });
-    socketIO.on('connect', () => {
-      const selectors: GameSelectorType = {
-        root: root as HTMLDivElement,
-        actions: actions as HTMLDivElement,
-        table: table as HTMLDivElement,
-        room: room as HTMLDivElement,
-        nav: nav as HTMLDivElement,
-      };
-      // Run the game
-      const outerEllipse = new Ellipse(tableWidth - cardDiagonal / 2, tableHeight - cardDiagonal / 2);
-      const game = new Game(selectors, socketIO, outerEllipse, defaults);
-      game.run();
-      game.onProcessGameData(setGameData);
-      game.onOffcanvasGameResults(setRoundResults, setGameResults);
-      console.log('Connected to game room');
-      console.log('Status: pending...');
-    });
-    socketIO.on('error', (message: string) => {
-      Alert(AlertType.ERROR, `${message}`, 10);
-    });
-    socketIO.on('validation:error', (message: string) => {
-      Alert(AlertType.ERROR, `[Validation] ${message}`, 10);
-    });
-    socketIO.on('game:error', (message: string) => {
-      Alert(AlertType.ERROR, `[Game] ${message}`, 10);
-    });
+    socketIO
+      .on('connect', () => {
+        const selectors: GameSelectorType = {
+          root: root as HTMLDivElement,
+          actions: actions as HTMLDivElement,
+          table: table as HTMLDivElement,
+          room: room as HTMLDivElement,
+          nav: nav as HTMLDivElement,
+        };
+        // Run the game
+        const outerEllipse = new Ellipse(tableWidth - cardDiagonal / 2, tableHeight - cardDiagonal / 2);
+        const game = new Game(selectors, socketIO, outerEllipse, defaults);
+        game.run();
+        game.onProcessGameData(setGameData);
+        game.onOffcanvasGameResults(setRoundResults, setGameResults);
+        console.log('Connected to game room');
+        console.log('Status: pending...');
+      })
+      .on('idle-game-before-next-round', (idleTimeInMillis: number) => {
+        setIdle(idleTimeInMillis);
+        console.log('Status: idle-game-before-next-round', idleTimeInMillis);
+      })
+      .on('final:game:results', (gameResult: Object[]) => {
+        setShowGameResults(true);
+        setGameResults(gameResult);
+      })
+      .on('disconnect', () => {
+        console.log('Disconnected from game room');
+      })
+      .on('error', (message: string) => {
+        Alert(AlertType.ERROR, `${message}`, 10);
+      })
+      .on('validation:error', (message: string) => {
+        Alert(AlertType.ERROR, `[Validation] ${message}`, 10);
+      })
+      .on('game:error', (message: string) => {
+        Alert(AlertType.ERROR, `[Game] ${message}`, 10);
+      });
   }, [defaults]);
 
   useEffect(() => {
@@ -111,73 +132,22 @@ export default () => {
 
   return (
     <div className={'x-2d-area no-select'} style={{ width: windowWidth }}>
+      {!!idle && (
+        <IdleView idleTime={idle}>
+          <Results style={{ margin: 'auto' }} gameResults={gameResults} roundResults={roundResults} />
+        </IdleView>
+      )}
+      {showGameResults && (
+        <ResultsView>
+          <Results style={{ margin: 'auto' }} gameResults={gameResults} roundResults={roundResults} />
+        </ResultsView>
+      )}
       <Offcanvas show={showResults} onHide={() => setShowResults(false)} scroll={true} backdrop={true} keyboard={true}>
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Offcanvas</Offcanvas.Title>
+          <Offcanvas.Title>Results</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          {roundResults && !!roundResults.length ? (
-            <table className="table-sm table-bordered table-dark">
-              <colgroup>
-                <col />
-                <col />
-                <col />
-                <col />
-                <col />
-                <col style={{ background: 'rgba(152,48,48,0.53)' }} />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>Player</th>
-                  <th>♣️-TWO</th>
-                  <th>♦️-TEN</th>
-                  <th>Clubs</th>
-                  <th>Cards</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {roundResults.map((round: any, idx) => (
-                  <>
-                    <tr className="text-center" key={`r-${idx}`}>
-                      <td colSpan={6}>Round {idx + 1}</td>
-                    </tr>
-                    {round &&
-                      round.map((player: any, pid: number) => (
-                        <tr className="text-center" key={`s-${pid}-${idx}`}>
-                          <td valign={'middle'}>{player.name}</td>
-                          <td valign={'middle'}>{player.result.hasTwoOfClubs ? 'YES' : 'NO'}</td>
-                          <td valign={'middle'}>{player.result.hasTenOfDiamonds ? 'YES' : 'NO'}</td>
-                          <td valign={'middle'}>{player.result.numberOfClubs}</td>
-                          <td valign={'middle'}>{player.result.numberOfCards}</td>
-                          <td valign={'middle'}>{player.score}</td>
-                        </tr>
-                      ))}
-                  </>
-                ))}
-                {gameResults && !!gameResults.length && (
-                  <>
-                    <tr className="text-center" key={'hmm'}>
-                      <td colSpan={6}>Summary</td>
-                    </tr>
-                    {gameResults.map((player: any, idx) => (
-                      <>
-                        <tr className="text-center" key={`h-${idx}`}>
-                          <td colSpan={1}>{player.name}</td>
-                          <td colSpan={4}>{player.isWinner ? 'Winner' : ''}</td>
-                          <td colSpan={1}>{player.score}</td>
-                        </tr>
-                      </>
-                    ))}
-                  </>
-                )}
-              </tbody>
-            </table>
-          ) : (
-            <div className="text-center">
-              <h3>No results</h3>
-            </div>
-          )}
+          <Results gameResults={gameResults} roundResults={roundResults} />
         </Offcanvas.Body>
       </Offcanvas>
 

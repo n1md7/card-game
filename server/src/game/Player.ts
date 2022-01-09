@@ -101,6 +101,7 @@ export default class Player {
   removeCardFromHand(cardFromHand: Card) {
     const index = this.playerCardsInHand.findIndex((card) => card.equals(cardFromHand));
     if (-1 === index) {
+      console.log({ playerCardsInHand: this.playerCardsInHand, cardFromHand });
       throw new GameException('You are not holding such card in hand. Thus, it cannot be removed.');
     }
     this.playerCardsInHand.splice(index, 1);
@@ -114,6 +115,7 @@ export default class Player {
 
   placeCardFromHand(cardFromHand: Card) {
     if (!this.playerCardsInHand.find((card) => card.equals(cardFromHand))) {
+      console.log({ playerCardsInHand: this.playerCardsInHand, cardFromHand });
       throw new GameException('You are not holding such card in hand. Thus, it cannot be placed.');
     }
 
@@ -127,6 +129,12 @@ export default class Player {
    */
   takeCardsFromTable(cardFromHand: Card, tableCardsToTake: Card[]) {
     if (!this.playerCardsInHand.find((card) => card.equals(cardFromHand))) {
+      console.log({
+        message: 'You are not holding such card in hand. Thus, it cannot be taken.',
+        player: this,
+        cardFromHand,
+        tableCardsToTake,
+      });
       throw new GameException('You are not holding such card in hand. Thus, it cannot be placed.');
     }
     this.game.playerAction(this, ActionType.TAKE_CARDS, cardFromHand, tableCardsToTake);

@@ -9,7 +9,7 @@ import GameModel from '../model/GameModel';
 import Koa from 'koa';
 import { SocketManager } from './manager';
 import ms from 'ms';
-import { gameStore } from '../store';
+import { gameStore, playerStore } from '../store';
 
 export default class SocketModule {
   constructor(private readonly io: SocketIO.Server, private readonly koa: Koa, private readonly events: Events) {
@@ -67,7 +67,7 @@ export default class SocketModule {
     });
   }
 
-  public sendUpdatesEvery = (socketManager: SocketManager, milliseconds = 1000) =>
+  public sendUpdatesEvery = (socketManager: SocketManager, milliseconds = 500) =>
     setInterval(() => {
       for (const gid in GameModel.games) {
         if (GameModel.games.hasOwnProperty(gid)) {
@@ -76,15 +76,26 @@ export default class SocketModule {
 
           game.ticker((tick, delta) => {
             if (tick) {
-              if (!game.isFinished && game.isStarted) {
+              if (game.isStarted && !game.isFinished && !game.idle) {
                 if (game.playerTime <= 0) {
                   game.forceActivePlayerToPlaceRandomCard();
                 }
               }
 
-              // Clean up finished games
+              if (game.idle && !game.isFinished) {
+                if (game.idleTime <= 0) {
+                  game.startNewRound();
+                } else {
+                  game.idleTime--;
+                }
+              }
+
               if (game.isFinished) {
+                game.sendGameResults();
+
+                // Clean up finished games
                 if (Date.now() - game.finishedAt >= ms('5m')) {
+                  game.players.forEach((player) => playerStore.removeById(player.id));
                   gameStore.removeById(game.id);
                 }
               }

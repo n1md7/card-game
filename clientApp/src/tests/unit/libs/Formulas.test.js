@@ -1,6 +1,6 @@
 import { Card } from '../../../game/Card';
 import { Rank, Suit } from '../../../game/types';
-import { CardCombination } from '../../../libs/Formulas';
+import { CardCombination, FullyQualifiedUrlParser } from '../../../libs/Formulas';
 
 describe.each([
   [Rank.ACE, [Rank.ACE], []],

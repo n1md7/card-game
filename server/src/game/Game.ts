@@ -71,6 +71,10 @@ export default class Game {
   private latestRoundResults: RoundResult[] = [];
   private allRoundResults: RoundResult[][] = [];
   private gameResult: GameResult[] = [];
+  private isIdle: boolean;
+  private idleAt: number;
+  public idleTime: number;
+  private dealerIndex = -1;
 
   constructor(
     numberOfPlayers: number,
@@ -103,6 +107,10 @@ export default class Game {
     };
     this.maxScores = maxScores;
     this.maxRounds = maxRounds;
+  }
+
+  get idle() {
+    return this.isIdle;
   }
 
   get deck() {
@@ -187,11 +195,18 @@ export default class Game {
     if (null === clubsDrawn) clubWinner.score += SCORE_FOR_MAX_CLUBS;
   }
 
+  private resetIdle() {
+    this.isIdle = false;
+    this.idleAt = 0;
+  }
+
   findEmptyPositions() {
     return this.positions[this.numberOfPlayers].filter((item) => not(this.occupiedPositions.includes(item)));
   }
 
   startGame(): void {
+    this.dealerIndex++;
+    this.cpi = this.dealerIndex;
     if (this.isStarted) return;
     this.isStarted = true;
     this.dealCards(true);
@@ -290,6 +305,15 @@ export default class Game {
     // When cards left on the table give it to last taker
     if (this.cards.length) {
       this.lastCardTaker.scoreCards(this.cards);
+      // Give a signal to the clients to remove remaining cards from the table
+      this.gamePlayers.forEach((player) => {
+        const [position] = this.positionShift(player, this.lastCardTaker);
+        this.io.to(player).emit('take-card-from-table', {
+          position,
+          playerCard: null,
+          tableCards: this.cards,
+        });
+      });
       this.cards = [];
     }
 
@@ -306,7 +330,12 @@ export default class Game {
     this.allRoundResults.push(R.clone(this.latestRoundResults));
     this.gamePlayers.forEach((player) => player.scoreReset());
     this.roundsCounter++;
+    this.isIdle = true;
+    this.idleTime = 30; // seconds
+    this.idleAt = Date.now();
     this.io.to(this.gamePlayers).emit('one-game-finished', this.allRoundResults);
+    // @ts-ignore TODO: add this union type in shared-types
+    this.io.to(this.gamePlayers).emit('idle-game-before-next-round', this.idleTime);
     this.evaluateEndOfGame();
   }
 
@@ -334,10 +363,11 @@ export default class Game {
       }
     }
 
-    this.startNewRound();
+    // Game stops here and game ticker will call restartRound as it's needed
   }
 
   startNewRound(): void {
+    this.resetIdle();
     this.restartGame();
   }
 
@@ -360,6 +390,13 @@ export default class Game {
       this.io.to(player).emit('game:players-data', this.getGamePlayersData(player));
       this.io.to(player).emit('game:round-results', this.allRoundResults);
       this.io.to(player).emit('game:results', this.gameResult, this.winner?.id);
+    });
+  }
+
+  sendGameResults() {
+    this.players.forEach((player) => {
+      // @ts-ignore
+      this.io.to(player).emit('final:game:results', this.gameResult, this.winner?.id);
     });
   }
 
@@ -529,10 +566,12 @@ export default class Game {
         throw new GameException('Action validation problem. TableCards length is zero.');
       }
       if (not(this.tableContainsCards(tableCards))) {
+        console.log({ player, type, playerCard, tableCards, gameDataCardsOnTable: this.cardsOnTable });
         throw new GameException(`Action validation problem. Cards do not match tableCards.`);
       }
     }
     if (type === ActionType.TAKE_CARDS && !playerCard.canTakeCards(tableCards)) {
+      console.log({ player, type, playerCard, tableCards, gameDataCardsOnTable: this.cardsOnTable });
       throw new GameException('Action validation problem. Incorrect move.');
     }
   }
@@ -542,7 +581,7 @@ export default class Game {
   }
 
   public forceActivePlayerToPlaceRandomCard() {
-    if (this.activePlayer) {
+    if (this.activePlayer && !this.isIdle) {
       this.playerAction(this.activePlayer, ActionType.PLACE_CARD, this.activePlayer.getRandomCardFromHand(), []);
     }
   }

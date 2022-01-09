@@ -6,20 +6,22 @@ import {
   GameSelectorType,
   PlayerPlaceOptions,
   PlayerScoresCardDto,
+  Rank,
   SocketType,
+  Suit,
   TableCardType,
 } from './types';
 import BaseGame from './BaseGame';
 import { Card } from './Card';
-import { random } from '../libs/Formulas';
+import { CardCombination, clone, random } from '../libs/Formulas';
 import { GameEvents } from 'shared-types';
 // @ts-ignore
 import Draggable from 'draggable';
 
 export default class Game extends BaseGame {
   private readonly defaults: Defaults;
-  private tableCards: { [x: string]: Card } = {};
-  private selectedTableCards: { [x: string]: Card } = {};
+  private tableCards: Card[] = [];
+  private selectedTableCards: Card[] = [];
   private playerTurn: PlayerPlaceOptions | null = PlayerPlaceOptions.down;
   private processGameDataCallback: ((data: GameData) => void) | null = null;
   private processOffcanvasRoundResults: ((data: any) => void) | null = null;
@@ -33,6 +35,9 @@ export default class Game extends BaseGame {
     height: 0,
   };
   private gameIsStarted = false;
+  private tableCardIsDragging = false;
+  private selectedPlayerCard: Card | null = null;
+  private cardCombination: number[] | number[][] = [];
 
   constructor(selector: GameSelectorType, socketIO: SocketType, outerEllipse: EllipseType, defaults: Defaults) {
     super(selector, socketIO);
@@ -42,7 +47,6 @@ export default class Game extends BaseGame {
   private static calculatedAnimationPoint(left: number, top: number, rotate = 0) {
     return {
       for: (playerTurn: PlayerPlaceOptions | null) => {
-        console.log('playerTurn', playerTurn);
         const ANIMATION_COEFFICIENT = 100;
         switch (playerTurn) {
           case PlayerPlaceOptions.down:
@@ -98,70 +102,100 @@ export default class Game extends BaseGame {
 
   private 'process:game-start'() {
     this.gameIsStarted = true;
-    console.log('game:started');
   }
 
-  private 'process:player-cards'(cards: TableCardType[]): void {
-    console.log('player-cards', cards);
-    if (!cards?.length && !this.gameIsStarted) {
-      return;
-    }
+  private 'process:player-cards'(playerCards: TableCardType[]): void {
+    if (!playerCards?.length && !this.gameIsStarted) return;
+    this.clearSelectedPlayerCardSelection();
 
     this.selector.actions.innerHTML = '';
 
     const fragment = new DocumentFragment();
     const createCardFragment = (card: TableCardType) => {
-      const div = document.createElement('div');
+      const size = window.innerWidth > 4 * 90 ? 90 : window.innerWidth / 4;
+      const cardContainer = document.createElement('div');
+      cardContainer.style.width = `${size}px`;
       const cardObject = new Card(card.rank, card.suit);
       cardObject.htmlElement.removeAttribute('style');
-      cardObject.appendDOM(div, 'actions');
-      const actions = document.createElement('div');
-      actions.className = 'x-card-actions';
-      const placeBtn = document.createElement('button');
-      placeBtn.className = 'btn btn-sm btn-dark';
-      placeBtn.innerText = 'Place';
-      const takeBtn = document.createElement('button');
-      takeBtn.className = 'btn btn-sm btn-dark';
-      takeBtn.innerText = 'Take';
-      actions.appendChild(placeBtn);
-      actions.appendChild(takeBtn);
-      div.appendChild(actions);
+      cardObject.appendDOM(cardContainer, 'actions');
 
       return {
         cardObject,
-        cardContainer: div,
-        takeBtn,
-        placeBtn,
+        cardContainer,
       };
     };
-    console.log('process:player-cards', cards);
-    cards.forEach((card) => {
-      const { cardContainer, cardObject, takeBtn, placeBtn } = createCardFragment(card);
-      cardObject.htmlElement.setAttribute('height', '128');
-      takeBtn.onclick = () => {
-        const serializeTableCards = [];
-        for (const sci in this.selectedTableCards) {
-          const sciCard = this.selectedTableCards[sci];
-          if (sciCard) {
-            serializeTableCards.push({
-              rank: sciCard.rank,
-              suit: sciCard.suit,
+
+    playerCards.forEach((playerCard) => {
+      const { cardContainer, cardObject } = createCardFragment(playerCard);
+      cardContainer.onclick = (event) => {
+        event.preventDefault();
+        this.clearSelectedPlayerCardSelection();
+        this.selectedPlayerCard = cardObject;
+        cardObject.htmlElement.classList.add('x-card-selected');
+
+        this.cardCombination = new CardCombination(this.selectedPlayerCard, this.tableCards).calculate();
+
+        if (this.cardCombination.length === 0) {
+          // Just place a card on the table since there is on combination
+          this.socketIO.emit('player:move', {
+            playerCard: {
+              rank: this.selectedPlayerCard.rank,
+              suit: this.selectedPlayerCard.suit,
+            },
+            tableCards: [],
+          });
+        } else if (this.cardCombination.length === 1) {
+          // When only one option just do it immediately
+          const combination = this.cardCombination[0] as number[];
+          if (combination.length) {
+            const serializeTableCards: { rank: Rank; suit: Suit }[] = [];
+            combination.forEach((cardIndex$) => {
+              const cardFromTable = this.tableCards[cardIndex$];
+              serializeTableCards.push({
+                rank: cardFromTable.rank,
+                suit: cardFromTable.suit,
+              });
+            });
+            this.socketIO.emit('player:move', {
+              playerCard: {
+                rank: this.selectedPlayerCard.rank,
+                suit: this.selectedPlayerCard.suit,
+              },
+              tableCards: serializeTableCards,
             });
           }
+        } else {
+          if (this.selectedTableCards.length) {
+            console.log('Table cards are selected');
+            this.cardCombination = new CardCombination(this.selectedPlayerCard, this.selectedTableCards).calculate();
+            if (this.cardCombination.length === 1) {
+              console.log(this.selectedPlayerCard, this.selectedTableCards, this.cardCombination);
+              // When only one option it means that player selected correct card combination
+              const serializeTableCards: { rank: Rank; suit: Suit }[] = [];
+              (this.cardCombination[0] as number[]).forEach((cardIndex$) => {
+                const cardFromTable = this.selectedTableCards[cardIndex$];
+                serializeTableCards.push({
+                  rank: cardFromTable.rank,
+                  suit: cardFromTable.suit,
+                });
+              });
+              console.log('sending serialized', {
+                serializeTableCards,
+                playerCard: clone({
+                  rank: this.selectedPlayerCard.rank,
+                  suit: this.selectedPlayerCard.suit,
+                }),
+              });
+              this.socketIO.emit('player:move', {
+                playerCard: {
+                  rank: this.selectedPlayerCard.rank,
+                  suit: this.selectedPlayerCard.suit,
+                },
+                tableCards: serializeTableCards,
+              });
+            }
+          }
         }
-        console.log('take card', card);
-
-        this.socketIO.emit('player:move', {
-          playerCard: card,
-          tableCards: serializeTableCards,
-        });
-      };
-      placeBtn.onclick = () => {
-        console.log('placeBtn', card);
-        this.socketIO.emit('player:move', {
-          playerCard: card,
-          tableCards: [],
-        });
       };
       fragment.appendChild(cardContainer);
     });
@@ -170,12 +204,12 @@ export default class Game extends BaseGame {
   }
 
   private 'process:player-turn'(position: PlayerPlaceOptions): void {
+    this.clearSelectedPlayerCardSelection();
     this.playerTurn = position;
   }
 
   private 'process: individual players in the game room'(data: GameData): void {
     this.clearSelectedTableCardSelection();
-    console.log(`data:`, data);
     if (this.processGameDataCallback) {
       this.processGameDataCallback(data);
     }
@@ -184,36 +218,50 @@ export default class Game extends BaseGame {
   private 'process:take-card-from-table'(dto: PlayerScoresCardDto): void {
     const cardWidth = 60;
     const cardHeight = 90;
-    const playerCard = new Card(dto.playerCard.name, dto.playerCard.suit);
+    console.log('take-card-from-table', dto);
     const centerPosition = {
       x: this.table.width / 2 - cardWidth / 2,
       y: this.table.height / 2 - cardHeight / 2,
     };
-    playerCard.setPosition(centerPosition.x, centerPosition.y);
-    playerCard.htmlElement.classList.add('x-card-selected');
-    playerCard.zIndex = this.zIndex + 1;
-    playerCard.appendDOM(this.selector.table, 'table');
     const [translatedX, translatedY] = Game.calculatedAnimationPoint(
       centerPosition.x,
       centerPosition.y,
       random(-30, 30),
     ).for(dto.position);
 
-    setTimeout(() => {
-      playerCard.animate({ translatedX, translatedY }, () => {
-        playerCard.remove();
-      });
-    }, 1500);
+    if (dto.playerCard) {
+      const playerCard = new Card(dto.playerCard.name, dto.playerCard.suit);
+      playerCard.setPosition(centerPosition.x, centerPosition.y);
+      playerCard.htmlElement.classList.add('x-card-selected');
+      playerCard.setZIndex(this.incrementZIndex());
+      playerCard.appendDOM(this.selector.table, 'table');
+      playerCard.animate(
+        {
+          translatedX,
+          translatedY,
+        },
+        () => setTimeout(() => playerCard.remove(), 500),
+        2500,
+      );
+    }
 
     dto.tableCards.forEach((dtoTableCard) => {
-      const cardId = Card.generateCardId(dtoTableCard.name, dtoTableCard.suit);
-      const tableCard = this.tableCards[cardId];
-      if (tableCard) {
+      const card = new Card(dtoTableCard.name, dtoTableCard.suit);
+      const tableCardIndex = this.tableCards.findIndex(($tableCard) => $tableCard.id === card.id);
+      if (tableCardIndex !== -1) {
+        // card is on the table
+        const tableCard = this.tableCards[tableCardIndex];
+        this.tableCards.splice(tableCardIndex, 1);
         tableCard.htmlElement.classList.add('x-card-selected');
-        tableCard.zIndex = this.zIndex + 1;
-        setTimeout(() => {
-          tableCard.remove();
-        }, 1500);
+        tableCard.setZIndex(this.incrementZIndex());
+        tableCard.animate(
+          {
+            translatedX,
+            translatedY,
+          },
+          () => setTimeout(() => tableCard.remove(), 500),
+          2500,
+        );
       }
     });
   }
@@ -247,37 +295,85 @@ export default class Game extends BaseGame {
   }
 
   private 'process: add a single card on the table'(card: Card) {
-    if (!this.tableCards.hasOwnProperty(card.id)) {
-      this.calculateTableDims();
-      const { left, top } = this.calculateCardPlacePosition(this.playerTurn);
-      this.tableCards[card.id] = card;
-      const angle = random(-30, 30);
-      const calculatedAnimatedPoint = Game.calculatedAnimationPoint(left, top, angle);
-      const [$left, $top, $rotate] = calculatedAnimatedPoint.for(this.playerTurn);
-      card.setPosition($left, $top);
-      card.setRotation($rotate);
-      card.appendDOM(this.selector.table);
-      card.attachEvent('click', (event) => {
-        event.preventDefault();
-        if (!this.selectedTableCards.hasOwnProperty(card.id)) {
-          this.selectedTableCards[card.id] = card;
-        } else {
-          delete this.selectedTableCards[card.id];
+    this.clearSelectedPlayerCardSelection();
+    this.tableCardIsDragging = false;
+    const cardIsOnTable = this.tableCards.find((tableCard) => tableCard.id === card.id);
+    if (cardIsOnTable) return;
+
+    // Card is not on the table so add it
+    this.calculateTableDims();
+    const { left, top } = this.calculateCardPlacePosition(this.playerTurn);
+    this.tableCards.push(card);
+    const angle = random(-30, 30);
+    const calculatedAnimatedPoint = Game.calculatedAnimationPoint(left, top, angle);
+    const [$left, $top, $rotate] = calculatedAnimatedPoint.for(this.playerTurn);
+    card.setPosition($left, $top);
+    card.setRotation($rotate);
+    card.appendDOM(this.selector.table);
+    card.attachEvent('mousedown', (event) => {
+      event.preventDefault();
+      card.setZIndex(this.incrementZIndex());
+    });
+    // Card player action click event
+    card.attachEvent('mouseup', (event) => {
+      event.preventDefault();
+      if (this.tableCardIsDragging) {
+        this.tableCardIsDragging = false;
+        return;
+      }
+      const cardIndex = this.selectedTableCards.findIndex((selectedCard) => selectedCard.id === card.id);
+      // toggle selection
+      if (cardIndex === -1) {
+        // card is not selected so select it
+        this.selectedTableCards.push(card);
+        if (this.selectedPlayerCard) {
+          // when player card is selected check if there is a combination to score
+          const cardCombinations = new CardCombination(this.selectedPlayerCard, this.selectedTableCards).calculate();
+          if (cardCombinations.length === 1) {
+            // When only one option it means that player selected correct card combination
+            const serializeTableCards: { rank: Rank; suit: Suit }[] = [];
+            (cardCombinations[0] as number[]).forEach((cardIndex$) => {
+              const cardFromTable = this.selectedTableCards[cardIndex$];
+              serializeTableCards.push({
+                rank: cardFromTable.rank,
+                suit: cardFromTable.suit,
+              });
+            });
+            this.socketIO.emit('player:move', {
+              playerCard: {
+                rank: this.selectedPlayerCard.rank,
+                suit: this.selectedPlayerCard.suit,
+              },
+              tableCards: serializeTableCards,
+            });
+          }
         }
-        card.zIndex = ++this.zIndex;
-        card.htmlElement.classList.toggle('x-card-selected');
-      });
-      const draggable = new Draggable(card.htmlElement, {
-        limit: {
-          x: [this.table.left, this.table.left + this.table.width - card.width],
-          y: [
-            this.table.top - this.xActionsHeight,
-            this.table.top + this.table.height - card.height - this.xActionsHeight,
-          ],
-        },
-      });
-      card.animate({ translatedX: left, translatedY: top, angle });
-    }
+      } else {
+        // card is selected so deselect it
+        this.selectedTableCards.splice(cardIndex, 1);
+      }
+      card.setZIndex(this.incrementZIndex());
+      card.htmlElement.classList.toggle('x-card-selected');
+    });
+
+    new Draggable(card.htmlElement, {
+      limit: {
+        x: [this.table.left, this.table.left + this.table.width - card.width],
+        y: [
+          this.table.top - this.xActionsHeight,
+          this.table.top + this.table.height - card.height - this.xActionsHeight,
+        ],
+      },
+      onDragStart: () => {
+        card.setZIndex(this.incrementZIndex());
+        this.tableCardIsDragging = true;
+        card.htmlElement.classList.add('x-card-dragging');
+      },
+      onDragEnd: () => {
+        card.htmlElement.classList.remove('x-card-dragging');
+      },
+    });
+    card.animate({ translatedX: left, translatedY: top, angle });
   }
 
   private 'process: add single/multiple card(s) on the table'(dto: AddCardType): void {
@@ -285,9 +381,9 @@ export default class Game extends BaseGame {
       dto.cards = [dto.cards];
     }
     this.playerTurn = dto.position;
-    dto.cards.forEach(({ name, suit }) => {
-      const card = new Card(name, suit);
-      this['process: add a single card on the table'](card);
+    dto.cards.forEach((card) => {
+      console.assert(card.name && card.suit, 'Card name and suit are required');
+      this['process: add a single card on the table'](new Card(card.name, card.suit));
     });
   }
 
@@ -342,9 +438,20 @@ export default class Game extends BaseGame {
   }
 
   private clearSelectedTableCardSelection(): void {
-    Object.values(this.selectedTableCards).forEach((card) => {
+    this.selectedTableCards.forEach((card) => {
       card.htmlElement.classList.remove('x-card-selected');
     });
-    this.selectedTableCards = {};
+    this.selectedTableCards = [];
+  }
+
+  private clearSelectedPlayerCardSelection(): void {
+    this.selector.actions.querySelectorAll('div>img.x-card').forEach((cardContainer) => {
+      cardContainer.classList.remove('x-card-selected');
+    });
+    this.selectedPlayerCard = null;
+  }
+
+  private incrementZIndex(): number {
+    return ++this.zIndex;
   }
 }
