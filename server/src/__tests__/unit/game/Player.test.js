@@ -1,7 +1,7 @@
 import Player from '../../../game/Player';
 import { CardRank, CardRankName, CardSuit } from 'shared-types';
 import Card from '../../../game/Card';
-import { id } from '../../../helpers/ids';
+import { id } from '../../../helpers';
 import { gameStore, playerStore, userStore } from '../../../store';
 import Game from '../../../game/Game';
 import GameModel from '../../../model/GameModel';
@@ -34,15 +34,33 @@ describe('Player', function () {
     const playerId = id.player();
     const playerName = 'Jenny';
     const player = new Player(playerId, playerName);
+    const gamePayload = {
+      size: 2,
+      isPublic: true,
+      roomId: id.game(),
+      userId: id.player(),
+      name: 'Jenny',
+    };
+    const game = new Game(
+      gamePayload.size,
+      gamePayload.roomId,
+      gamePayload.isPublic,
+      gamePayload.userId,
+      gamePayload.name,
+      new SocketManager(SocketIO),
+    );
     // No game created
-    player.gameId = id.game();
+    player.gameId = gamePayload.roomId;
     expect(player.game).toBeUndefined();
+
+    // Save game in store
+    gameStore.setById(gamePayload.roomId, game);
     expect(player.data).toEqual({
       cards: 0,
       name: playerName,
-      progress: 0,
-      score: 0,
       taken: true,
+      time: game.playerTime,
+      isActive: false,
     });
     expect(player.id).toBe(playerId);
   });
@@ -186,8 +204,7 @@ describe('Player', function () {
     player.takeCardsInHand(cards);
     player.placeCardFromHand(new Card(CardSuit.CLUBS, CardRankName.FIVE, CardRank.FIVE));
     expect(playerActionMock).toHaveBeenCalled();
-    player.placeRandomCardFromHand();
-    expect(playerActionMock).toHaveBeenCalledTimes(2);
+    player.getRandomCardFromHand();
     expect(() => {
       // Trying to place wrong card
       player.placeCardFromHand(new Card(CardSuit.SPADES, CardRankName.NINE, CardRank.NINE));

@@ -15,7 +15,6 @@ export class SocketManager {
 
   private static extractSocketId(player: Player): SocketId {
     if (!player || !player.socketId) {
-      console.log('Player or socketId is null');
       return;
     }
     return player.socketId;
@@ -27,7 +26,6 @@ export class SocketManager {
     }
 
     this.targetSocketIds.forEach((socketId: SocketId) => {
-      console.log(`emitting ${event} to ${socketId}`);
       this.io.to(socketId).emit(event, ...args);
     });
   }

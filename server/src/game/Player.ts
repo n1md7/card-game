@@ -41,17 +41,12 @@ export default class Player {
   }
 
   get data(): PlayerDataType {
-    const progressValue =
-      this.game && this.game.activePlayer && this.game.activePlayer.equals(this)
-        ? (100 * this.game.playerTime) / PLAYER_MOVER_INTERVAL
-        : 0;
-
     return {
       taken: true,
       name: this.name,
-      time: this.game.playerTime,
+      time: this.game?.playerTime,
       cards: this.playerCardsInHand.length,
-      isActive: this.game && this.game.activePlayer && this.game.activePlayer.equals(this),
+      isActive: this.game?.activePlayer?.equals(this) || false,
     };
   }
 

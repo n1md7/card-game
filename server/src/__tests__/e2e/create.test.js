@@ -112,6 +112,7 @@ describe('Create user/verify', () => {
         name: payload.name,
       },
       isPublic: payload.isPublic,
+      createdAt: expect.any(String),
     });
     expect(games).toEqual(
       expect.arrayContaining([

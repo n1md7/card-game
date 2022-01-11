@@ -84,8 +84,8 @@ export default class Game {
     name: string,
     socketManager: SocketManager,
     shuffleCards = true,
-    maxScores = 6,
-    maxRounds = 3, // TODO Make this configurable
+    maxScores = 11,
+    maxRounds = 6, // TODO Make this configurable
   ) {
     this.numberOfPlayers = numberOfPlayers;
     this.deckOfCards = shuffleCards ? new Deck().shuffle() : new Deck();

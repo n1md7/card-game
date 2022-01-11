@@ -59,7 +59,7 @@ export default class Server {
           }
           throw new Error(
             `Request referer=>origin=[${ctx.request.headers.referer}]=>[${ctx.headers.origin}] rejected by CORs.` +
-              ` Requests are allowed only from: ${this.config.origins.join(', ')}`,
+              ` Requests are allowed only from: ${JSON.stringify(this.config.origins, null, 2)}`,
           );
         },
         allowMethods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE', 'PATCH', 'HEAD'],
