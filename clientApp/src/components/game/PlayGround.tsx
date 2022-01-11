@@ -66,6 +66,17 @@ export default () => {
     setShowGameResults(true);
   };
 
+  useEffect(() => {
+    if (idle === 0) return;
+    const id = setInterval(() => {
+      setIdle(idle - 1);
+    }, 1000);
+
+    return () => {
+      clearInterval(id);
+    };
+  }, [idle]);
+
   useLayoutEffect(() => {
     if (!defaults) return;
     const nav = document.querySelector('div.x-actions');
@@ -132,7 +143,7 @@ export default () => {
 
   return (
     <div className={'x-2d-area no-select'} style={{ width: windowWidth }}>
-      {!!idle && (
+      {idle > 0 && (
         <IdleView idleTime={idle}>
           <Results style={{ margin: 'auto' }} gameResults={gameResults} roundResults={roundResults} />
         </IdleView>

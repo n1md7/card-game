@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import React from 'react';
+import { Button, Modal } from 'react-bootstrap';
 
 type Props = {
   idleTime: number;
@@ -7,41 +7,24 @@ type Props = {
 };
 
 export default function IdleView(props: Props) {
-  const [idle, setIdle] = useState(props.idleTime);
-  const [show, setShow] = useState(true);
-
-  const handleClose = () => {
-    setShow(false);
-  };
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setIdle(idle - 1);
-    }, 1000);
-
-    return () => {
-      clearInterval(id);
-    };
-  }, [idle]);
-
   return (
-    <Modal show={show} animation={false} size="lg" centered backdrop={false} scrollable className={'text-center'}>
+    <Modal show={true} animation={false} size="lg" centered backdrop={false} scrollable className={'text-center'}>
       <Modal.Header>
         <Modal.Title>Round has been finished</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {props.children}
         <p className={'mt-5'}>
-          {idle > 0 && (
+          {props.idleTime > 0 && (
             <p>
-              Next round starts <strong>{idle} seconds</strong>
+              Next round starts <strong>{props.idleTime} seconds</strong>
             </p>
           )}
         </p>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="primary" onClick={handleClose} disabled={idle >= 0}>
-          {idle <= 0 ? 'Continue' : `Continue [${idle}]`}
+        <Button variant="primary" disabled={props.idleTime >= 0}>
+          {props.idleTime <= 0 ? 'Continue' : `Continue [${props.idleTime}]`}
         </Button>
       </Modal.Footer>
     </Modal>
