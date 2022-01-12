@@ -70,6 +70,7 @@ describe('Create user/verify', () => {
         isPublic: true,
         name: 'RedBull',
         size: 2,
+        points: 5,
       },
       {
         headers: { [Token.auth]: data[Token.auth] },
@@ -84,6 +85,7 @@ describe('Create user/verify', () => {
       isPublic: true,
       name: 'Nacho',
       size: 3,
+      points: 1,
     };
     const { status: initStatus, data } = await ref.request.get('/auth/init');
     const { status: createStatus, data: createRoomId = null } = await ref.request.post('/game/create', payload, {
