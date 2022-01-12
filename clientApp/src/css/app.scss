@@ -1,8 +1,10 @@
 $body-bg: rgb(16, 15, 15);
 $body-color: white;
 
-$offcanvas-bg-color: rgb(16, 15, 15);
+$offcanvas-bg-color: $body-bg;
 $offcanvas-color: white;
+$modal-content-color: white;
+$modal-content-bg: $body-bg;
 
 @import '~bootstrap';
 
