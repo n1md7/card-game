@@ -32,7 +32,7 @@ export default function Row(props) {
   };
 
   return (
-    <tr>
+    <tr style={{ 'vertical-align': 'middle' }}>
       <td>{props.id}</td>
       <td>{props.creator.name}</td>
       <td>{props.createdAt}</td>

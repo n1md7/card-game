@@ -20,9 +20,19 @@ class GameController extends BaseController implements GameInterface {
 
     const roomId = Id.game();
     const userId = ctx.state.user?.id;
-    const { isPublic, size, name } = validation.value;
+    const { isPublic, size, name, points } = validation.value;
     const player = new Player(userId, name);
-    const game = new Game(size, roomId, isPublic, userId, name, ctx.socketManager);
+    const game = new Game(
+      size,
+      roomId,
+      isPublic,
+      userId,
+      name,
+      ctx.socketManager,
+      true,
+      points,
+      Number.MAX_SAFE_INTEGER,
+    );
     game.joinPlayer(player);
     GameModel.create(userId, player, game);
     PlayerModel.addPlayer(player, userId);

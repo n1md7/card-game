@@ -1,8 +1,10 @@
-//$body-bg: rgba(0, 0, 0, 0.88);
-//$body-color: #ececec;
+$body-bg: rgb(16, 15, 15);
+$body-color: white;
+
+$offcanvas-bg-color: rgb(16, 15, 15);
+$offcanvas-color: white;
 
 @import '~bootstrap';
-
 
 h1 {
   a {
