@@ -33,7 +33,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Run tests
         run: npm run server:tests
       - name: Upload coverage to Codecov
@@ -46,7 +46,7 @@ jobs:
           directory: ./reports/server
           name: codecov-umbrella
           files: clover.xml,cobertura-coverage.xml,lcov.info,junit.xml
-   
+
 
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
