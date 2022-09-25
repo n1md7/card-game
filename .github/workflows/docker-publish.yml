@@ -33,7 +33,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
-        run: npm run install:all
+        run: npm ci && npm run install:all
       - name: Run tests
         run: npm run server:tests
       - name: Upload coverage to Codecov
