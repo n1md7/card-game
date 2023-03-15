@@ -24,7 +24,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 14.16.0 ]
+        node-version: [ 18.9.1 ]
 
     steps:
       - uses: actions/checkout@v2
@@ -33,7 +33,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
-        run: npm install
+        run: npm ci && npm run install:all
       - name: Run tests
         run: npm run server:tests
       - name: Upload coverage to Codecov
@@ -46,7 +46,7 @@ jobs:
           directory: ./reports/server
           name: codecov-umbrella
           files: clover.xml,cobertura-coverage.xml,lcov.info,junit.xml
-   
+
 
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
@@ -87,3 +87,17 @@ jobs:
 
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+  
+  badge_job:
+    runs-on: ubuntu-latest
+    steps:
+      - id: date
+        run: echo "##[set-output name=data;]$(date)"
+      - name: Time badge
+        uses: RubbaBoy/BYOB@v1.2.1
+        with:
+          NAME: time
+          LABEL: 'Updated at'
+          STATUS: ${{ steps.date.outputs.data }}
+          COLOR: 00EEFF
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

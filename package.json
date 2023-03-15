@@ -7,17 +7,17 @@
     "server:start:prod": "npm run prod --prefix server",
     "server:start:dev": "npm run dev --prefix server",
     "server:start:test": "npm run test --prefix server",
-    "server:install": "npm install --prefix server",
+    "server:install": "npm ci --prefix server",
     "server:tests": "npm run test --prefix server -- --coverage --ci",
     "client:build:prod": "npm run build --prefix clientApp",
     "client:start:dev": "npm run start --prefix clientApp",
     "client:start:test": "npm run test --prefix clientApp",
-    "client:install": "npm install --prefix clientApp",
-    "shared:install": "npm install --prefix shared-types",
+    "client:install": "npm ci --prefix clientApp",
+    "shared:install": "npm ci --prefix shared-types",
     "shared:build": "npm run build --prefix shared-types",
     "shared:watch": "npm run watch --prefix shared-types",
     "dev": "npm-run-all --parallel client:start:dev server:start:dev shared:watch",
-    "install": "npm-run-all --parallel server:install client:install shared:install",
+    "install:all": "npm-run-all --parallel server:install client:install shared:install",
     "format:code": "npx prettier --write .",
     "prepare": "husky install"
   },
@@ -36,8 +36,8 @@
     "npm-run-all": "^4.1.5"
   },
   "engines": {
-    "node": "14.16.0",
-    "npm": "7.14.0"
+    "node": "18.9.1",
+    "npm": "8.19.1"
   },
   "engineStrict": true,
   "devDependencies": {

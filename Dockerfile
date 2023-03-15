@@ -1,13 +1,12 @@
-FROM node:14.16.0-alpine
+FROM node:18.9.0-alpine3.15
 
 WORKDIR card-game
 RUN apk update
 
 COPY . .
 
-RUN npm install
-RUN npm install --prefix clientApp
-RUN npm install --prefix server
+RUN npm ci
+RUN npm run install:all
 
 RUN npm run build --prefix clientApp
 RUN npm run prod:build --prefix server
