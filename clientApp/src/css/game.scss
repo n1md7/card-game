@@ -38,9 +38,26 @@ body,
   .x-actions {
     display: flex;
     width: 100%;
-    justify-content: right;
-    padding: 4px 8px;
+    justify-content: space-between;
+    padding: 4px;
     border-bottom: 1px solid;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    .x-middle {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      span {
+        padding-right: 4px;
+      }
+
+      input {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+    }
   }
 
   .x-2d-room {

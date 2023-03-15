@@ -9,11 +9,13 @@ export default function Create() {
   const [gameId, setGameId] = useState(null);
   const [size, setSize] = useState(2);
   const [points, setPoints] = useState(5);
+  const [rounds, setRounds] = useState(5);
   const [isPublic, setIsPublic] = useState(true);
   // Get name value from the redux store
   const { name } = useSelector(({ user }) => user);
   // define event change handlers
   const sizeChangeHandler = ({ target: { value } }) => setSize(+value);
+  const roundChangeHandler = ({ target: { value } }) => setRounds(+value);
   const pointChangeHandler = ({ target: { value } }) => setPoints(+value);
   const isPublicChangeHandler = ({ target: { value } }) => setIsPublic(!!+value);
   const history = useHistory();
@@ -26,6 +28,7 @@ export default function Create() {
         isPublic: this.isPublic,
         name: this.name,
         points: this.points,
+        maxRounds: this.rounds,
       })
       .then((response) => {
         if (response.status === 200) {
@@ -34,7 +37,7 @@ export default function Create() {
         throw new Error(response.data);
       })
       .catch(handleError);
-  }.bind({ size, isPublic, name, points });
+  }.bind({ size, isPublic, name, points, rounds });
 
   // Redirect to Game when ID is available
   useEffect(() => {
@@ -59,6 +62,21 @@ export default function Create() {
           </div>
           <div className="col-12 my-3">{/**/}</div>
           <div className="col-md-4">
+            <label htmlFor="max-rounds">Max rounds</label>
+            <select id="max-rounds" defaultValue={5} onChange={roundChangeHandler} className="form-control">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="7">7</option>
+              <option value="9">9</option>
+              <option value="12">12</option>
+            </select>
+            <small className="form-text text-muted">Maximum rounds to play</small>
+          </div>
+          <div className="col-12 my-3">{/**/}</div>
+          <div className="col-md-4">
             <label htmlFor="room-visibility">Max points</label>
             <select id="room-visibility" onChange={pointChangeHandler} className="form-control">
               <option value="1">1</option>
@@ -69,7 +87,7 @@ export default function Create() {
           </div>
           <div className="col-12 my-3">{/**/}</div>
           <div className="col-md-4">
-            <label htmlFor="room-visibility">Room visibility</label>
+            <label htmlFor="room-visibility">Visibility</label>
             <select id="room-visibility" onChange={isPublicChangeHandler} className="form-control">
               <option value="1">Public</option>
               <option value="0">Private</option>

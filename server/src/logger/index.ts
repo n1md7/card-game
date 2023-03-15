@@ -2,7 +2,8 @@ import { createLogger as initLogger, format, transports } from 'winston';
 import config from '../config';
 import { Format } from 'logform';
 import { ConsoleTransportInstance, FileTransportInstance } from 'winston/lib/winston/transports';
-import { Level, TransportType, Env } from '../types';
+import { Level, TransportType } from '../types';
+import { Env } from '../helpers/env';
 
 class Logger {
   static instance: Logger;
@@ -43,13 +44,10 @@ class Logger {
 
   createLogger() {
     return initLogger({
-      level: config.env === Env.Prod ? Level.Info : Level.Debug,
-      silent: config.env === Env.Test, // do not show any log on tests
+      level: Env.isProd ? Level.Info : Level.Debug,
+      silent: Env.isTest, // do not show any log on tests
       handleExceptions: true,
-      transports:
-        config.env === Env.Prod
-          ? Logger.loggingTransport(TransportType.File)
-          : Logger.loggingTransport(TransportType.Console),
+      transports: Logger.loggingTransport(TransportType.Console),
     });
   }
 }

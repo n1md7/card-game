@@ -15,6 +15,8 @@ import { SocketManager } from '../socket/manager';
 import { GameResult, PlayerPositionType, RoundResult, TransformedPlayerData } from './types';
 import { not } from '../helpers';
 import * as R from 'rambda';
+import { gameStore } from '../store';
+import ms from 'ms';
 
 export default class Game {
   public isStarted: boolean;
@@ -85,7 +87,7 @@ export default class Game {
     socketManager: SocketManager,
     shuffleCards = true,
     maxScores = 11,
-    maxRounds = 6, // TODO Make this configurable
+    maxRounds = 6,
   ) {
     this.numberOfPlayers = numberOfPlayers;
     this.deckOfCards = shuffleCards ? new Deck().shuffle() : new Deck();
@@ -127,6 +129,7 @@ export default class Game {
       },
       isPublic: this.isPublic,
       createdAt: this.createdAt,
+      isStarted: this.isStarted,
     };
   }
 
@@ -424,6 +427,12 @@ export default class Game {
     this.isFinished = true;
     this.calculateGameResult();
     this.io.to(this.gamePlayers).emit('full-game-finished', this.gameResult, this.winner?.id);
+
+    setTimeout(() => this.destroy(), ms('10 minutes'));
+  }
+
+  destroy() {
+    gameStore.removeById(this.id);
   }
 
   ticker(callback: (tick: boolean, delta: number) => void): void {

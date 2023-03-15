@@ -1,7 +1,8 @@
-import { ConfigOptions, Env } from '../types';
+import { ConfigOptions } from '../types';
+import { Env } from '../helpers/env';
 
 const config: ConfigOptions = {
-  env: process.env.NODE_ENV as Env,
+  env: Env.NodeEnv,
   test: {
     port: 3456,
   },

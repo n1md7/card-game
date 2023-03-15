@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import '../../css/game.scss';
 import { httpClient } from '../../services/httpClient';
-import { useHistory } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import defaultsValue from '../../constants/defaults';
 import Ellipse, { Pythagoras } from '../../libs/Formulas';
 import Game from '../../game/Game';
@@ -29,6 +29,7 @@ export default () => {
   const [gameResults, setGameResults] = useState<null | Object[]>(null);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [idle, setIdle] = useState<number>(0);
+  const [url, setUrl] = useState('...');
   const [showGameResults, setShowGameResults] = useState<boolean>(false);
   const [gameData, setGameData] = useState<GameData>({
     playerData: {} as PlayerData,
@@ -40,6 +41,11 @@ export default () => {
     right: 'x-three',
     down: 'x-four',
   };
+  const params = useParams<{ roomId: string }>();
+
+  useEffect(() => {
+    setUrl(`#${params.roomId}`);
+  }, [params.roomId]);
 
   useEffect(() => {
     setCardDiagonal(Pythagoras(cardHeight, cardWidth));
@@ -61,9 +67,8 @@ export default () => {
     });
   };
 
-  const handleGameResultData = (data: null | Object[]) => {
-    setGameResults(data);
-    setShowGameResults(true);
+  const copy = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => Alert(AlertType.INFO, 'URL has been copied'));
   };
 
   useEffect(() => {
@@ -127,19 +132,18 @@ export default () => {
         console.log('Disconnected from game room');
       })
       .on('error', (message: string) => {
-        Alert(AlertType.ERROR, `${message}`, 10);
+        console.log('Error: ', message);
+        // Alert(AlertType.ERROR, `${message}`, 10);
       })
       .on('validation:error', (message: string) => {
-        Alert(AlertType.ERROR, `[Validation] ${message}`, 10);
+        console.log('ValidationError: ', message);
+        // Alert(AlertType.ERROR, `[Validation] ${message}`, 10);
       })
       .on('game:error', (message: string) => {
-        Alert(AlertType.ERROR, `[Game] ${message}`, 10);
+        console.log('GameError: ', message);
+        // Alert(AlertType.ERROR, `[Game] ${message}`, 10);
       });
   }, [defaults]);
-
-  useEffect(() => {
-    console.log('Game data', gameData);
-  }, [gameData]);
 
   return (
     <div className={'x-2d-area no-select'} style={{ width: windowWidth }}>
@@ -163,12 +167,25 @@ export default () => {
       </Offcanvas>
 
       <div className="x-actions">
-        <button onClick={() => setShowResults(true)} className="btn btn-sm btn-secondary me-2 align-self-start">
-          Results
-        </button>
-        <button onClick={exitRoomHandler} className="btn btn-sm btn-danger">
-          Leave
-        </button>
+        <div className="x-left">
+          <button onClick={() => setShowResults(true)} className="btn btn-secondary me-2 align-self-start">
+            Show results
+          </button>
+        </div>
+        <div className="x-middle">
+          <span>Share room ID:</span>
+          <div className="btn-group">
+            <input type="text" className="form-control" value={url} disabled={true} />
+            <button className="btn btn-outline-secondary" onClick={copy}>
+              Copy
+            </button>
+          </div>
+        </div>
+        <div className="x-right">
+          <button onClick={exitRoomHandler} className="btn btn-danger">
+            Leave room
+          </button>
+        </div>
       </div>
       <div className="x-2d-room">
         {Object.keys(gameData.playerData).map((position, key) => {

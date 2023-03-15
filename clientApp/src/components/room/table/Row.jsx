@@ -32,15 +32,20 @@ export default function Row(props) {
   };
 
   return (
-    <tr style={{ 'vertical-align': 'middle' }}>
+    <tr style={{ verticalAlign: 'middle' }} className={props.isStarted ? 'game-started' : ''}>
       <td>{props.id}</td>
       <td>{props.creator.name}</td>
       <td>{props.createdAt}</td>
       <td>
         {props.inRoomSize}/{props.size}
       </td>
+      <td>{props.isStarted ? 'Started' : 'Waiting for players'}</td>
       <td>
-        <button onClick={joinClickHandler(props)} className="btn btn-sm btn-outline-secondary">
+        <button
+          onClick={joinClickHandler(props)}
+          className="btn btn-sm btn-outline-secondary"
+          disabled={props.isStarted}
+        >
           {joinText}
         </button>
       </td>

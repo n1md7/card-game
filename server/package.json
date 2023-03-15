@@ -17,7 +17,7 @@
     "lint:fix": "eslint src --fix",
     "test": "export NODE_ENV=test && jest --forceExit",
     "test:cov": "export NODE_ENV=test && jest --coverage --forceExit",
-    "generate:env-types": "npx gen-env-types .env -o src/env.d.ts -e ."
+    "generate:env-types": "npx gen-env-types .env.development -o src/env.d.ts -e ."
   },
   "repository": {
     "type": "git",

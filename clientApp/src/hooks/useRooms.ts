@@ -11,6 +11,8 @@ type Room = {
   inRoomSize: number;
   isPublic: boolean;
   size: number;
+  createdAt: Date | number;
+  isStarted: boolean;
 };
 
 const useRooms = (): Room[] => {

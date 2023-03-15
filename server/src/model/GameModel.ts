@@ -54,6 +54,8 @@ class GameModel extends BaseModel<Game> {
     }
 
     game.removePlayerFromGameById(userId);
+    // remove game when no players left
+    if (game.players.length < 1) gameStore.removeById(game.id);
     // remove gameId from User
     userStore.setGameId(userId, null);
   }

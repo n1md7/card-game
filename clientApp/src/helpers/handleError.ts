@@ -14,6 +14,7 @@ export default (error: AxiosError): string => {
     // Something happened in setting up the request that triggered an Error
     message = error.message;
   }
+  console.log('ClientError', message);
   Alert(AlertType.ERROR, message, 10);
 
   return message;

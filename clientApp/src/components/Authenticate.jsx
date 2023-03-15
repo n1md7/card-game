@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../store/redux/actions';
 import { httpClient } from '../services/httpClient';
@@ -9,6 +9,8 @@ import useAuth from '../hooks/useAuth';
 import { getRandomInt } from '../libs/Formulas';
 import { useParams } from 'react-router-dom';
 import Nav from './Nav';
+import { marked } from 'marked';
+import Rules from './Rules';
 
 export default ({ history }) => {
   const [isAuth, isLoading] = useAuth();
@@ -45,7 +47,7 @@ export default ({ history }) => {
   }, []);
 
   // When authenticated redirect to Lobby
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isAuth) {
       // When redirected from game room and auth
       // Redirect back to game room
@@ -78,7 +80,7 @@ export default ({ history }) => {
               />
               <small className="form-text text-muted">This name will be used during the game</small>
             </div>
-            <div className="row">
+            <div className="row mt-3">
               <div className="col-12">
                 <button type="submit" className="w-100 btn btn-outline-primary">
                   START
@@ -88,6 +90,12 @@ export default ({ history }) => {
           </form>
         </div>
       </div>
+      <div
+        className="row justify-content-center m-5 text-center"
+        dangerouslySetInnerHTML={{
+          __html: marked(Rules, {}),
+        }}
+      ></div>
     </Nav>
   );
 };

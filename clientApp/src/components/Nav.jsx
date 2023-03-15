@@ -5,7 +5,7 @@ const Nav = ({ children }) => (
   <div className="container my-5">
     <div className="jumbotron">
       <h1 className="text-muted text-center">
-        <Link to={'/'}>Card game</Link>
+        <Link to={'/'}>Phurt.io</Link>
       </h1>
       {children}
     </div>

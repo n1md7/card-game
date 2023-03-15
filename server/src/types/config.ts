@@ -1,4 +1,4 @@
-import { Env } from './index';
+import { Env } from '../helpers/env';
 
 export type ConfigOptions = {
   env: Env;

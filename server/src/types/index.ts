@@ -21,10 +21,11 @@ export interface JWTProps {
   exp: number;
 }
 
-export enum Env {
-  Dev = 'development',
-  Test = 'test',
-  Prod = 'production',
+export enum NodeEnv {
+  DEVELOPMENT = 'development',
+  PRODUCTION = 'production',
+  TEST = 'test',
+  DEBUG = 'debug',
 }
 
 export enum KoaEvent {

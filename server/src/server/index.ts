@@ -5,7 +5,7 @@ import cors from '@koa/cors';
 import logWrite from '../logger';
 import routes from '../routes';
 import handleErrors from '../middleware/ErrorHandler';
-import { ConfigOptions, Env, KoaEvent } from '../types';
+import { ConfigOptions, KoaEvent } from '../types';
 import path from 'path';
 import http, { Server as HttpServer } from 'http';
 import SocketIO, { Server as SocketIoServer } from 'socket.io';
@@ -17,6 +17,7 @@ import Events from '../socket/events';
 import { Token } from 'shared-types';
 import chalk from 'chalk';
 import { ip } from '../helpers';
+import { Env } from '../helpers/env';
 
 export default class Server {
   public koa: Koa;
@@ -93,10 +94,10 @@ export default class Server {
 
     return new Promise((resolve) => {
       this.httpServer.listen(port, hostname, function () {
-        if (process.env.NODE_ENV !== Env.Test) {
+        if (!Env.isTest) {
           const localhost = chalk.blue(`http://127.0.0.1:${port}${apiContextPath}/v1/storage`);
           logWrite.debug(`Example API endpoint: ${localhost}`);
-          if (process.env.NODE_ENV === Env.Dev) {
+          if (Env.isDev) {
             const localEndpoint = chalk.blue(`http://${ip.address}:${port}`);
             logWrite.debug(`Your local endpoint: ${localEndpoint}`);
           }

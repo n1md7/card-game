@@ -19,3 +19,15 @@ h1 {
     }
   }
 }
+
+.modal-dialog-scrollable .modal-content {
+  border: 1px solid white !important;
+}
+
+tr.game-started td {
+  text-decoration: line-through;
+}
+
+input.form-control:disabled {
+  background-color: #151212 !important;
+}

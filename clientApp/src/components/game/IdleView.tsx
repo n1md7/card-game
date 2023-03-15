@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 
 type Props = {
   idleTime: number;
@@ -17,16 +17,11 @@ export default function IdleView(props: Props) {
         <p className={'mt-5'}>
           {props.idleTime > 0 && (
             <p>
-              Next round starts <strong>{props.idleTime} seconds</strong>
+              Next round starts in <strong>{props.idleTime} seconds</strong>
             </p>
           )}
         </p>
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="primary" disabled={props.idleTime >= 0}>
-          {props.idleTime <= 0 ? 'Continue' : `Continue [${props.idleTime}]`}
-        </Button>
-      </Modal.Footer>
     </Modal>
   );
 }
