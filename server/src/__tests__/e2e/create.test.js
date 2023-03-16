@@ -71,6 +71,7 @@ describe('Create user/verify', () => {
         name: 'RedBull',
         size: 2,
         points: 5,
+        maxRounds: 4,
       },
       {
         headers: { [Token.auth]: data[Token.auth] },
@@ -85,6 +86,7 @@ describe('Create user/verify', () => {
       isPublic: true,
       name: 'Nacho',
       size: 3,
+      maxRound: 1,
       points: 1,
     };
     const { status: initStatus, data } = await ref.request.get('/auth/init');
