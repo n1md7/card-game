@@ -86,7 +86,7 @@ describe('Create user/verify', () => {
       isPublic: true,
       name: 'Nacho',
       size: 3,
-      maxRound: 1,
+      maxRounds: 1,
       points: 1,
     };
     const { status: initStatus, data } = await ref.request.get('/auth/init');
@@ -115,6 +115,7 @@ describe('Create user/verify', () => {
       creator: {
         name: payload.name,
       },
+      isStarted: false,
       isPublic: payload.isPublic,
       createdAt: expect.any(String),
     });
