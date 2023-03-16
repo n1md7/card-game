@@ -15,6 +15,7 @@ import { Offcanvas } from 'react-bootstrap';
 import IdleView from './IdleView';
 import Results from './Results';
 import ResultsView from './ResultsView';
+import WaitView from './WaitView';
 
 export default () => {
   const history = useHistory();
@@ -29,6 +30,7 @@ export default () => {
   const [gameResults, setGameResults] = useState<null | Object[]>(null);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [idle, setIdle] = useState<number>(0);
+  const [wait, setWait] = useState<boolean>(true);
   const [url, setUrl] = useState('...');
   const [showGameResults, setShowGameResults] = useState<boolean>(false);
   const [gameData, setGameData] = useState<GameData>({
@@ -120,14 +122,12 @@ export default () => {
         console.log('Connected to game room');
         console.log('Status: pending...');
       })
-      .on('idle-game-before-next-round', (idleTimeInMillis: number) => {
-        setIdle(idleTimeInMillis);
-        console.log('Status: idle-game-before-next-round', idleTimeInMillis);
-      })
+      .on('idle-game-before-next-round', (idleTimeInMillis: number) => setIdle(idleTimeInMillis))
       .on('final:game:results', (gameResult: Object[]) => {
         setShowGameResults(true);
         setGameResults(gameResult);
       })
+      .on('game:start', () => setWait(false))
       .on('disconnect', () => {
         console.log('Disconnected from game room');
       })
@@ -147,6 +147,15 @@ export default () => {
 
   return (
     <div className={'x-2d-area no-select'} style={{ width: windowWidth }}>
+      <WaitView setWait={setWait} wait={wait}>
+        <div className="mb-3">Share the room ID to your friend(s) to play with</div>
+        <div className="btn-group">
+          <input type="text" className="form-control" value={url} disabled={true} />
+          <button className="btn btn-outline-secondary" onClick={copy}>
+            Copy
+          </button>
+        </div>
+      </WaitView>
       {idle > 0 && (
         <IdleView idleTime={idle}>
           <Results style={{ margin: 'auto' }} gameResults={gameResults} roundResults={roundResults} />

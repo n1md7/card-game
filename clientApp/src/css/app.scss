@@ -31,3 +31,7 @@ tr.game-started td {
 input.form-control:disabled {
   background-color: #151212 !important;
 }
+
+.btn-close {
+  filter: contrast(0) brightness(10);
+}
