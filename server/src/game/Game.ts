@@ -14,7 +14,7 @@ import {
 import { SocketManager } from '../socket/manager';
 import { GameResult, PlayerPositionType, RoundResult, TransformedPlayerData } from './types';
 import { not } from '../helpers';
-import * as R from 'rambda';
+import * as R from 'ramda';
 import { gameStore } from '../store';
 import ms from 'ms';
 
