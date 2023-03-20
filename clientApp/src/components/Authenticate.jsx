@@ -52,7 +52,7 @@ export default ({ history }) => {
       // When redirected from game room and auth
       // Redirect back to game room
       if (roomId && roomId !== 'null') {
-        return history.push(`/room/${roomId}`);
+        return history.push(`/G/${roomId}`);
       }
       history.push('/lobby');
     }
